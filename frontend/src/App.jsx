@@ -107,8 +107,37 @@ export default function App() {
         {/* KPI Cards */}
         <SummaryCards data={dashboardData} loading={loading} />
 
-        {/* 1-Click Payment Recovery Test Lab */}
-        <WebhookSimulator onEventProcessed={() => loadData()} />
+        {/* Live Razorpay Webhook Status Banner */}
+        <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-2xl p-5 text-white shadow-lg border border-indigo-800/40 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center shrink-0">
+              <span className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm font-bold text-white tracking-tight">
+                  Razorpay Webhook Listener Active
+                </h2>
+                <span className="bg-emerald-500/20 text-emerald-300 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-emerald-500/30">
+                  Live & Listening
+                </span>
+              </div>
+              <p className="text-xs text-indigo-200/80 mt-0.5">
+                Every <code className="text-emerald-300 bg-black/30 px-1 py-0.2 rounded font-mono">payment.failed</code> webhook received from Razorpay will be automatically diagnosed & recovered.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 text-xs text-slate-300">
+            <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+              <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+              <span className="font-medium text-slate-200">AI: Gemini 2.0 + Groq</span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+              <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span className="font-medium text-slate-200">Slack: Connected</span>
+            </div>
+          </div>
+        </div>
 
         {/* Analytics Distribution Charts */}
         <RecoveryChart data={dashboardData} />

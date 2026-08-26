@@ -33,7 +33,7 @@ export default function Header({
 
               <div className="flex items-center flex-wrap gap-2 text-[11px] text-slate-500 font-medium mt-0.5">
                 <span className="flex items-center gap-1 text-slate-700 font-semibold">
-                  <Cpu className="w-3 h-3 text-indigo-600 inline" /> Claude Sonnet 3.5
+                  <Cpu className="w-3 h-3 text-indigo-600 inline" /> Gemini 2.0 & Groq AI
                 </span>
                 <span>•</span>
                 <span className="text-slate-600">Webhook Gateway</span>

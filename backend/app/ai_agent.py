@@ -169,14 +169,20 @@ async def _try_gemini(event: Event) -> Optional[dict]:
         return None
     try:
         prompt = f"{SYSTEM_PROMPT}\n\nPayment event:\n{_build_user_message(event)}"
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt,
-        )
-        result = _parse_llm_response(response.text, event)
-        if result:
-            logger.info("Diagnosis completed via Gemini.")
-        return result
+        # Try active Gemini models
+        for m in ["gemini-2.5-flash", "gemini-1.5-flash"]:
+            try:
+                response = client.models.generate_content(
+                    model=m,
+                    contents=prompt,
+                )
+                result = _parse_llm_response(response.text, event)
+                if result:
+                    logger.info(f"Diagnosis completed via Gemini ({m}).")
+                    return result
+            except Exception:
+                continue
+        return None
     except Exception as e:
         logger.warning(f"Gemini API request failed ({e}), trying next provider.")
         return None
@@ -188,7 +194,7 @@ async def _try_groq(event: Event) -> Optional[dict]:
         return None
     try:
         completion = client.chat.completions.create(
-            model="llama-3.1-70b-versatile",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": _build_user_message(event)},
@@ -199,8 +205,9 @@ async def _try_groq(event: Event) -> Optional[dict]:
         raw = completion.choices[0].message.content
         result = _parse_llm_response(raw, event)
         if result:
-            logger.info("Diagnosis completed via Groq (Llama 3.1 70B).")
-        return result
+            logger.info("Diagnosis completed via Groq (Llama 3.3 70B).")
+            return result
+        return None
     except Exception as e:
         logger.warning(f"Groq API request failed ({e}), trying next provider.")
         return None

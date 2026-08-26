@@ -45,11 +45,17 @@ function getActionBadge(summary) {
 
 function formatRelativeTime(dateStr) {
   try {
-    const date = new Date(dateStr);
+    if (!dateStr) return 'Just now';
+    // Ensure ISO UTC parsing if missing Z
+    let normalized = dateStr;
+    if (typeof normalized === 'string' && !normalized.endsWith('Z') && !normalized.includes('+')) {
+      normalized = normalized + 'Z';
+    }
+    const date = new Date(normalized);
     const now = new Date();
     const diffSec = Math.floor((now - date) / 1000);
 
-    if (diffSec < 5) return 'Just now';
+    if (diffSec < 10 || isNaN(diffSec) || diffSec < 0) return 'Just now';
     if (diffSec < 60) return `${diffSec}s ago`;
     const diffMin = Math.floor(diffSec / 60);
     if (diffMin < 60) return `${diffMin}m ago`;
@@ -61,8 +67,8 @@ function formatRelativeTime(dateStr) {
       hour: '2-digit',
       minute: '2-digit'
     });
-  } catch {
-    return dateStr;
+  } catch (e) {
+    return 'Just now';
   }
 }
 

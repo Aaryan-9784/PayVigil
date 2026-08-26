@@ -1,94 +1,65 @@
 import React from 'react';
-import { Bot, RefreshCw, Zap, Trash2, ShieldCheck, Activity, Cpu, CheckCircle2 } from 'lucide-react';
+import { IndianRupee, RefreshCw, Zap, Trash2 } from 'lucide-react';
 
 export default function Header({
-  isAutoRefresh,
-  setIsAutoRefresh,
   onRefresh,
   onSeedData,
   onResetData,
   isRefreshing
 }) {
   return (
-    <header className="border-b border-slate-200 bg-white/95 backdrop-blur-md sticky top-0 z-40 shadow-xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <header className="border-b border-slate-200 bg-white sticky top-0 z-40 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           
-          {/* Brand Identity & Engine Details */}
-          <div className="flex items-center gap-3.5">
-            {/* Logo Icon */}
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-blue-500 p-0.5 shadow-sm shadow-blue-500/20 flex items-center justify-center shrink-0">
-              <div className="w-full h-full bg-white rounded-[10px] flex items-center justify-center">
-                <Bot className="w-5 h-5 text-blue-600" />
-              </div>
+          {/* Brand & Status */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-sm shadow-blue-500/30 shrink-0">
+              <IndianRupee className="w-5 h-5" strokeWidth={2.8} />
             </div>
-
-            {/* Title & Status Details */}
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-base sm:text-lg font-black text-slate-900 tracking-tight flex items-center gap-1.5">
-                  Razorpay <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600">AI Revenue Recovery</span>
+                <h1 className="text-lg font-bold text-slate-900 tracking-tight">
+                  Razorpay <span className="text-blue-600">AI Revenue Recovery</span>
                 </h1>
-              </div>
-
-              <div className="flex items-center flex-wrap gap-2 text-[11px] text-slate-500 font-medium mt-0.5">
-                <span className="flex items-center gap-1 text-slate-700 font-semibold">
-                  <Cpu className="w-3 h-3 text-indigo-600 inline" /> Gemini 2.0 & Groq AI
-                </span>
-                <span>•</span>
-                <span className="text-slate-600">Webhook Gateway</span>
-                <span>•</span>
-                <span className="text-blue-700 font-semibold flex items-center gap-1 bg-blue-50 px-1.5 py-0.2 rounded border border-blue-100">
-                  <ShieldCheck className="w-3 h-3" /> Stopping Rules Active
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  Live
                 </span>
               </div>
+              <p className="text-xs text-slate-500 font-normal">
+                Autonomous Failed Payment Recovery & Protection
+              </p>
             </div>
           </div>
 
-          {/* Action Toolbar */}
-          <div className="flex items-center flex-wrap gap-2.5 self-start lg:self-center">
-            {/* Live Polling & Refresh Segmented Pill */}
-            <div className="flex items-center gap-1 bg-slate-50 p-0.5 rounded-lg border border-slate-200 shadow-xs h-8">
-              <button
-                onClick={() => setIsAutoRefresh(!isAutoRefresh)}
-                title="Toggle automatic 10-second polling"
-                className={`inline-flex items-center gap-1.5 px-2.5 h-7 rounded-md text-[11px] font-bold transition-all ${
-                  isAutoRefresh
-                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-xs'
-                    : 'text-slate-500 hover:text-slate-700'
-                }`}
-              >
-                <span className={`w-2 h-2 rounded-full ${isAutoRefresh ? 'bg-emerald-500 animate-ping' : 'bg-slate-400'}`}></span>
-                <span>{isAutoRefresh ? 'Live Poll (10s)' : 'Polling Paused'}</span>
-              </button>
-
-              <button
-                onClick={onRefresh}
-                disabled={isRefreshing}
-                className="w-7 h-7 flex items-center justify-center text-slate-500 hover:text-slate-900 rounded-md hover:bg-white transition-all disabled:opacity-50"
-                title="Refresh dashboard data"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-blue-600' : ''}`} />
-              </button>
-            </div>
+          {/* Actions */}
+          <div className="flex items-center flex-wrap gap-2">
+            {/* Manual Refresh */}
+            <button
+              onClick={onRefresh}
+              disabled={isRefreshing}
+              title="Refresh now"
+              className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-blue-600' : ''}`} />
+            </button>
 
             {/* Seed Demo Scenarios */}
             <button
               onClick={onSeedData}
-              title="Populate test failure scenarios across all 3 recovery branches"
-              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 shadow-xs transition-all hover:scale-[1.01] active:scale-[0.99]"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-colors"
             >
-              <Zap className="w-3.5 h-3.5 text-blue-600 fill-blue-600/20" />
-              <span>Seed Scenarios</span>
+              <Zap className="w-3.5 h-3.5 fill-white/20" />
+              <span>Load Demo Data</span>
             </button>
 
             {/* Reset Database */}
             <button
               onClick={onResetData}
-              title="Clear all events and reset audit logs"
-              className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-lg text-xs font-bold bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-slate-200 hover:border-rose-200 shadow-xs transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-slate-200 hover:border-rose-200 transition-colors"
             >
-              <Trash2 className="w-3.5 h-3.5 text-slate-400 group-hover:text-rose-600" />
+              <Trash2 className="w-3.5 h-3.5" />
               <span>Reset</span>
             </button>
           </div>
@@ -98,3 +69,4 @@ export default function Header({
     </header>
   );
 }
+

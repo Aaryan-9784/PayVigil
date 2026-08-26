@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-800 antialiased selection:bg-blue-600 selection:text-white;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(224, 239, 254, 0.5) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(238, 242, 255, 0.6) 0px, transparent 50%),
+      radial-gradient(at 50% 100%, rgba(240, 253, 244, 0.4) 0px, transparent 50%);
+    background-attachment: fixed;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* Custom Scrollbar for Light Theme */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Premium Light Theme Cards */
+.theme-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+  border-radius: 1rem;
+}
+
+.theme-card-interactive {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+  border-radius: 1rem;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.theme-card-interactive:hover {
+  border-color: rgba(12, 90, 219, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px -4px rgba(12, 90, 219, 0.1), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+}
+
+/* Subtle glowing light effects */
+.glow-primary-subtle {
+  box-shadow: 0 0 25px rgba(12, 90, 219, 0.12);
+}
+
+.glow-emerald-subtle {
+  box-shadow: 0 0 25px rgba(5, 150, 105, 0.12);
+}

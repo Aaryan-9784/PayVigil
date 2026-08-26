@@ -9,7 +9,7 @@ from sqlalchemy import select, delete
 from app.database import get_db
 from app.config import settings
 from app.models import Event, Action, AuditLog, Diagnosis
-from app.claude_agent import diagnose_and_decide
+from app.ai_agent import diagnose_and_decide
 from app.executor import execute_action
 from app.schemas import DevSimulatePaymentRequest
 

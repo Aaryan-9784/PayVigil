@@ -2,7 +2,8 @@ import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    anthropic_api_key: str = "sk-ant-mock-key-for-dev-testing"
+    gemini_api_key: str = ""
+    groq_api_key: str = ""
     razorpay_key_id: str = "rzp_test_mock_key"
     razorpay_key_secret: str = "rzp_secret_mock"
     razorpay_webhook_secret: str = "rzp_webhook_secret_mock_12345"

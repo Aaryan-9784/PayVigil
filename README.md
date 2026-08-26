@@ -1,13 +1,13 @@
 # AI Revenue Recovery Agent
 
-An autonomous, production-grade payment revenue recovery pipeline built for Razorpay and LLM orchestration (Claude Sonnet).
+An autonomous, production-grade payment revenue recovery pipeline built for Razorpay with multi-provider AI orchestration (Gemini / Groq / built-in heuristic).
 
 ```
 Payment fails (Razorpay sends payment.failed webhook)
         ↓
 FastAPI Webhook Handler (Raw HMAC-SHA256 signature verification & Idempotency)
         ↓
-Claude Agent Diagnoses & Decides (Strict tool_choice={"type": "any"})
+AI Agent Diagnoses & Decides (Gemini → Groq → Built-in Heuristic fallback)
         ↓
 Flow Branches:
    ├── Retry payment (Transient bank timeouts, gateway errors, insufficient funds)
@@ -26,7 +26,7 @@ Live Interactive Fintech Dashboard (₹ Recovered, At-Risk, Recovery Rate %, Liv
 ## Architecture & Tech Stack
 
 - **Backend**: FastAPI, SQLAlchemy (Async), PostgreSQL / SQLite, Pydantic v2, Alembic, SlowAPI
-- **AI Agent**: Claude Sonnet (`anthropic`), strict tool calling
+- **AI Agent**: Google Gemini (`google-generativeai`) / Groq (`groq`) with automatic fallback to built-in heuristic engine
 - **Integrations**: Razorpay SDK, Resend (Email), Slack Webhooks (Escalation)
 - **Frontend**: Vite, React 18, Tailwind CSS, Lucide React, Recharts, Axios
 

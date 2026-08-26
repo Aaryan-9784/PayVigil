@@ -1,6 +1,6 @@
 import pytest
 from app.models import Event
-from app.claude_agent import diagnose_and_decide, TOOLS
+from app.ai_agent import diagnose_and_decide, TOOLS
 
 @pytest.mark.asyncio
 async def test_diagnose_insufficient_funds_returns_retry_payment():

@@ -6,7 +6,7 @@ from app.database import get_db
 from app.security import verify_razorpay_signature
 from app.config import settings
 from app.models import Event
-from app.claude_agent import diagnose_and_decide
+from app.ai_agent import diagnose_and_decide
 from app.executor import execute_action
 
 logger = logging.getLogger("revenue_recovery.webhooks")
@@ -56,7 +56,7 @@ async def razorpay_webhook(
     await db.commit()
     await db.refresh(event)
 
-    # 4. Diagnose + decide (Claude Sonnet agent)
+    # 4. Diagnose + decide (AI agent: Gemini → Groq → heuristic)
     decision = await diagnose_and_decide(event)
 
     # 5. Execute with stopping rules & log

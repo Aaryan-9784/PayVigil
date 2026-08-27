@@ -1,0 +1,280 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 820" width="100%" height="100%" style="background-color: #fdfbf7; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#eab308"/>
+    </linearGradient>
+
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#fefce8"/>
+    </linearGradient>
+
+    <linearGradient id="emeraldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+
+    <linearGradient id="amberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+
+    <linearGradient id="roseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="100%" stop-color="#e11d48"/>
+    </linearGradient>
+
+    <!-- Filters -->
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#ca8a04" flood-opacity="0.08"/>
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000000" flood-opacity="0.04"/>
+    </filter>
+
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#eab308" flood-opacity="0.25"/>
+    </filter>
+
+    <!-- Markers -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#ca8a04"/>
+    </marker>
+    <marker id="arrow-emerald" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#059669"/>
+    </marker>
+    <marker id="arrow-rose" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#e11d48"/>
+    </marker>
+  </defs>
+
+  <!-- Background Grid Pattern -->
+  <g opacity="0.4">
+    <line x1="0" y1="100" x2="1200" y2="100" stroke="#fef08a" stroke-width="1" stroke-dasharray="4,4"/>
+    <line x1="0" y1="260" x2="1200" y2="260" stroke="#fef08a" stroke-width="1" stroke-dasharray="4,4"/>
+    <line x1="0" y1="440" x2="1200" y2="440" stroke="#fef08a" stroke-width="1" stroke-dasharray="4,4"/>
+    <line x1="0" y1="620" x2="1200" y2="620" stroke="#fef08a" stroke-width="1" stroke-dasharray="4,4"/>
+  </g>
+
+  <!-- Title Header Banner -->
+  <g transform="translate(40, 24)">
+    <rect width="1120" height="54" rx="14" fill="#ffffff" stroke="#fde047" stroke-width="1.5" filter="url(#cardShadow)"/>
+    <rect x="8" y="8" width="38" height="38" rx="10" fill="url(#headerGrad)"/>
+    <text x="27" y="34" font-size="22" font-weight="900" fill="#ffffff" text-anchor="middle">₹</text>
+    <text x="58" y="34" font-size="17" font-weight="800" fill="#0f172a">Razorpay AI Revenue Recovery Agent <tspan fill="#b45309" font-weight="600">| Complete End-to-End System Architecture Flow</tspan></text>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- 1. STAGE 1: INGESTION & SECURITY -->
+  <!-- ========================================================================= -->
+  <g transform="translate(40, 96)">
+    <!-- Stage Box -->
+    <rect width="250" height="320" rx="16" fill="url(#cardGrad)" stroke="#facc15" stroke-width="1.5" filter="url(#cardShadow)"/>
+    <rect width="250" height="36" rx="16" fill="#fef9c3"/>
+    <text x="125" y="24" font-size="12" font-weight="800" fill="#854d0e" text-anchor="middle">1. INGESTION &amp; SECURITY</text>
+
+    <!-- Node 1: Razorpay Webhook -->
+    <rect x="18" y="50" width="214" height="60" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2"/>
+    <text x="125" y="73" font-size="12" font-weight="700" fill="#0f172a" text-anchor="middle">Razorpay Gateway</text>
+    <text x="125" y="93" font-size="10.5" font-weight="600" fill="#b45309" text-anchor="middle">⚡ payment.failed Webhook</text>
+
+    <!-- Arrow Down -->
+    <line x1="125" y1="110" x2="125" y2="135" stroke="#ca8a04" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Node 2: HMAC-SHA256 Check -->
+    <rect x="18" y="140" width="214" height="64" rx="10" fill="#ffffff" stroke="#fde047" stroke-width="1.2"/>
+    <text x="125" y="162" font-size="11.5" font-weight="700" fill="#0f172a" text-anchor="middle">HMAC-SHA256 Verify</text>
+    <text x="125" y="182" font-size="10" font-weight="500" fill="#64748b" text-anchor="middle">Raw body signature check</text>
+    <circle cx="212" cy="154" r="8" fill="#d1fae5"/>
+    <text x="212" y="158" font-size="9" font-weight="900" fill="#047857" text-anchor="middle">✓</text>
+
+    <!-- Arrow Down -->
+    <line x1="125" y1="204" x2="125" y2="228" stroke="#ca8a04" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Node 3: Idempotency & DB Save -->
+    <rect x="18" y="234" width="214" height="64" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+    <text x="125" y="256" font-size="11.5" font-weight="700" fill="#0f172a" text-anchor="middle">Payment Idempotency</text>
+    <text x="125" y="276" font-size="10" font-weight="500" fill="#64748b" text-anchor="middle">Atomic DB Insert: 'events'</text>
+  </g>
+
+  <!-- Connect Stage 1 -> Stage 2 -->
+  <line x1="290" y1="260" x2="330" y2="260" stroke="#ca8a04" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- ========================================================================= -->
+  <!-- 2. STAGE 2: MULTI-PROVIDER AI DECISION CASCADE -->
+  <!-- ========================================================================= -->
+  <g transform="translate(330, 96)">
+    <rect width="260" height="320" rx="16" fill="url(#cardGrad)" stroke="#facc15" stroke-width="1.5" filter="url(#cardShadow)"/>
+    <rect width="260" height="36" rx="16" fill="#fef9c3"/>
+    <text x="130" y="24" font-size="12" font-weight="800" fill="#854d0e" text-anchor="middle">2. MULTI-MODEL AI TRIAGE</text>
+
+    <!-- Sub-node 1: Gemini -->
+    <rect x="18" y="50" width="224" height="54" rx="10" fill="#ffffff" stroke="#eab308" stroke-width="1.2"/>
+    <text x="32" y="72" font-size="11.5" font-weight="700" fill="#0f172a">1. Google Gemini Flash</text>
+    <text x="32" y="89" font-size="10" font-weight="500" fill="#64748b">Primary LLM (google-genai)</text>
+    <rect x="186" y="60" width="44" height="18" rx="6" fill="#fef08a"/>
+    <text x="208" y="73" font-size="9" font-weight="800" fill="#854d0e" text-anchor="middle">MAIN</text>
+
+    <!-- Fallback Arrow -->
+    <line x1="130" y1="104" x2="130" y2="124" stroke="#ca8a04" stroke-width="1.8" stroke-dasharray="3,3" marker-end="url(#arrow)"/>
+
+    <!-- Sub-node 2: Groq -->
+    <rect x="18" y="130" width="224" height="54" rx="10" fill="#ffffff" stroke="#fed7aa" stroke-width="1.2"/>
+    <text x="32" y="152" font-size="11.5" font-weight="700" fill="#0f172a">2. Groq Cloud Llama-3.3</text>
+    <text x="32" y="169" font-size="10" font-weight="500" fill="#64748b">High-speed secondary fallback</text>
+    <rect x="178" y="140" width="52" height="18" rx="6" fill="#ffedd5"/>
+    <text x="204" y="153" font-size="9" font-weight="800" fill="#c2410c" text-anchor="middle">BACKUP</text>
+
+    <!-- Fallback Arrow -->
+    <line x1="130" y1="184" x2="130" y2="204" stroke="#ca8a04" stroke-width="1.8" stroke-dasharray="3,3" marker-end="url(#arrow)"/>
+
+    <!-- Sub-node 3: Offline Heuristic -->
+    <rect x="18" y="210" width="224" height="54" rx="10" fill="#ffffff" stroke="#bbf7d0" stroke-width="1.2"/>
+    <text x="32" y="232" font-size="11.5" font-weight="700" fill="#0f172a">3. Built-in Heuristic</text>
+    <text x="32" y="249" font-size="10" font-weight="500" fill="#64748b">Zero-key deterministic engine</text>
+    <rect x="178" y="220" width="52" height="18" rx="6" fill="#dcfce7"/>
+    <text x="204" y="233" font-size="9" font-weight="800" fill="#15803d" text-anchor="middle">OFFLINE</text>
+
+    <!-- Output Pill -->
+    <rect x="18" y="278" width="224" height="28" rx="8" fill="#fef08a" stroke="#ca8a04" stroke-width="1"/>
+    <text x="130" y="296" font-size="10.5" font-weight="800" fill="#713f12" text-anchor="middle">✓ Standardized JSON Diagnosis</text>
+  </g>
+
+  <!-- Connect Stage 2 -> Stage 3 -->
+  <line x1="590" y1="260" x2="630" y2="260" stroke="#ca8a04" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- ========================================================================= -->
+  <!-- 3. STAGE 3: FINANCIAL GUARDRAILS & STOPPING RULES -->
+  <!-- ========================================================================= -->
+  <g transform="translate(630, 96)">
+    <rect width="250" height="320" rx="16" fill="url(#cardGrad)" stroke="#facc15" stroke-width="1.5" filter="url(#cardShadow)"/>
+    <rect width="250" height="36" rx="16" fill="#fef9c3"/>
+    <text x="125" y="24" font-size="12" font-weight="800" fill="#854d0e" text-anchor="middle">3. SAFETY GUARDRAILS</text>
+
+    <!-- Guardrail 1: Max Retries -->
+    <rect x="18" y="55" width="214" height="74" rx="10" fill="#ffffff" stroke="#fca5a5" stroke-width="1.2"/>
+    <text x="32" y="78" font-size="11.5" font-weight="800" fill="#991b1b">Rule 1: Max 3 Retries</text>
+    <text x="32" y="97" font-size="10" font-weight="500" fill="#475569">If attempts ≥ 3:</text>
+    <text x="32" y="113" font-size="10" font-weight="700" fill="#dc2626">Auto-Escalate to Human Review</text>
+
+    <!-- Guardrail 2: Cooldown Throttle -->
+    <rect x="18" y="145" width="214" height="74" rx="10" fill="#ffffff" stroke="#fed7aa" stroke-width="1.2"/>
+    <text x="32" y="168" font-size="11.5" font-weight="800" fill="#9a3412">Rule 2: 12h Cooldown</text>
+    <text x="32" y="187" font-size="10" font-weight="500" fill="#475569">If retry within 12 hours:</text>
+    <text x="32" y="203" font-size="10" font-weight="700" fill="#c2410c">Mark 'skipped_stopping_rule'</text>
+
+    <!-- Decision Diamond Representation -->
+    <rect x="18" y="235" width="214" height="66" rx="10" fill="#ffffff" stroke="#86efac" stroke-width="1.2"/>
+    <text x="125" y="258" font-size="11" font-weight="800" fill="#166534" text-anchor="middle">Policy Verification</text>
+    <text x="125" y="278" font-size="10" font-weight="600" fill="#15803d" text-anchor="middle">✓ Allowed ──► Dispatch Action</text>
+  </g>
+
+  <!-- Connect Stage 3 -> Stage 4 -->
+  <line x1="880" y1="260" x2="920" y2="260" stroke="#ca8a04" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- ========================================================================= -->
+  <!-- 4. STAGE 4: THREE RECOVERY ACTION BRANCHES -->
+  <!-- ========================================================================= -->
+  <g transform="translate(920, 96)">
+    <rect width="240" height="320" rx="16" fill="url(#cardGrad)" stroke="#facc15" stroke-width="1.5" filter="url(#cardShadow)"/>
+    <rect width="240" height="36" rx="16" fill="#fef9c3"/>
+    <text x="120" y="24" font-size="12" font-weight="800" fill="#854d0e" text-anchor="middle">4. RECOVERY ACTIONS</text>
+
+    <!-- Branch 1 -->
+    <rect x="16" y="50" width="208" height="74" rx="10" fill="#ffffff" stroke="#86efac" stroke-width="1.2"/>
+    <text x="28" y="71" font-size="11" font-weight="800" fill="#15803d">Branch 1: Smart Retry</text>
+    <text x="28" y="88" font-size="9.5" font-weight="500" fill="#475569">Bank timeouts &amp; low funds</text>
+    <text x="28" y="106" font-size="9.5" font-weight="700" fill="#047857">⚡ Razorpay API Execution</text>
+
+    <!-- Branch 2 -->
+    <rect x="16" y="136" width="208" height="74" rx="10" fill="#ffffff" stroke="#fde047" stroke-width="1.2"/>
+    <text x="28" y="157" font-size="11" font-weight="800" fill="#854d0e">Branch 2: Reminder Email</text>
+    <text x="28" y="174" font-size="9.5" font-weight="500" fill="#475569">Expired card &amp; 3DS OTP drops</text>
+    <text x="28" y="192" font-size="9.5" font-weight="700" fill="#b45309">✉️ Resend API Recovery Link</text>
+
+    <!-- Branch 3 -->
+    <rect x="16" y="222" width="208" height="74" rx="10" fill="#ffffff" stroke="#fca5a5" stroke-width="1.2"/>
+    <text x="28" y="243" font-size="11" font-weight="800" fill="#991b1b">Branch 3: Human Escalation</text>
+    <text x="28" y="260" font-size="9.5" font-weight="500" fill="#475569">Fraud / Disputes / ≥3 attempts</text>
+    <text x="28" y="278" font-size="9.5" font-weight="700" fill="#b91c1c">🚨 Slack #ops Alert</text>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- 5. STAGE 5: IMMUTABLE AUDIT LOG & REACT DASHBOARD -->
+  <!-- ========================================================================= -->
+  <!-- Connecting Down Arrows from Stage 4 into Stage 5 -->
+  <path d="M 1040 416 L 1040 450 L 600 450 L 600 480" fill="none" stroke="#ca8a04" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <g transform="translate(40, 480)">
+    <!-- Main Dashboard Container Card -->
+    <rect width="1120" height="300" rx="18" fill="#ffffff" stroke="#facc15" stroke-width="1.8" filter="url(#cardShadow)"/>
+
+    <!-- Header -->
+    <rect width="1120" height="42" rx="18" fill="#fef9c3"/>
+    <text x="560" y="27" font-size="13" font-weight="800" fill="#713f12" text-anchor="middle">5. IMMUTABLE AUDIT TRAIL &amp; LIVE REACT FINTECH DASHBOARD (PORT 5173)</text>
+
+    <!-- Database Schemas Box (Left) -->
+    <g transform="translate(24, 60)">
+      <rect width="320" height="215" rx="12" fill="#fafaf9" stroke="#e7e5e4" stroke-width="1.2"/>
+      <text x="160" y="26" font-size="12" font-weight="800" fill="#44403c" text-anchor="middle">📦 Relational Storage Tables</text>
+      
+      <rect x="16" y="42" width="288" height="34" rx="6" fill="#ffffff" stroke="#d6d3d1"/>
+      <text x="28" y="63" font-size="10.5" font-weight="700" fill="#1c1917">events <tspan font-weight="500" fill="#78716c">(razorpay_payment_id, amount, error)</tspan></text>
+
+      <rect x="16" y="82" width="288" height="34" rx="6" fill="#ffffff" stroke="#d6d3d1"/>
+      <text x="28" y="103" font-size="10.5" font-weight="700" fill="#1c1917">diagnoses <tspan font-weight="500" fill="#78716c">(root_cause, confidence, event_id)</tspan></text>
+
+      <rect x="16" y="122" width="288" height="34" rx="6" fill="#ffffff" stroke="#d6d3d1"/>
+      <text x="28" y="143" font-size="10.5" font-weight="700" fill="#1c1917">actions <tspan font-weight="500" fill="#78716c">(action_type, status, amount_recovered)</tspan></text>
+
+      <rect x="16" y="162" width="288" height="34" rx="6" fill="#fef08a" stroke="#ca8a04"/>
+      <text x="28" y="183" font-size="10.5" font-weight="800" fill="#713f12">audit_log <tspan font-weight="600" fill="#854d0e">(immutable timeline &amp; reason)</tspan></text>
+    </g>
+
+    <!-- Arrow from DB to UI -->
+    <line x1="344" y1="165" x2="380" y2="165" stroke="#ca8a04" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+    <!-- Live React UI Components (Right) -->
+    <g transform="translate(380, 60)">
+      <rect width="716" height="215" rx="12" fill="#fefce8" stroke="#fde047" stroke-width="1.2"/>
+      
+      <!-- 4 KPI Badges -->
+      <g transform="translate(18, 18)">
+        <rect width="156" height="60" rx="8" fill="#d1fae5" stroke="#86efac"/>
+        <text x="14" y="24" font-size="9.5" font-weight="800" fill="#065f46">RECOVERED REVENUE</text>
+        <text x="14" y="48" font-size="15" font-weight="900" fill="#047857">₹15,497.00</text>
+      </g>
+      <g transform="translate(188, 18)">
+        <rect width="156" height="60" rx="8" fill="#fef3c7" stroke="#fcd34d"/>
+        <text x="14" y="24" font-size="9.5" font-weight="800" fill="#92400e">FAILED VOLUME</text>
+        <text x="14" y="48" font-size="15" font-weight="900" fill="#b45309">₹28,994.00</text>
+      </g>
+      <g transform="translate(358, 18)">
+        <rect width="156" height="60" rx="8" fill="#fef9c3" stroke="#facc15"/>
+        <text x="14" y="24" font-size="9.5" font-weight="800" fill="#713f12">RECOVERY RATE</text>
+        <text x="14" y="48" font-size="15" font-weight="900" fill="#854d0e">53.4%</text>
+      </g>
+      <g transform="translate(528, 18)">
+        <rect width="170" height="60" rx="8" fill="#fef08a" stroke="#eab308"/>
+        <text x="14" y="24" font-size="9.5" font-weight="800" fill="#713f12">GUARDRAIL STATUS</text>
+        <text x="14" y="48" font-size="14" font-weight="900" fill="#78350f">Active &amp; Enforced</text>
+      </g>
+
+      <!-- Live Stream Preview -->
+      <g transform="translate(18, 92)">
+        <rect width="680" height="106" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+        <text x="16" y="24" font-size="11" font-weight="800" fill="#0f172a">Live Audit Trail Stream &amp; Interactive Simulator Sandbox</text>
+        
+        <rect x="14" y="36" width="652" height="26" rx="6" fill="#f8fafc"/>
+        <text x="24" y="53" font-size="9.5" font-weight="700" fill="#059669">[Auto-Retry Success]</text>
+        <text x="135" y="53" font-size="9.5" font-weight="500" fill="#334155">retry_payment attempt 1 on pay_sim_89a11: ₹4,999.00 successfully recovered</text>
+        <text x="600" y="53" font-size="9" font-weight="600" fill="#64748b">Just now</text>
+
+        <rect x="14" y="68" width="652" height="26" rx="6" fill="#f8fafc"/>
+        <text x="24" y="85" font-size="9.5" font-weight="700" fill="#b45309">[Reminder Email]</text>
+        <text x="135" y="85" font-size="9.5" font-weight="500" fill="#334155">send_reminder_email dispatched to cust_priya_02 (Card Expired portal link)</text>
+        <text x="600" y="85" font-size="9" font-weight="600" fill="#64748b">1m ago</text>
+      </g>
+    </g>
+  </g>
+</svg>

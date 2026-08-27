@@ -16,9 +16,10 @@ from app.schemas import DevSimulatePaymentRequest
 router = APIRouter(prefix="/api/dev", tags=["Developer & Testing Tools"])
 
 SCENARIOS = {
+    # ── Track 03: Core Payment Degradation Scenarios ───────────────────
     "insufficient_funds": {
         "error_code": "BAD_REQUEST_PAYMENT_FAILED",
-        "error_description": "Payment failed due to insufficient funds in customer bank account",
+        "error_description": "Payment failed due to temporary insufficient funds in customer bank account",
         "expected_action": "retry_payment",
     },
     "expired_card": {
@@ -43,8 +44,24 @@ SCENARIOS = {
     },
     "dispute_chargeback": {
         "error_code": "PAYMENT_DISPUTE_RAISED",
-        "error_description": "Customer initiated chargeback inquiry on order",
+        "error_description": "Customer initiated chargeback inquiry on transaction",
         "expected_action": "escalate_to_human",
+    },
+    # ── Track 03: Advanced Directions (Subscriptions, B2B, Checkout) ────
+    "subscription_mandate_failed": {
+        "error_code": "SUBSCRIPTION_MANDATE_DEBIT_FAILED",
+        "error_description": "Recurring e-mandate debit failed. Bank reported transient clearing network error.",
+        "expected_action": "retry_payment",
+    },
+    "b2b_invoice_overdue": {
+        "error_code": "B2B_INVOICE_PAYMENT_OVERDUE",
+        "error_description": "Net-30 B2B invoice #INV-2026-89 past due date. Requires customer account payment update.",
+        "expected_action": "send_reminder_email",
+    },
+    "checkout_abandoned": {
+        "error_code": "CHECKOUT_SESSION_ABANDONED",
+        "error_description": "High-intent checkout drop-off detected at OTP payment step. Generated 1-click recovery link.",
+        "expected_action": "send_reminder_email",
     }
 }
 
@@ -103,10 +120,10 @@ async def simulate_webhook(
     await db.commit()
     await db.refresh(event)
 
-    # Diagnose + decide
+    # Diagnose + decide (Gemini -> Groq -> Heuristic)
     decision = await diagnose_and_decide(event)
 
-    # Execute
+    # Execute with Guardrails
     action = await execute_action(db, event, decision)
 
     return {
@@ -133,14 +150,16 @@ async def generate_signature(payload_json: dict):
 
 @router.post("/seed-demo-data")
 async def seed_demo_data(db: AsyncSession = Depends(get_db)):
-    """Seed sample recoveries across all 3 branches for realistic first-look UI."""
+    """Seed comprehensive sample recoveries across all Track 03 directions."""
     scenarios_to_seed = [
         ("insufficient_funds", 349900, "cust_arjun_01"),
         ("expired_card", 899000, "cust_priya_02"),
-        ("bank_timeout", 154900, "cust_rohit_03"),
+        ("subscription_mandate_failed", 149900, "cust_mandate_03"),
+        ("bank_timeout", 154900, "cust_rohit_04"),
+        ("b2b_invoice_overdue", 4500000, "cust_corp_tata_05"),
         ("fraud_suspected", 12500000, "cust_anon_99"),
-        ("insufficient_funds", 499900, "cust_ananya_05"),
-        ("3ds_auth_failed", 229900, "cust_vikram_06"),
+        ("checkout_abandoned", 499900, "cust_ananya_07"),
+        ("3ds_auth_failed", 229900, "cust_vikram_08"),
     ]
 
     results = []

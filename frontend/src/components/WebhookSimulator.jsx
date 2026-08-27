@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
-import { RotateCcw, Mail, AlertTriangle, ArrowRight, CheckCircle2, Zap } from 'lucide-react';
+import { RotateCcw, Mail, AlertTriangle, ArrowRight, CheckCircle2, Zap, RefreshCw, FileText, ShoppingCart } from 'lucide-react';
 import { simulateWebhookEvent } from '../api';
+
+const SCENARIO_CATEGORIES = [
+  { id: 'all', label: 'All Scenarios' },
+  { id: 'card', label: '💳 Cards & 2FA' },
+  { id: 'subscriptions', label: '🔁 Subscriptions & B2B' },
+];
 
 const SCENARIOS = [
   {
     id: 'insufficient_funds',
+    category: 'card',
     title: 'Temporary Card Decline',
-    subtitle: 'System autonomously schedules an intelligent smart retry.',
+    subtitle: 'System autonomously schedules an intelligent smart retry with bank cooldown.',
     actionBadge: 'Auto-Retry',
     icon: RotateCcw,
     amount: 4999,
@@ -20,6 +27,7 @@ const SCENARIOS = [
   },
   {
     id: 'expired_card',
+    category: 'card',
     title: 'Expired Card Details',
     subtitle: 'Dispatches automated personalized payment update email link.',
     actionBadge: 'Customer Email',
@@ -35,8 +43,9 @@ const SCENARIOS = [
   },
   {
     id: 'fraud_suspected',
+    category: 'card',
     title: 'High-Risk / Suspicious',
-    subtitle: 'Pauses auto-recovery and immediately alerts risk team for review.',
+    subtitle: 'Pauses auto-recovery and immediately alerts risk team on Slack for review.',
     actionBadge: 'Support Review',
     icon: AlertTriangle,
     amount: 75000,
@@ -47,14 +56,65 @@ const SCENARIOS = [
     badgeBg: 'rgba(254,243,199,0.95)',
     badgeBorder: 'rgba(245,158,11,0.45)',
     badgeText: '#92400e'
+  },
+  {
+    id: 'subscription_mandate_failed',
+    category: 'subscriptions',
+    title: 'Subscription Mandate Fail',
+    subtitle: 'Mandate retry sequencer detects transient bank clearing handoff error.',
+    actionBadge: 'Mandate Retry',
+    icon: RefreshCw,
+    amount: 1499,
+    accentColor: '#059669',
+    glowColor: 'rgba(16,185,129,0.15)',
+    borderColor: 'rgba(16,185,129,0.3)',
+    bgGradient: 'linear-gradient(135deg, rgba(209,250,229,0.6) 0%, rgba(255,255,255,0.95) 75%)',
+    badgeBg: 'rgba(209,250,229,0.9)',
+    badgeBorder: 'rgba(16,185,129,0.35)',
+    badgeText: '#047857'
+  },
+  {
+    id: 'b2b_invoice_overdue',
+    category: 'subscriptions',
+    title: 'B2B Invoice Overdue',
+    subtitle: 'Automated B2B receivables chaser with Promise-to-Pay tracking.',
+    actionBadge: 'Invoice Chaser',
+    icon: FileText,
+    amount: 45000,
+    accentColor: '#ca8a04',
+    glowColor: 'rgba(234,179,8,0.2)',
+    borderColor: 'rgba(234,179,8,0.35)',
+    bgGradient: 'linear-gradient(135deg, rgba(254,249,195,0.7) 0%, rgba(255,255,255,0.95) 75%)',
+    badgeBg: 'rgba(254,240,138,0.85)',
+    badgeBorder: 'rgba(234,179,8,0.45)',
+    badgeText: '#854d0e'
+  },
+  {
+    id: 'checkout_abandoned',
+    category: 'subscriptions',
+    title: 'Checkout Drop-off',
+    subtitle: 'High-intent cart abandonment recovery with 1-click retry payment link.',
+    actionBadge: 'Cart Recovery',
+    icon: ShoppingCart,
+    amount: 3499,
+    accentColor: '#ca8a04',
+    glowColor: 'rgba(234,179,8,0.2)',
+    borderColor: 'rgba(234,179,8,0.35)',
+    bgGradient: 'linear-gradient(135deg, rgba(254,249,195,0.7) 0%, rgba(255,255,255,0.95) 75%)',
+    badgeBg: 'rgba(254,240,138,0.85)',
+    badgeBorder: 'rgba(234,179,8,0.45)',
+    badgeText: '#854d0e'
   }
 ];
 
 export default function WebhookSimulator({ onEventProcessed }) {
   const [isSimulating, setIsSimulating] = useState(false);
   const [activeScenario, setActiveScenario] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [lastResult, setLastResult] = useState(null);
   const [lastError, setLastError] = useState(null);
+
+  const filteredScenarios = SCENARIOS.filter(s => selectedCategory === 'all' || s.category === selectedCategory);
 
   const handleSimulate = async (scenarioId, amount) => {
     setIsSimulating(true);
@@ -84,18 +144,35 @@ export default function WebhookSimulator({ onEventProcessed }) {
               Interactive Scenario Simulator
             </h2>
             <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-bold tracking-wider uppercase bg-yellow-100 text-yellow-800 border border-yellow-300">
-              Sandbox
+              Track 03 Sandbox
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1 font-medium">
-            Trigger simulated Razorpay webhook events to test the autonomous decision engine in real-time
+            Trigger simulated payment failures, subscription mandates, and B2B invoices to test AI decisioning live
           </p>
+        </div>
+
+        {/* Category Filter Tabs */}
+        <div className="flex items-center gap-1 bg-white/80 p-1 rounded-xl border border-yellow-200 shadow-2xs">
+          {SCENARIO_CATEGORIES.map(cat => (
+            <button
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.id)}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                selectedCategory === cat.id
+                  ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Scenario Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {SCENARIOS.map((scenario) => {
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredScenarios.map((scenario) => {
           const Icon = scenario.icon;
           const isRunning = isSimulating && activeScenario === scenario.id;
 
@@ -153,7 +230,7 @@ export default function WebhookSimulator({ onEventProcessed }) {
                 style={{ borderTop: '1px solid rgba(234, 179, 8, 0.2)' }}
               >
                 <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500">Transaction</span>
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500">Transaction Value</span>
                   <span className="text-sm font-extrabold" style={{ color: scenario.accentColor }}>
                     ₹{scenario.amount.toLocaleString('en-IN')}
                   </span>

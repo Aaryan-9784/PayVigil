@@ -8,9 +8,9 @@ function getActionBadge(summary) {
     return (
       <span
         className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"
-        style={{ background: 'rgba(192,132,252,0.18)', border: '1px solid rgba(192,132,252,0.4)', color: '#d8b4fe' }}
+        style={{ background: 'rgba(254, 240, 138, 0.8)', border: '1px solid rgba(202, 138, 4, 0.4)', color: '#854d0e' }}
       >
-        <ShieldCheck className="w-3.5 h-3.5 text-purple-300" />
+        <ShieldCheck className="w-3.5 h-3.5 text-yellow-700" />
         Safety Cooldown
       </span>
     );
@@ -19,9 +19,9 @@ function getActionBadge(summary) {
     return (
       <span
         className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"
-        style={{ background: 'rgba(52,211,153,0.18)', border: '1px solid rgba(52,211,153,0.4)', color: '#6ee7b7' }}
+        style={{ background: 'rgba(209, 250, 229, 0.85)', border: '1px solid rgba(16, 185, 129, 0.4)', color: '#047857' }}
       >
-        <RotateCcw className="w-3.5 h-3.5 text-emerald-300" />
+        <RotateCcw className="w-3.5 h-3.5 text-emerald-700" />
         Payment Retry
       </span>
     );
@@ -30,9 +30,9 @@ function getActionBadge(summary) {
     return (
       <span
         className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"
-        style={{ background: 'rgba(129,140,248,0.18)', border: '1px solid rgba(129,140,248,0.4)', color: '#a5b4fc' }}
+        style={{ background: 'rgba(254, 249, 195, 0.9)', border: '1px solid rgba(234, 179, 8, 0.45)', color: '#a16207' }}
       >
-        <Mail className="w-3.5 h-3.5 text-indigo-300" />
+        <Mail className="w-3.5 h-3.5 text-amber-700" />
         Customer Email
       </span>
     );
@@ -41,9 +41,9 @@ function getActionBadge(summary) {
     return (
       <span
         className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"
-        style={{ background: 'rgba(251,191,36,0.18)', border: '1px solid rgba(251,191,36,0.4)', color: '#fde68a' }}
+        style={{ background: 'rgba(254, 243, 199, 0.9)', border: '1px solid rgba(245, 158, 11, 0.45)', color: '#b45309' }}
       >
-        <AlertTriangle className="w-3.5 h-3.5 text-amber-300" />
+        <AlertTriangle className="w-3.5 h-3.5 text-amber-800" />
         Support Review
       </span>
     );
@@ -51,9 +51,9 @@ function getActionBadge(summary) {
   return (
     <span
       className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"
-      style={{ background: 'rgba(148,163,184,0.15)', border: '1px solid rgba(148,163,184,0.3)', color: '#cbd5e1' }}
+      style={{ background: 'rgba(241, 245, 249, 0.9)', border: '1px solid rgba(203, 213, 225, 0.8)', color: '#475569' }}
     >
-      <Activity className="w-3.5 h-3.5 text-slate-300" />
+      <Activity className="w-3.5 h-3.5 text-slate-600" />
       Activity Log
     </span>
   );
@@ -111,41 +111,42 @@ export default function AuditTable({ logs = [] }) {
       {/* Table Header & Controls */}
       <div
         className="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
-        style={{ borderBottom: '1px solid rgba(139,92,246,0.15)', background: 'rgba(13,18,35,0.85)' }}
+        style={{ borderBottom: '1px solid rgba(234,179,8,0.25)', background: 'rgba(254, 249, 195, 0.45)' }}
       >
         <div>
           <div className="flex items-center gap-3">
-            <h2 className="text-base font-bold text-slate-100 tracking-tight">Audit &amp; Recovery Log</h2>
+            <h2 className="text-base font-bold text-slate-900 tracking-tight">Audit &amp; Recovery Log</h2>
             <span
-              className="text-xs font-bold px-2.5 py-0.5 rounded-full text-indigo-300 bg-indigo-500/20 border border-indigo-500/30"
+              className="text-xs font-bold px-2.5 py-0.5 rounded-full text-yellow-900 bg-yellow-100 border border-yellow-300"
             >
               {logs.length} Recorded
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1 font-medium">
+          <p className="text-xs text-slate-500 mt-1 font-medium">
             Immutable, real-time audit trail of all automated recovery decisions
           </p>
         </div>
 
         <div className="flex items-center flex-wrap gap-3 w-full sm:w-auto">
-          {/* Search */}
-          <div className="relative flex-1 sm:w-60">
+          {/* Search Box */}
+          <div className="relative flex items-center flex-1 sm:w-64">
             <Search
-              className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"
+              className="w-4 h-4 absolute left-3.5 pointer-events-none text-slate-400 z-10"
             />
             <input
               type="text"
               placeholder="Search audit trail..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="dark-input pl-10 pr-4 py-2 text-xs font-medium text-slate-200 placeholder:text-slate-500 rounded-xl"
+              className="w-full text-xs font-medium text-slate-800 placeholder:text-slate-400 rounded-xl bg-white border border-yellow-300/80 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 outline-none shadow-sm transition-all"
+              style={{ paddingLeft: '40px', paddingRight: '14px', paddingTop: '8px', paddingBottom: '8px' }}
             />
           </div>
 
           {/* Filter Tabs */}
           <div
             className="flex items-center gap-1 p-1 rounded-xl"
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
+            style={{ background: 'rgba(255,255,255,0.85)', border: '1px solid rgba(234,179,8,0.3)' }}
           >
             {FILTER_TABS.map((tab) => (
               <button
@@ -154,11 +155,11 @@ export default function AuditTable({ logs = [] }) {
                 className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer"
                 style={
                   filterType === tab.id
-                    ? { background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#ffffff', boxShadow: '0 2px 10px rgba(99,102,241,0.4)' }
-                    : { color: '#94a3b8' }
+                    ? { background: 'linear-gradient(135deg, #f59e0b, #eab308)', color: '#ffffff', boxShadow: '0 2px 8px rgba(217,119,6,0.3)' }
+                    : { color: '#64748b' }
                 }
-                onMouseEnter={e => { if (filterType !== tab.id) e.currentTarget.style.color = '#f1f5f9'; }}
-                onMouseLeave={e => { if (filterType !== tab.id) e.currentTarget.style.color = '#94a3b8'; }}
+                onMouseEnter={e => { if (filterType !== tab.id) e.currentTarget.style.color = '#0f172a'; }}
+                onMouseLeave={e => { if (filterType !== tab.id) e.currentTarget.style.color = '#64748b'; }}
               >
                 {tab.label}
               </button>
@@ -173,13 +174,13 @@ export default function AuditTable({ logs = [] }) {
           <div className="p-12 flex flex-col items-center justify-center gap-3 text-center">
             <div
               className="w-14 h-14 rounded-2xl flex items-center justify-center"
-              style={{ background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)' }}
+              style={{ background: 'rgba(254, 240, 138, 0.5)', border: '1px solid rgba(234, 179, 8, 0.35)' }}
             >
-              <Clock className="w-6 h-6 text-indigo-400" />
+              <Clock className="w-6 h-6 text-yellow-700" />
             </div>
             <div>
-              <p className="text-sm font-bold text-slate-200">No activity logs matching criteria</p>
-              <p className="text-xs text-slate-400 mt-1 font-medium">Click "Load Demo Data" or execute a simulator action above</p>
+              <p className="text-sm font-bold text-slate-800">No activity logs matching criteria</p>
+              <p className="text-xs text-slate-500 mt-1 font-medium">Click "Load Demo Data" or execute a simulator action above</p>
             </div>
           </div>
         ) : (
@@ -191,16 +192,16 @@ export default function AuditTable({ logs = [] }) {
                 <th className="py-3 px-5 text-right">Timestamp</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-amber-100">
               {filteredLogs.map((log) => (
-                <tr key={log.id} className="hover:bg-white/[0.04] transition-colors">
+                <tr key={log.id} className="hover:bg-yellow-50/60 transition-colors">
                   <td className="py-3.5 px-5 whitespace-nowrap">
                     {getActionBadge(log.summary)}
                   </td>
-                  <td className="py-3.5 px-5 text-xs text-slate-200 font-medium leading-relaxed">
+                  <td className="py-3.5 px-5 text-xs text-slate-800 font-medium leading-relaxed">
                     {log.summary}
                   </td>
-                  <td className="py-3.5 px-5 text-right whitespace-nowrap text-xs font-semibold text-slate-400">
+                  <td className="py-3.5 px-5 text-right whitespace-nowrap text-xs font-semibold text-slate-500">
                     <span title={log.created_at}>{formatRelativeTime(log.created_at)}</span>
                   </td>
                 </tr>

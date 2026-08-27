@@ -6,47 +6,47 @@ const SCENARIOS = [
   {
     id: 'insufficient_funds',
     title: 'Temporary Card Decline',
-    subtitle: 'System automatically schedules an intelligent smart retry.',
+    subtitle: 'System autonomously schedules an intelligent smart retry.',
     actionBadge: 'Auto-Retry',
     icon: RotateCcw,
     amount: 4999,
-    accentColor: '#34d399',
-    glowColor: 'rgba(52,211,153,0.3)',
-    borderColor: 'rgba(52,211,153,0.35)',
-    bgGradient: 'linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(13,18,35,0.85) 80%)',
-    badgeBg: 'rgba(52,211,153,0.18)',
-    badgeBorder: 'rgba(52,211,153,0.4)',
-    badgeText: '#6ee7b7'
+    accentColor: '#059669',
+    glowColor: 'rgba(16,185,129,0.15)',
+    borderColor: 'rgba(16,185,129,0.3)',
+    bgGradient: 'linear-gradient(135deg, rgba(209,250,229,0.6) 0%, rgba(255,255,255,0.95) 75%)',
+    badgeBg: 'rgba(209,250,229,0.9)',
+    badgeBorder: 'rgba(16,185,129,0.35)',
+    badgeText: '#047857'
   },
   {
     id: 'expired_card',
-    title: 'Expired Card',
+    title: 'Expired Card Details',
     subtitle: 'Dispatches automated personalized payment update email link.',
     actionBadge: 'Customer Email',
     icon: Mail,
     amount: 2999,
-    accentColor: '#818cf8',
-    glowColor: 'rgba(99,102,241,0.3)',
-    borderColor: 'rgba(99,102,241,0.35)',
-    bgGradient: 'linear-gradient(135deg, rgba(99,102,241,0.16) 0%, rgba(13,18,35,0.85) 80%)',
-    badgeBg: 'rgba(99,102,241,0.18)',
-    badgeBorder: 'rgba(99,102,241,0.4)',
-    badgeText: '#a5b4fc'
+    accentColor: '#ca8a04',
+    glowColor: 'rgba(234,179,8,0.2)',
+    borderColor: 'rgba(234,179,8,0.35)',
+    bgGradient: 'linear-gradient(135deg, rgba(254,249,195,0.7) 0%, rgba(255,255,255,0.95) 75%)',
+    badgeBg: 'rgba(254,240,138,0.85)',
+    badgeBorder: 'rgba(234,179,8,0.45)',
+    badgeText: '#854d0e'
   },
   {
     id: 'fraud_suspected',
     title: 'High-Risk / Suspicious',
-    subtitle: 'Pauses auto-recovery and immediately alerts risk team for manual review.',
+    subtitle: 'Pauses auto-recovery and immediately alerts risk team for review.',
     actionBadge: 'Support Review',
     icon: AlertTriangle,
     amount: 75000,
-    accentColor: '#fbbf24',
-    glowColor: 'rgba(245,158,11,0.3)',
-    borderColor: 'rgba(251,191,36,0.35)',
-    bgGradient: 'linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(13,18,35,0.85) 80%)',
-    badgeBg: 'rgba(245,158,11,0.18)',
-    badgeBorder: 'rgba(251,191,36,0.4)',
-    badgeText: '#fde68a'
+    accentColor: '#b45309',
+    glowColor: 'rgba(245,158,11,0.18)',
+    borderColor: 'rgba(245,158,11,0.35)',
+    bgGradient: 'linear-gradient(135deg, rgba(254,243,199,0.7) 0%, rgba(255,255,255,0.95) 75%)',
+    badgeBg: 'rgba(254,243,199,0.95)',
+    badgeBorder: 'rgba(245,158,11,0.45)',
+    badgeText: '#92400e'
   }
 ];
 
@@ -79,16 +79,16 @@ export default function WebhookSimulator({ onEventProcessed }) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-base font-bold text-slate-100 tracking-tight">
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-base font-bold text-slate-900 tracking-tight">
               Interactive Scenario Simulator
             </h2>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-              Live Test
+            <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-bold tracking-wider uppercase bg-yellow-100 text-yellow-800 border border-yellow-300">
+              Sandbox
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1 font-medium">
-            Trigger simulated Razorpay webhook events to test autonomous decision engine in real-time
+          <p className="text-xs text-slate-500 mt-1 font-medium">
+            Trigger simulated Razorpay webhook events to test the autonomous decision engine in real-time
           </p>
         </div>
       </div>
@@ -108,21 +108,21 @@ export default function WebhookSimulator({ onEventProcessed }) {
               style={{
                 background: scenario.bgGradient,
                 border: `1px solid ${scenario.borderColor}`,
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+                boxShadow: '0 2px 12px -2px rgba(161, 98, 7, 0.05)',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.boxShadow = `0 10px 30px ${scenario.glowColor}`;
+                e.currentTarget.style.boxShadow = `0 10px 24px -2px ${scenario.glowColor}`;
                 e.currentTarget.style.borderColor = scenario.accentColor;
                 e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.3)';
+                e.currentTarget.style.boxShadow = '0 2px 12px -2px rgba(161, 98, 7, 0.05)';
                 e.currentTarget.style.borderColor = scenario.borderColor;
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
               <div>
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-3.5">
                   <span
                     className="text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider"
                     style={{
@@ -134,37 +134,37 @@ export default function WebhookSimulator({ onEventProcessed }) {
                     {scenario.actionBadge}
                   </span>
                   <div
-                    className="w-8 h-8 rounded-xl flex items-center justify-center shadow-inner"
+                    className="w-8 h-8 rounded-xl flex items-center justify-center shadow-sm"
                     style={{ background: scenario.badgeBg, color: scenario.badgeText }}
                   >
                     <Icon className="w-4 h-4" />
                   </div>
                 </div>
-                <h3 className="text-sm font-bold text-slate-100 group-hover:text-white transition-colors">
+                <h3 className="text-sm font-bold text-slate-900 group-hover:text-amber-800 transition-colors">
                   {scenario.title}
                 </h3>
-                <p className="text-xs text-slate-300 mt-1.5 leading-relaxed font-normal">
+                <p className="text-xs text-slate-600 mt-1.5 leading-relaxed font-normal">
                   {scenario.subtitle}
                 </p>
               </div>
 
               <div
                 className="mt-5 pt-3.5 flex items-center justify-between text-xs"
-                style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}
+                style={{ borderTop: '1px solid rgba(234, 179, 8, 0.2)' }}
               >
                 <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Impact</span>
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500">Transaction</span>
                   <span className="text-sm font-extrabold" style={{ color: scenario.accentColor }}>
                     ₹{scenario.amount.toLocaleString('en-IN')}
                   </span>
                 </div>
-                <span className="font-semibold flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 group-hover:bg-white/10 text-slate-200 transition-colors">
+                <span className="font-semibold flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/80 group-hover:bg-white text-slate-800 border border-yellow-200 shadow-sm transition-colors">
                   {isRunning ? (
                     <span style={{ color: scenario.accentColor }} className="flex items-center gap-1">
                       <Zap className="w-3 h-3 animate-spin" /> Processing...
                     </span>
                   ) : (
-                    <>Run Simulation <ArrowRight className="w-3.5 h-3.5 text-indigo-400 group-hover:translate-x-0.5 transition-transform" /></>
+                    <>Run Simulation <ArrowRight className="w-3.5 h-3.5 text-amber-600 group-hover:translate-x-0.5 transition-transform" /></>
                   )}
                 </span>
               </div>
@@ -178,19 +178,19 @@ export default function WebhookSimulator({ onEventProcessed }) {
         <div
           className="mt-4 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
           style={{
-            background: 'linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(13,18,35,0.9) 100%)',
-            border: '1px solid rgba(52,211,153,0.35)',
-            boxShadow: '0 4px 20px rgba(16,185,129,0.15)'
+            background: 'linear-gradient(135deg, rgba(209,250,229,0.8) 0%, rgba(254,249,195,0.7) 100%)',
+            border: '1px solid rgba(16,185,129,0.35)',
+            boxShadow: '0 4px 14px rgba(16,185,129,0.1)'
           }}
         >
-          <div className="flex items-center gap-2.5 font-medium text-emerald-300">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-            <span className="text-slate-200">
-              Autonomous Action <strong className="text-emerald-300 uppercase tracking-wide px-2 py-0.5 rounded bg-emerald-500/20">{lastResult.agent_decision?.replace(/_/g, ' ')}</strong> triggered & logged.
+          <div className="flex items-center gap-2.5 font-medium text-emerald-900">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+            <span className="text-slate-800">
+              Autonomous Action <strong className="text-emerald-800 uppercase tracking-wide px-2 py-0.5 rounded bg-emerald-200 border border-emerald-300 font-bold">{lastResult.agent_decision?.replace(/_/g, ' ')}</strong> triggered & logged.
             </span>
           </div>
           {lastResult.amount_recovered_inr > 0 && (
-            <div className="font-bold text-sm px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+            <div className="font-bold text-sm px-3 py-1 rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-sm">
               Recovered: ₹{Number(lastResult.amount_recovered_inr).toLocaleString('en-IN')}
             </div>
           )}
@@ -200,9 +200,9 @@ export default function WebhookSimulator({ onEventProcessed }) {
       {lastError && (
         <div
           className="mt-4 p-4 rounded-xl text-xs font-semibold flex items-center gap-2"
-          style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.35)', color: '#fca5a5' }}
+          style={{ background: 'rgba(254,226,226,0.85)', border: '1px solid rgba(239,68,68,0.35)', color: '#991b1b' }}
         >
-          <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+          <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
           <span>{lastError}</span>
         </div>
       )}

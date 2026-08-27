@@ -14,10 +14,10 @@ import {
 import { PieChart as PieIcon, BarChart3, TrendingUp } from 'lucide-react';
 
 const ACTION_CONFIG = {
-  retry_payment:         { label: 'Payment Retry',   color: '#34d399', bg: 'rgba(52,211,153,0.15)' },
-  send_reminder_email:   { label: 'Customer Email',  color: '#818cf8', bg: 'rgba(129,140,248,0.15)' },
-  escalate_to_human:     { label: 'Support Review',  color: '#fbbf24', bg: 'rgba(251,191,36,0.15)' },
-  skipped_stopping_rule: { label: 'Safety Cooldown', color: '#c084fc', bg: 'rgba(192,132,252,0.15)' }
+  retry_payment:         { label: 'Payment Retry',   color: '#059669', bg: 'rgba(209,250,229,0.7)', border: 'rgba(16,185,129,0.35)' },
+  send_reminder_email:   { label: 'Customer Email',  color: '#ca8a04', bg: 'rgba(254,249,195,0.75)', border: 'rgba(234,179,8,0.35)' },
+  escalate_to_human:     { label: 'Support Review',  color: '#b45309', bg: 'rgba(254,243,199,0.75)', border: 'rgba(245,158,11,0.35)' },
+  skipped_stopping_rule: { label: 'Safety Cooldown', color: '#854d0e', bg: 'rgba(254,240,138,0.75)', border: 'rgba(202,138,4,0.35)' }
 };
 
 const CustomTooltip = ({ active, payload }) => {
@@ -25,16 +25,16 @@ const CustomTooltip = ({ active, payload }) => {
     return (
       <div
         style={{
-          background: 'rgba(15, 23, 42, 0.95)',
-          border: '1px solid rgba(139,92,246,0.3)',
+          background: 'rgba(255, 255, 255, 0.98)',
+          border: '1px solid rgba(234, 179, 8, 0.35)',
           borderRadius: 12,
           padding: '10px 16px',
           fontSize: 12,
-          boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+          boxShadow: '0 8px 24px -2px rgba(161, 98, 7, 0.15)',
         }}
       >
-        <p className="font-bold text-slate-200">{payload[0]?.name}</p>
-        <p className="font-extrabold text-sm mt-1" style={{ color: payload[0]?.payload?.color || '#a78bfa' }}>
+        <p className="font-bold text-slate-800">{payload[0]?.name}</p>
+        <p className="font-extrabold text-sm mt-1" style={{ color: payload[0]?.payload?.color || '#ca8a04' }}>
           {payload[0]?.value} Action{payload[0]?.value > 1 ? 's' : ''}
         </p>
       </div>
@@ -48,15 +48,15 @@ const FinancialTooltip = ({ active, payload }) => {
     return (
       <div
         style={{
-          background: 'rgba(15, 23, 42, 0.95)',
-          border: '1px solid rgba(139,92,246,0.3)',
+          background: 'rgba(255, 255, 255, 0.98)',
+          border: '1px solid rgba(234, 179, 8, 0.35)',
           borderRadius: 12,
           padding: '10px 16px',
           fontSize: 12,
-          boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+          boxShadow: '0 8px 24px -2px rgba(161, 98, 7, 0.15)',
         }}
       >
-        <p className="font-bold text-slate-200">{payload[0]?.payload?.name}</p>
+        <p className="font-bold text-slate-800">{payload[0]?.payload?.name}</p>
         <p className="font-extrabold text-sm mt-1" style={{ color: payload[0]?.payload?.fill }}>
           ₹{Number(payload[0]?.value).toLocaleString('en-IN')}
         </p>
@@ -78,16 +78,17 @@ export default function RecoveryChart({ data }) {
     .map(([key, value]) => ({
       name:  ACTION_CONFIG[key]?.label || key,
       value: value || 0,
-      color: ACTION_CONFIG[key]?.color || '#94a3b8',
-      bg:    ACTION_CONFIG[key]?.bg || 'rgba(255,255,255,0.05)'
+      color: ACTION_CONFIG[key]?.color || '#64748b',
+      bg:    ACTION_CONFIG[key]?.bg || 'rgba(254, 249, 195, 0.4)',
+      border: ACTION_CONFIG[key]?.border || 'rgba(234, 179, 8, 0.2)'
     }))
     .filter((item) => item.value > 0);
 
   const totalActions = Object.values(breakdown).reduce((a, b) => a + b, 0);
 
   const financialData = [
-    { name: 'Failed Volume',    amount: (data?.total_at_risk_paise    || 0) / 100, fill: '#fbbf24' },
-    { name: 'Recovered Revenue', amount: (data?.total_recovered_paise  || 0) / 100, fill: '#34d399' },
+    { name: 'Failed Volume',    amount: (data?.total_at_risk_paise    || 0) / 100, fill: '#f59e0b' },
+    { name: 'Recovered Revenue', amount: (data?.total_recovered_paise  || 0) / 100, fill: '#059669' },
   ];
 
   return (
@@ -97,16 +98,16 @@ export default function RecoveryChart({ data }) {
         <div>
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
-              <div className="icon-box icon-box-blue">
+              <div className="icon-box icon-box-yellow">
                 <PieIcon className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-100">Recovery Action Distribution</h3>
-                <p className="text-xs text-slate-400 mt-0.5 font-medium">Breakdown of automated resolution types</p>
+                <h3 className="text-sm font-bold text-slate-900">Recovery Action Distribution</h3>
+                <p className="text-xs text-slate-500 mt-0.5 font-medium">Breakdown of automated resolution types</p>
               </div>
             </div>
             <span
-              className="text-xs font-bold px-3 py-1 rounded-full text-indigo-300 bg-indigo-500/15 border border-indigo-500/30"
+              className="text-xs font-bold px-3 py-1 rounded-full text-yellow-900 bg-yellow-100 border border-yellow-300"
             >
               {totalActions} Total Events
             </span>
@@ -116,13 +117,13 @@ export default function RecoveryChart({ data }) {
             <div className="h-60 flex flex-col items-center justify-center gap-3 text-center">
               <div
                 className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                style={{ background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)' }}
+                style={{ background: 'rgba(254, 240, 138, 0.5)', border: '1px solid rgba(234, 179, 8, 0.35)' }}
               >
-                <PieIcon className="w-6 h-6 text-indigo-400" />
+                <PieIcon className="w-6 h-6 text-yellow-700" />
               </div>
               <div>
-                <p className="text-sm font-bold text-slate-200">No actions recorded yet</p>
-                <p className="text-xs text-slate-400 mt-1">Click "Load Demo Data" or trigger simulation above</p>
+                <p className="text-sm font-bold text-slate-800">No actions recorded yet</p>
+                <p className="text-xs text-slate-500 mt-1">Click "Load Demo Data" or trigger simulation above</p>
               </div>
             </div>
           ) : (
@@ -143,9 +144,9 @@ export default function RecoveryChart({ data }) {
                         <Cell
                           key={`cell-${index}`}
                           fill={entry.color}
-                          stroke="#060b18"
+                          stroke="#ffffff"
                           strokeWidth={3}
-                          style={{ filter: `drop-shadow(0 0 8px ${entry.color}66)` }}
+                          style={{ filter: `drop-shadow(0 2px 6px ${entry.color}40)` }}
                         />
                       ))}
                     </Pie>
@@ -162,15 +163,15 @@ export default function RecoveryChart({ data }) {
                     className="flex items-center justify-between text-xs py-2 px-3 rounded-xl border"
                     style={{
                       background: item.bg,
-                      borderColor: `${item.color}33`,
+                      borderColor: item.border,
                     }}
                   >
                     <div className="flex items-center gap-2.5">
                       <span
                         className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: item.color, boxShadow: `0 0 8px ${item.color}` }}
+                        style={{ backgroundColor: item.color, boxShadow: `0 0 6px ${item.color}` }}
                       />
-                      <span className="font-semibold text-slate-200">{item.name}</span>
+                      <span className="font-semibold text-slate-800">{item.name}</span>
                     </div>
                     <span className="font-extrabold text-sm" style={{ color: item.color }}>{item.value}</span>
                   </div>
@@ -190,11 +191,11 @@ export default function RecoveryChart({ data }) {
                 <BarChart3 className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-100">Revenue Performance</h3>
-                <p className="text-xs text-slate-400 mt-0.5 font-medium">Failed payment volume vs successfully recovered</p>
+                <h3 className="text-sm font-bold text-slate-900">Revenue Performance</h3>
+                <p className="text-xs text-slate-500 mt-0.5 font-medium">Failed payment volume vs successfully recovered</p>
               </div>
             </div>
-            <div className="flex items-center gap-1 text-xs font-semibold text-emerald-400">
+            <div className="flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-full border border-emerald-300">
               <TrendingUp className="w-4 h-4" /> Live ROI
             </div>
           </div>
@@ -202,28 +203,28 @@ export default function RecoveryChart({ data }) {
           <div className="h-60">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={financialData} margin={{ top: 20, right: 20, left: 10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.07)" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(234, 179, 8, 0.15)" />
                 <XAxis
                   dataKey="name"
-                  stroke="rgba(255,255,255,0.2)"
-                  tick={{ fill: '#cbd5e1', fontSize: 12, fontWeight: 600 }}
-                  axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+                  stroke="rgba(100, 116, 139, 0.4)"
+                  tick={{ fill: '#334155', fontSize: 12, fontWeight: 600 }}
+                  axisLine={{ stroke: 'rgba(234, 179, 8, 0.25)' }}
                   tickLine={false}
                 />
                 <YAxis
-                  stroke="rgba(255,255,255,0.2)"
-                  tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 500 }}
+                  stroke="rgba(100, 116, 139, 0.4)"
+                  tick={{ fill: '#64748b', fontSize: 11, fontWeight: 500 }}
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={(val) => `₹${val >= 1000 ? `${(val / 1000).toFixed(0)}k` : val}`}
                 />
-                <Tooltip content={<FinancialTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+                <Tooltip content={<FinancialTooltip />} cursor={{ fill: 'rgba(254, 240, 138, 0.25)' }} />
                 <Bar dataKey="amount" radius={[8, 8, 0, 0]} maxBarSize={70}>
                   {financialData.map((entry, index) => (
                     <Cell
                       key={`bar-cell-${index}`}
                       fill={entry.fill}
-                      style={{ filter: `drop-shadow(0 0 10px ${entry.fill}88)` }}
+                      style={{ filter: `drop-shadow(0 2px 8px ${entry.fill}55)` }}
                     />
                   ))}
                 </Bar>

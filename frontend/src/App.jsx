@@ -62,45 +62,45 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col grid-bg" style={{ fontFamily: "'Inter', sans-serif" }}>
+    <div className="min-h-screen flex flex-col grid-bg text-slate-800" style={{ fontFamily: "'Inter', sans-serif" }}>
 
-      {/* Premium Toast Notification */}
+      {/* Premium Toast Notification (Light Theme) */}
       {notification && (
         <div
           className="fixed bottom-5 right-5 z-50"
           style={{ animation: 'fadeSlideUp 0.35s ease forwards' }}
         >
           <div
-            className="flex items-center gap-3 pl-4 pr-3 py-3 rounded-xl text-xs font-semibold"
+            className="flex items-center gap-3 pl-4 pr-3 py-3 rounded-xl text-xs font-semibold shadow-lg"
             style={
               notification.type === 'error'
                 ? {
-                    background: 'rgba(239,68,68,0.1)',
-                    border: '1px solid rgba(239,68,68,0.25)',
-                    color: '#fca5a5',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    boxShadow: '0 8px 30px rgba(239,68,68,0.2)',
+                    background: 'rgba(254, 226, 226, 0.95)',
+                    border: '1px solid rgba(239, 68, 68, 0.4)',
+                    color: '#991b1b',
+                    backdropFilter: 'blur(16px)',
+                    WebkitBackdropFilter: 'blur(16px)',
+                    boxShadow: '0 10px 25px -3px rgba(239, 68, 68, 0.2)',
                   }
                 : {
-                    background: 'rgba(52,211,153,0.1)',
-                    border: '1px solid rgba(52,211,153,0.25)',
-                    color: '#6ee7b7',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    boxShadow: '0 8px 30px rgba(52,211,153,0.15)',
+                    background: 'rgba(209, 250, 229, 0.95)',
+                    border: '1px solid rgba(16, 185, 129, 0.4)',
+                    color: '#065f46',
+                    backdropFilter: 'blur(16px)',
+                    WebkitBackdropFilter: 'blur(16px)',
+                    boxShadow: '0 10px 25px -3px rgba(16, 185, 129, 0.2)',
                   }
             }
           >
             {notification.type === 'error' ? (
-              <AlertCircle className="w-4 h-4 shrink-0" style={{ color: '#f87171' }} />
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
             ) : (
-              <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: '#34d399' }} />
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
             )}
             <span>{notification.message}</span>
             <button
               onClick={() => setNotification(null)}
-              className="ml-1 p-0.5 rounded-md transition-opacity opacity-50 hover:opacity-100"
+              className="ml-1 p-0.5 rounded-md transition-opacity opacity-60 hover:opacity-100"
             >
               <X className="w-3.5 h-3.5" />
             </button>

@@ -10,13 +10,13 @@ export function formatINR(paise) {
 
 /* ─── Shared label style ─────────────────────────── */
 const labelStyle = {
-  fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em',
+  fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
   textTransform: 'uppercase', color: '#64748b',
 };
 /* ─── Shared big-value style ─────────────────────── */
 const bigVal = {
   fontSize: 26, fontWeight: 800, letterSpacing: '-0.03em',
-  color: '#f1f5f9', lineHeight: 1.1,
+  color: '#0f172a', lineHeight: 1.1,
 };
 
 export default function SummaryCards({ data, loading }) {
@@ -33,57 +33,66 @@ export default function SummaryCards({ data, loading }) {
       {/* ── 1. Recovered Revenue ── */}
       <div
         className="glass-card-interactive p-5 fade-in"
-        style={{ background: 'linear-gradient(135deg,rgba(52,211,153,0.1) 0%,rgba(13,18,35,0.75) 55%)', borderColor: 'rgba(52,211,153,0.25)' }}
+        style={{
+          background: 'linear-gradient(135deg, rgba(209, 250, 229, 0.5) 0%, rgba(255, 255, 255, 0.95) 60%)',
+          borderColor: 'rgba(16, 185, 129, 0.35)',
+        }}
       >
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14 }}>
           <span style={labelStyle}>Recovered Revenue</span>
           <div className="icon-box icon-box-emerald"><TrendingUp style={{ width:16, height:16 }} /></div>
         </div>
-        <div style={{ ...bigVal, background:'linear-gradient(135deg,#6ee7b7,#34d399)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>
+        <div style={{ ...bigVal, color: '#047857' }}>
           {loading ? <span className="shimmer" /> : formatINR(totalRecovered)}
         </div>
         {!loading && (
-          <div style={{ marginTop:10, display:'flex', alignItems:'center', gap:5, fontSize:12, color:'#6ee7b7', fontWeight:600 }}>
+          <div style={{ marginTop:10, display:'flex', alignItems:'center', gap:5, fontSize:12, color:'#059669', fontWeight:600 }}>
             <CheckCircle2 style={{ width:13, height:13 }} />
             {successfulActions} payments recovered
           </div>
         )}
       </div>
 
-      {/* ── 2. Failed Payments ── */}
+      {/* ── 2. Failed Payments Volume ── */}
       <div
         className="glass-card-interactive p-5 fade-in-delay-1"
-        style={{ background:'linear-gradient(135deg,rgba(251,191,36,0.09) 0%,rgba(13,18,35,0.75) 55%)', borderColor:'rgba(251,191,36,0.22)' }}
+        style={{
+          background: 'linear-gradient(135deg, rgba(254, 240, 138, 0.45) 0%, rgba(255, 255, 255, 0.95) 60%)',
+          borderColor: 'rgba(234, 179, 8, 0.35)',
+        }}
       >
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
-          <span style={labelStyle}>Failed Payments</span>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14 }}>
+          <span style={labelStyle}>At-Risk Volume</span>
           <div className="icon-box icon-box-amber"><AlertTriangle style={{ width:16, height:16 }} /></div>
         </div>
-        <div style={bigVal}>
+        <div style={{ ...bigVal, color: '#b45309' }}>
           {loading ? <span className="shimmer" /> : formatINR(totalAtRisk)}
         </div>
         {!loading && (
-          <div style={{ marginTop:10, fontSize:12, color:'#94a3b8', fontWeight:500 }}>
+          <div style={{ marginTop:10, fontSize:12, color:'#64748b', fontWeight:500 }}>
             Total failed volume detected
           </div>
         )}
       </div>
 
-      {/* ── 3. Recovery Rate ── */}
+      {/* ── 3. Recovery Success Rate ── */}
       <div
         className="glass-card-interactive p-5 fade-in-delay-2"
-        style={{ background:'linear-gradient(135deg,rgba(99,102,241,0.1) 0%,rgba(13,18,35,0.75) 55%)', borderColor:'rgba(129,140,248,0.25)' }}
+        style={{
+          background: 'linear-gradient(135deg, rgba(254, 249, 195, 0.6) 0%, rgba(255, 255, 255, 0.95) 60%)',
+          borderColor: 'rgba(202, 138, 4, 0.35)',
+        }}
       >
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14 }}>
           <span style={labelStyle}>Recovery Rate</span>
-          <div className="icon-box icon-box-blue"><Activity style={{ width:16, height:16 }} /></div>
+          <div className="icon-box icon-box-yellow"><Activity style={{ width:16, height:16 }} /></div>
         </div>
-        <div style={{ display:'flex', alignItems:'baseline', gap:8, marginBottom:14 }}>
-          <span style={{ ...bigVal, background:'linear-gradient(135deg,#a5b4fc,#818cf8)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>
+        <div style={{ display:'flex', alignItems:'baseline', gap:8, marginBottom:12 }}>
+          <span style={{ ...bigVal, color: '#854d0e' }}>
             {loading ? '…' : `${recoveryRate}%`}
           </span>
           {!loading && (
-            <span style={{ fontSize:11.5, color:'#64748b', fontWeight:500 }}>
+            <span style={{ fontSize:11.5, color:'#64748b', fontWeight:600 }}>
               ({successfulActions}/{totalActions})
             </span>
           )}
@@ -93,21 +102,24 @@ export default function SummaryCards({ data, loading }) {
         </div>
       </div>
 
-      {/* ── 4. Safety Limits ── */}
+      {/* ── 4. Safety Guardrails Prevented ── */}
       <div
         className="glass-card-interactive p-5 fade-in-delay-3"
-        style={{ background:'linear-gradient(135deg,rgba(167,139,250,0.1) 0%,rgba(13,18,35,0.75) 55%)', borderColor:'rgba(167,139,250,0.25)' }}
+        style={{
+          background: 'linear-gradient(135deg, rgba(254, 243, 199, 0.5) 0%, rgba(255, 255, 255, 0.95) 60%)',
+          borderColor: 'rgba(245, 158, 11, 0.35)',
+        }}
       >
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
-          <span style={labelStyle}>Safety Limits</span>
-          <div className="icon-box icon-box-purple"><ShieldCheck style={{ width:16, height:16 }} /></div>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14 }}>
+          <span style={labelStyle}>Safety Guardrails</span>
+          <div className="icon-box icon-box-yellow"><ShieldCheck style={{ width:16, height:16 }} /></div>
         </div>
-        <div style={{ ...bigVal, background:'linear-gradient(135deg,#c4b5fd,#a78bfa)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>
+        <div style={{ ...bigVal, color: '#713f12' }}>
           {loading ? <span className="shimmer" /> : `${skippedCount} Prevented`}
         </div>
         {!loading && (
-          <div style={{ marginTop:10, fontSize:12, color:'#c4b5fd', fontWeight:600 }}>
-            Protected from duplicate retries
+          <div style={{ marginTop:10, fontSize:12, color:'#a16207', fontWeight:600 }}>
+            Protected from spam retries
           </div>
         )}
       </div>

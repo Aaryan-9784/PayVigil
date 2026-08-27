@@ -1,35 +1,140 @@
-# Environments
-.env
-.env.local
-.env.*.local
-venv/
-env/
-ENV/
+# ==============================================================================
+# Git Ignore Configuration - AI Revenue Recovery Agent
+# ==============================================================================
 
-# Python
+# ------------------------------------------------------------------------------
+# 1. Environment & Secrets
+# ------------------------------------------------------------------------------
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+# Keep example templates committed
+!.env.example
+!*/.env.example
+
+# ------------------------------------------------------------------------------
+# 2. Python & Virtual Environments
+# ------------------------------------------------------------------------------
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv/
+env.bak/
+venv.bak/
+virtualenv/
+
+# ------------------------------------------------------------------------------
+# 3. Databases & Local Storage
+# ------------------------------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+revenue_recovery.db
+backend/revenue_recovery.db
+
+# ------------------------------------------------------------------------------
+# 4. Testing & Code Quality
+# ------------------------------------------------------------------------------
 .pytest_cache/
 .coverage
+.coverage.*
 htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+.ruff_cache/
+.mypy_cache/
 
-# Node
+# ------------------------------------------------------------------------------
+# 5. Node.js & Frontend (Vite / React)
+# ------------------------------------------------------------------------------
 node_modules/
-dist/
-dist-ssr/
-*.local
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+.vite/
+.turbo/
+*.tsbuildinfo
 
-# Logs
+# Node package manager logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# OS & IDE
+# ------------------------------------------------------------------------------
+# 6. Docker & Persistent Volumes
+# ------------------------------------------------------------------------------
+docker-compose.override.yml
+pgdata/
+n8ndata/
+
+# ------------------------------------------------------------------------------
+# 7. Logs & Temporary Files
+# ------------------------------------------------------------------------------
+logs/
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+# ------------------------------------------------------------------------------
+# 8. Operating System & IDEs
+# ------------------------------------------------------------------------------
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# Windows
 Thumbs.db
-.vscode/
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+desktop.ini
+
+# Editors & IDEs
 .idea/
+*.sublime-workspace
+*.sublime-project
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json

@@ -1,91 +1,78 @@
 import React from 'react';
-import { IndianRupee, RefreshCw, Zap, Trash2 } from 'lucide-react';
+import { IndianRupee, RefreshCw, Zap, Trash2, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 export default function Header({ onRefresh, onSeedData, onResetData, isRefreshing }) {
   return (
-    <header
-      className="sticky top-0 z-40"
-      style={{
-        background: 'rgba(255, 255, 255, 0.88)',
-        borderBottom: '1px solid rgba(234, 179, 8, 0.28)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
-        boxShadow: '0 2px 12px -2px rgba(161, 98, 7, 0.05)',
-      }}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <header className="sticky top-0 z-40 bg-white/95 border-b border-slate-200/90 backdrop-blur-md shadow-xs">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Top Navbar */}
+        <div className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
-          {/* ── Brand ── */}
+          {/* ── Official Razorpay Logo & Product Brand ── */}
           <div className="flex items-center gap-3.5">
-            {/* Logo orb with Light Yellow / Gold Gradient */}
+            {/* Razorpay Logo Orb with Indian Rupee Symbol */}
             <div
-              className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 relative"
+              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 relative shadow-sm"
               style={{
-                background: 'linear-gradient(135deg, #f59e0b 0%, #eab308 100%)',
-                boxShadow: '0 0 0 1px rgba(234, 179, 8, 0.4), 0 4px 16px rgba(217, 119, 6, 0.35)',
+                background: 'linear-gradient(135deg, #02042b 0%, #0c2340 50%, #0c83ff 100%)',
+                border: '1px solid rgba(12, 131, 255, 0.4)',
+                boxShadow: '0 4px 14px rgba(12, 131, 255, 0.3)',
               }}
             >
+              {/* Rupee Symbol Icon */}
               <IndianRupee className="w-5 h-5 text-white" strokeWidth={2.5} />
-              {/* live indicator */}
-              <span
-                className="pulse-dot absolute -top-1 -right-1"
-                style={{ width: 10, height: 10, border: '2px solid #ffffff' }}
-              />
+              
+              {/* Live Gateway Pulse */}
+              <span className="pulse-dot absolute -top-1 -right-1 w-2.5 h-2.5 border-2 border-white" />
             </div>
 
             <div>
               <div className="flex items-center gap-2.5 flex-wrap">
-                <h1 style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em', margin: 0 }}>
-                  Razorpay{' '}
-                  <span className="gradient-text">AI Revenue Recovery</span>
-                </h1>
+                <span className="text-lg font-black tracking-tight text-[#0c2340] font-sans">
+                  Razorpay
+                </span>
+                <span className="h-4 w-px bg-slate-300 hidden sm:block" />
+                <span className="text-xs font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-50 text-[#0c83ff] border border-blue-200">
+                  AI Revenue Recovery
+                </span>
               </div>
-              <p style={{ fontSize: 11.5, color: '#64748b', marginTop: 2, fontWeight: 500 }}>
-                Autonomous Failed Payment Recovery &amp; AI Protection Pipeline
+              <p className="text-[11.5px] text-slate-500 font-medium mt-0.5">
+                Autonomous Payment Triage • Multi-Channel Retries &amp; Safety Guardrails
               </p>
             </div>
           </div>
 
-          {/* ── Actions ── */}
+          {/* ── Razorpay Action Bar ── */}
           <div className="flex items-center flex-wrap gap-2.5">
-            {/* Refresh icon button */}
+            {/* Live Gateway Indicator */}
+            <div className="hidden md:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>HMAC Secured</span>
+            </div>
+
+            {/* Refresh Button */}
             <button
               onClick={onRefresh}
               disabled={isRefreshing}
-              title="Refresh dashboard data"
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                width: 36, height: 36, borderRadius: 10,
-                background: 'rgba(254, 249, 195, 0.65)',
-                border: '1px solid rgba(234, 179, 8, 0.35)',
-                color: '#854d0e', cursor: 'pointer', transition: 'all 0.2s',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.color = '#713f12';
-                e.currentTarget.style.borderColor = 'rgba(202,138,4,0.6)';
-                e.currentTarget.style.background = 'rgba(254,240,138,0.95)';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.color = '#854d0e';
-                e.currentTarget.style.borderColor = 'rgba(234, 179, 8, 0.35)';
-                e.currentTarget.style.background = 'rgba(254, 249, 195, 0.65)';
-              }}
+              title="Sync with Razorpay Gateway"
+              className="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-50 border border-slate-200 text-slate-700 hover:text-[#0c83ff] hover:bg-blue-50 hover:border-blue-200 transition-all cursor-pointer"
             >
               <RefreshCw
-                className={isRefreshing ? 'animate-spin' : ''}
-                style={{ width: 15, height: 15, color: isRefreshing ? '#ca8a04' : 'inherit' }}
+                className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#0c83ff]' : ''}`}
               />
             </button>
 
+            {/* Load Demo Data Button (Razorpay Blue CTA) */}
             <button onClick={onSeedData} className="btn-primary">
-              <Zap style={{ width: 14, height: 14 }} />
-              Load Demo Data
+              <Zap className="w-3.5 h-3.5" />
+              Load Test Webhooks
             </button>
 
+            {/* Reset Database Button */}
             <button onClick={onResetData} className="btn-danger">
-              <Trash2 style={{ width: 14, height: 14 }} />
-              Reset
+              <Trash2 className="w-3.5 h-3.5" />
+              Clear Logs
             </button>
           </div>
 

@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
+import PipelineFlow from './components/PipelineFlow';
 import SummaryCards from './components/SummaryCards';
+import GuardrailsPanel from './components/GuardrailsPanel';
+import WebhookSimulator from './components/WebhookSimulator';
 import RecoveryChart from './components/RecoveryChart';
 import AuditTable from './components/AuditTable';
-import WebhookSimulator from './components/WebhookSimulator';
 import Footer from './components/Footer';
 import { fetchDashboard, seedDemoData, resetDatabase } from './api';
 import { AlertCircle, CheckCircle2, X } from 'lucide-react';
@@ -62,9 +64,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col grid-bg text-slate-800" style={{ fontFamily: "'Inter', sans-serif" }}>
+    <div className="min-h-screen flex flex-col grid-bg text-[#0c2340]" style={{ fontFamily: "'Inter', sans-serif" }}>
 
-      {/* Premium Toast Notification (Light Theme) */}
+      {/* Premium Toast Notification (Razorpay Theme) */}
       {notification && (
         <div
           className="fixed bottom-5 right-5 z-50"
@@ -83,19 +85,19 @@ export default function App() {
                     boxShadow: '0 10px 25px -3px rgba(239, 68, 68, 0.2)',
                   }
                 : {
-                    background: 'rgba(209, 250, 229, 0.95)',
-                    border: '1px solid rgba(16, 185, 129, 0.4)',
-                    color: '#065f46',
+                    background: 'rgba(240, 247, 255, 0.98)',
+                    border: '1px solid rgba(12, 131, 255, 0.5)',
+                    color: '#004797',
                     backdropFilter: 'blur(16px)',
                     WebkitBackdropFilter: 'blur(16px)',
-                    boxShadow: '0 10px 25px -3px rgba(16, 185, 129, 0.2)',
+                    boxShadow: '0 10px 25px -3px rgba(12, 131, 255, 0.25)',
                   }
             }
           >
             {notification.type === 'error' ? (
               <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
             ) : (
-              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-[#0c83ff]" />
             )}
             <span>{notification.message}</span>
             <button
@@ -108,7 +110,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Header */}
+      {/* Header Navigation */}
       <Header
         onRefresh={() => loadData(true)}
         onSeedData={handleSeedData}
@@ -116,14 +118,28 @@ export default function App() {
         isRefreshing={isRefreshing}
       />
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 flex-1 w-full">
+      {/* Main Dashboard Layout */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 space-y-6 flex-1 w-full">
+        {/* 1. Visual Lifecycle Pipeline (Problem Statement Overview) */}
+        <PipelineFlow />
+
+        {/* 2. Key Metrics & Financial Recovery KPIs */}
         <SummaryCards data={dashboardData} loading={loading} />
+
+        {/* 3. Safety Guardrails & Stopping Rules Protection */}
+        <GuardrailsPanel guardrails={dashboardData?.guardrails} />
+
+        {/* 4. Interactive Scenario Simulator (Sandbox) */}
         <WebhookSimulator onEventProcessed={() => loadData()} />
+
+        {/* 5. Revenue Recovery Analytics & Resolution Distribution */}
         <RecoveryChart data={dashboardData} />
+
+        {/* 6. Immutable Audit Trail & AI Diagnostic Inspector */}
         <AuditTable logs={dashboardData?.recent_audit_log || []} />
       </main>
 
+      {/* Footer */}
       <Footer />
     </div>
   );

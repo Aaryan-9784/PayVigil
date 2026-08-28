@@ -8,50 +8,47 @@ export default {
   theme: {
     extend: {
       colors: {
-        brand: {
-          50: '#fefce8',
-          100: '#fef9c3',
-          200: '#fef08a',
-          300: '#fde047',
-          400: '#facc15',
-          500: '#eab308',
-          600: '#ca8a04',
-          700: '#a16207',
-          800: '#854d0e',
-          900: '#713f12',
+        razorpay: {
+          50: '#f0f7ff',
+          100: '#e0effe',
+          200: '#b9dffe',
+          300: '#7cc5fd',
+          400: '#36a8fa',
+          500: '#0c83ff', // Razorpay Signature Blue
+          600: '#006de6',
+          700: '#0054b8',
+          800: '#004797',
+          900: '#0c2340', // Razorpay Navy Dark
+          950: '#02042b', // Deep Space Navy
         },
-        warmwhite: {
-          50: '#ffffff',
-          100: '#fdfcf7',
-          200: '#faf8f0',
-          300: '#f5f2e3',
-          400: '#eee9d3',
-        },
-        sunshine: {
-          light: '#fef9c3',
-          DEFAULT: '#fde047',
-          accent: '#eab308',
-          deep: '#b45309'
-        },
-        surface: {
-          50: '#fdfcf9',
-          100: '#f9f7f0',
-          200: '#f1ede0',
-          300: '#e5dec8',
+        rzpnavy: {
+          50: '#f8fafc',
+          100: '#f1f5f9',
+          200: '#e2e8f0',
+          300: '#cbd5e1',
+          400: '#94a3b8',
+          500: '#64748b',
+          600: '#475569',
           700: '#334155',
           800: '#1e293b',
-          900: '#0f172a',
+          900: '#0c2340',
+          950: '#02042b',
         },
+        rzpgreen: {
+          DEFAULT: '#10b981',
+          light: '#ecfdf5',
+          dark: '#047857',
+        }
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         mono: ['JetBrains Mono', 'Menlo', 'monospace'],
       },
       boxShadow: {
-        'card': '0 2px 14px -2px rgba(161, 98, 7, 0.07), 0 1px 4px 0 rgba(0, 0, 0, 0.04)',
-        'card-hover': '0 14px 30px -4px rgba(161, 98, 7, 0.14), 0 4px 12px -2px rgba(0, 0, 0, 0.04)',
-        'glow-yellow': '0 0 24px -2px rgba(234, 179, 8, 0.35)',
-        'glow-gold': '0 0 24px -2px rgba(217, 119, 6, 0.25)',
+        'card': '0 2px 14px -2px rgba(12, 35, 64, 0.06), 0 1px 4px 0 rgba(0, 0, 0, 0.03)',
+        'card-hover': '0 16px 36px -4px rgba(12, 131, 255, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.04)',
+        'glow-blue': '0 0 24px -2px rgba(12, 131, 255, 0.35)',
+        'glow-navy': '0 0 24px -2px rgba(12, 35, 64, 0.25)',
       },
       animation: {
         'pulse-gentle': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',

@@ -7,39 +7,56 @@
 
   body {
     @apply antialiased;
-    font-family: 'Inter', sans-serif;
-    color: #1e293b;
-    background-color: #fdfbf7;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #0c2340;
+    background-color: #f8fafc;
     background-image:
-      radial-gradient(ellipse 95% 65% at 50% -5%, rgba(254, 240, 138, 0.42) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 50% at 92% 20%,  rgba(253, 224, 71, 0.22) 0%, transparent 50%),
-      radial-gradient(ellipse 50% 45% at 8%  75%,  rgba(250, 204, 21, 0.16) 0%, transparent 55%);
+      radial-gradient(circle 900px at 50% -100px, rgba(12, 131, 255, 0.16), transparent 70%),
+      radial-gradient(circle 650px at 95% 20%, rgba(0, 82, 204, 0.08), transparent 60%),
+      radial-gradient(circle 700px at 5%  65%, rgba(16, 185, 129, 0.06), transparent 60%),
+      radial-gradient(circle 600px at 50% 100%, rgba(12, 35, 64, 0.05), transparent 70%);
     background-attachment: fixed;
     min-height: 100vh;
   }
 }
 
-/* ─── Scrollbar ─────────────────────────────────────────── */
+/* ─── Razorpay Scrollbar ────────────────────────────────── */
 ::-webkit-scrollbar       { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: rgba(254, 249, 195, 0.4); }
-::-webkit-scrollbar-thumb { background: rgba(234, 179, 8, 0.45); border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(202, 138, 4, 0.75); }
+::-webkit-scrollbar-track { background: rgba(241, 245, 249, 0.7); }
+::-webkit-scrollbar-thumb { background: rgba(12, 131, 255, 0.4); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 84, 184, 0.75); }
 
-/* ─── Glass Cards (Warm White & Light Yellow) ───────────── */
+/* ─── Razorpay Grid Background Overlay ──────────────────── */
+.grid-bg {
+  background-image: 
+    radial-gradient(rgba(12, 131, 255, 0.12) 1.2px, transparent 1.2px),
+    linear-gradient(to right, rgba(12, 131, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(12, 131, 255, 0.025) 1px, transparent 1px);
+  background-size: 28px 28px, 56px 56px, 56px 56px;
+  background-position: 0 0, 0 0, 0 0;
+}
+
+/* ─── Razorpay Glass Cards ──────────────────────────────── */
 .glass-card {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(234, 179, 8, 0.22);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(12, 131, 255, 0.16);
   border-radius: 1.25rem;
-  box-shadow: 0 4px 20px -2px rgba(161, 98, 7, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.03), inset 0 1px 0 #ffffff;
+  box-shadow: 
+    0 10px 30px -5px rgba(12, 35, 64, 0.05),
+    0 4px 10px -2px rgba(12, 131, 255, 0.03),
+    inset 0 1px 0 #ffffff;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
 .glass-card-interactive {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(234, 179, 8, 0.22);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(12, 131, 255, 0.16);
   border-radius: 1.25rem;
-  box-shadow: 0 4px 20px -2px rgba(161, 98, 7, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.03), inset 0 1px 0 #ffffff;
+  box-shadow: 
+    0 10px 30px -5px rgba(12, 35, 64, 0.05),
+    0 4px 10px -2px rgba(12, 131, 255, 0.03),
+    inset 0 1px 0 #ffffff;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -47,26 +64,31 @@
 }
 
 .glass-card-interactive:hover {
-  border-color: rgba(234, 179, 8, 0.55);
-  box-shadow: 0 14px 34px -4px rgba(202, 138, 4, 0.15), 0 4px 12px -2px rgba(0,0,0,0.04), inset 0 1px 0 #ffffff;
+  border-color: rgba(12, 131, 255, 0.45);
+  box-shadow: 
+    0 20px 40px -8px rgba(12, 35, 64, 0.10),
+    0 6px 16px -2px rgba(12, 131, 255, 0.08),
+    inset 0 1px 0 #ffffff;
   transform: translateY(-3px);
 }
 
-/* ─── Icon Boxes (Light Yellow, Emerald & Amber Accents) ─ */
+/* ─── Razorpay Icon Containers ──────────────────────────── */
 .icon-box {
   width: 38px; height: 38px;
   border-radius: 11px;
   display: flex; align-items: center; justify-content: center;
 }
-.icon-box-yellow  { background: rgba(254, 240, 138, 0.65); border: 1px solid rgba(234, 179, 8, 0.45); color: #a16207; }
-.icon-box-emerald { background: rgba(209, 250, 229, 0.85); border: 1px solid rgba(16, 185, 129, 0.35); color: #047857; }
-.icon-box-amber   { background: rgba(254, 243, 199, 0.85); border: 1px solid rgba(245, 158, 11, 0.4);  color: #b45309; }
-.icon-box-blue    { background: rgba(254, 249, 195, 0.9);  border: 1px solid rgba(234, 179, 8, 0.45); color: #854d0e; }
-.icon-box-purple  { background: rgba(254, 240, 138, 0.6);  border: 1px solid rgba(202, 138, 4, 0.35); color: #713f12; }
+.icon-box-blue    { background: rgba(224, 239, 254, 0.95); border: 1px solid rgba(12, 131, 255, 0.4);  color: #0054b8; }
+.icon-box-navy    { background: rgba(241, 245, 249, 0.95); border: 1px solid rgba(12, 35, 64, 0.25);   color: #0c2340; }
+.icon-box-emerald { background: rgba(209, 250, 229, 0.95); border: 1px solid rgba(16, 185, 129, 0.4);  color: #047857; }
+.icon-box-forest  { background: rgba(224, 239, 254, 0.95); border: 1px solid rgba(12, 131, 255, 0.35); color: #0054b8; }
+.icon-box-sage    { background: rgba(241, 245, 249, 0.95); border: 1px solid rgba(12, 35, 64, 0.25);   color: #0c2340; }
+.icon-box-amber   { background: rgba(254, 243, 199, 0.95); border: 1px solid rgba(245, 158, 11, 0.4);  color: #b45309; }
+.icon-box-yellow  { background: rgba(224, 239, 254, 0.95); border: 1px solid rgba(12, 131, 255, 0.35); color: #0054b8; }
 
-/* ─── Progress Bar (Sunny Golden Accent) ────────────────── */
+/* ─── Razorpay Progress Bar (Electric Blue to Emerald) ──── */
 .progress-track {
-  background: rgba(234, 179, 8, 0.14);
+  background: rgba(12, 131, 255, 0.12);
   border-radius: 9999px;
   height: 8px;
   overflow: visible;
@@ -75,10 +97,10 @@
 .progress-fill {
   height: 100%;
   border-radius: 9999px;
-  background: linear-gradient(90deg, #f59e0b 0%, #eab308 60%, #facc15 100%);
+  background: linear-gradient(90deg, #0c2340 0%, #0052cc 40%, #0c83ff 80%, #38bdf8 100%);
   transition: width 0.9s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  box-shadow: 0 0 10px rgba(234, 179, 8, 0.45);
+  box-shadow: 0 0 12px rgba(12, 131, 255, 0.45);
 }
 .progress-fill::after {
   content: '';
@@ -86,38 +108,38 @@
   transform: translateY(-50%);
   width: 12px; height: 12px; border-radius: 50%;
   background: #ffffff;
-  border: 2px solid #ca8a04;
-  box-shadow: 0 0 8px 1px rgba(234, 179, 8, 0.7);
+  border: 2px solid #0c83ff;
+  box-shadow: 0 0 8px 1px rgba(12, 131, 255, 0.7);
 }
 
-/* ─── Pulsing Live Dot ──────────────────────────────────── */
+/* ─── Pulsing Live Dot (Razorpay Blue) ──────────────────── */
 .pulse-dot {
   border-radius: 50%;
-  background: #16a34a;
-  box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.45);
+  background: #0c83ff;
+  box-shadow: 0 0 0 0 rgba(12, 131, 255, 0.45);
   animation: pulse-glow 2s infinite;
   display: inline-block;
 }
 @keyframes pulse-glow {
-  0%   { box-shadow: 0 0 0 0   rgba(22, 163, 74, 0.45); }
-  70%  { box-shadow: 0 0 0 7px rgba(22, 163, 74, 0); }
-  100% { box-shadow: 0 0 0 0   rgba(22, 163, 74, 0); }
+  0%   { box-shadow: 0 0 0 0   rgba(12, 131, 255, 0.45); }
+  70%  { box-shadow: 0 0 0 7px rgba(12, 131, 255, 0); }
+  100% { box-shadow: 0 0 0 0   rgba(12, 131, 255, 0); }
 }
 
-/* ─── Buttons ───────────────────────────────────────────── */
+/* ─── Razorpay Buttons (Signature Blue) ─────────────────── */
 .btn-primary {
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 16px; border-radius: 10px;
+  padding: 8px 18px; border-radius: 10px;
   font-size: 12px; font-weight: 700; letter-spacing: 0.01em;
-  background: linear-gradient(135deg, #f59e0b 0%, #eab308 100%);
-  color: #ffffff; border: 1px solid rgba(217, 119, 6, 0.3);
-  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3), 0 1px 3px rgba(0,0,0,0.06);
+  background: linear-gradient(135deg, #0c83ff 0%, #0054b8 100%);
+  color: #ffffff; border: 1px solid rgba(12, 131, 255, 0.5);
+  box-shadow: 0 4px 14px rgba(12, 131, 255, 0.35), 0 1px 3px rgba(0,0,0,0.06);
   transition: all 0.2s ease; cursor: pointer;
 }
 .btn-primary:hover:not(:disabled) {
-  box-shadow: 0 6px 20px rgba(217, 119, 6, 0.45), 0 2px 6px rgba(0,0,0,0.08);
+  box-shadow: 0 6px 20px rgba(12, 131, 255, 0.5), 0 2px 6px rgba(0,0,0,0.08);
   transform: translateY(-1px);
-  background: linear-gradient(135deg, #d97706 0%, #ca8a04 100%);
+  background: linear-gradient(135deg, #36a8fa 0%, #0c83ff 60%, #0054b8 100%);
 }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -125,51 +147,51 @@
   display: inline-flex; align-items: center; gap: 6px;
   padding: 8px 16px; border-radius: 10px;
   font-size: 12px; font-weight: 600;
-  background: rgba(254, 249, 195, 0.65); color: #854d0e;
-  border: 1px solid rgba(234, 179, 8, 0.35);
+  background: rgba(224, 239, 254, 0.85); color: #0054b8;
+  border: 1px solid rgba(12, 131, 255, 0.35);
   transition: all 0.2s ease; cursor: pointer;
 }
 .btn-ghost:hover {
-  background: rgba(254, 240, 138, 0.9); color: #713f12;
-  border-color: rgba(202, 138, 4, 0.5);
+  background: rgba(185, 223, 254, 0.95); color: #004797;
+  border-color: rgba(12, 131, 255, 0.5);
 }
 
 .btn-danger {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 8px 16px; border-radius: 10px;
   font-size: 12px; font-weight: 600;
-  background: rgba(254, 226, 226, 0.7); color: #b91c1c;
+  background: rgba(254, 226, 226, 0.85); color: #991b1b;
   border: 1px solid rgba(239, 68, 68, 0.3);
   transition: all 0.2s ease; cursor: pointer;
 }
 .btn-danger:hover {
-  background: rgba(254, 202, 202, 0.9); border-color: rgba(220, 38, 38, 0.5);
-  color: #991b1b; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+  background: rgba(254, 202, 202, 0.95); border-color: rgba(220, 38, 38, 0.5);
+  color: #7f1d1d; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
 }
 
-/* ─── White & Light Yellow Table ────────────────────────── */
+/* ─── Razorpay Table ────────────────────────────────────── */
 .dark-table { width: 100%; text-align: left; }
 .dark-table thead th {
-  background: rgba(254, 249, 195, 0.55);
-  color: #713f12;
+  background: rgba(241, 245, 249, 0.85);
+  color: #0c2340;
   font-size: 10.5px; font-weight: 700;
   letter-spacing: 0.08em; text-transform: uppercase;
   padding: 11px 16px;
-  border-bottom: 1px solid rgba(234, 179, 8, 0.25);
+  border-bottom: 1px solid rgba(12, 131, 255, 0.2);
 }
 .dark-table tbody tr {
-  border-bottom: 1px solid rgba(241, 237, 224, 0.8);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
   transition: background 0.15s ease;
 }
-.dark-table tbody tr:hover { background: rgba(254, 249, 195, 0.35); }
+.dark-table tbody tr:hover { background: rgba(240, 247, 255, 0.85); }
 .dark-table tbody td { padding: 12px 16px; }
 
-/* ─── Light Input ───────────────────────────────────────── */
+/* ─── Razorpay Inputs ───────────────────────────────────── */
 .dark-input {
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(234, 179, 8, 0.3);
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(12, 131, 255, 0.25);
   border-radius: 10px;
-  color: #1e293b; font-size: 12px;
+  color: #0c2340; font-size: 12px;
   padding: 8px 14px; width: 100%;
   box-shadow: 0 1px 2px rgba(0,0,0,0.03);
   transition: all 0.2s ease;
@@ -181,20 +203,20 @@
 .dark-input::placeholder { color: #94a3b8; }
 .dark-input:focus {
   outline: none;
-  border-color: rgba(202, 138, 4, 0.65);
-  box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.2);
+  border-color: rgba(12, 131, 255, 0.7);
+  box-shadow: 0 0 0 3px rgba(12, 131, 255, 0.2);
   background: #ffffff;
-  color: #0f172a;
+  color: #0c2340;
 }
 
-/* ─── Shimmer Skeleton (Warm Light) ─────────────────────── */
+/* ─── Shimmer Skeleton (Razorpay Blue Tint) ─────────────── */
 .shimmer {
   display: inline-block; width: 75%; height: 1.75rem;
   border-radius: 8px;
   background: linear-gradient(90deg,
-    rgba(254, 240, 138, 0.3) 0%,
-    rgba(254, 240, 138, 0.7) 50%,
-    rgba(254, 240, 138, 0.3) 100%
+    rgba(224, 239, 254, 0.3) 0%,
+    rgba(224, 239, 254, 0.7) 50%,
+    rgba(224, 239, 254, 0.3) 100%
   );
   background-size: 200% 100%;
   animation: shimmer-anim 1.6s linear infinite;
@@ -202,14 +224,6 @@
 @keyframes shimmer-anim {
   0%   { background-position: -200% 0; }
   100% { background-position:  200% 0; }
-}
-
-/* ─── Grid BG (Delicate Warm Grid) ──────────────────────── */
-.grid-bg {
-  background-image:
-    linear-gradient(rgba(202, 138, 4, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(202, 138, 4, 0.05) 1px, transparent 1px);
-  background-size: 36px 36px;
 }
 
 /* ─── Fade-in Animations ────────────────────────────────── */
@@ -224,19 +238,19 @@
 .fade-in-delay-4  { animation: fadeSlideUp 0.45s ease 0.36s both; }
 
 /* ─── Typography & Gradient Text ────────────────────────── */
-.text-heading  { color: #0f172a; }
+.text-heading  { color: #0c2340; }
 .text-body     { color: #334155; }
 .text-muted    { color: #64748b; }
-.text-label    { color: #854d0e; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.text-label    { color: #0054b8; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
 
 .gradient-text {
-  background: linear-gradient(135deg, #b45309 0%, #d97706 45%, #ca8a04 100%);
+  background: linear-gradient(135deg, #0c2340 0%, #0054b8 40%, #0c83ff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-.gradient-text-emerald {
-  background: linear-gradient(135deg, #047857 0%, #059669 100%);
+.gradient-text-blue {
+  background: linear-gradient(135deg, #0c83ff 0%, #0052cc 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

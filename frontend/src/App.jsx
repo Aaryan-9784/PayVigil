@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
-import PipelineFlow from './components/PipelineFlow';
 import SummaryCards from './components/SummaryCards';
-import GuardrailsPanel from './components/GuardrailsPanel';
 import WebhookSimulator from './components/WebhookSimulator';
 import RecoveryChart from './components/RecoveryChart';
 import AuditTable from './components/AuditTable';
@@ -120,22 +118,16 @@ export default function App() {
 
       {/* Main Dashboard Layout */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 space-y-6 flex-1 w-full">
-        {/* 1. Visual Lifecycle Pipeline (Problem Statement Overview) */}
-        <PipelineFlow />
-
-        {/* 2. Key Metrics & Financial Recovery KPIs */}
+        {/* 1. Key Metrics & Financial Recovery KPIs */}
         <SummaryCards data={dashboardData} loading={loading} />
 
-        {/* 3. Safety Guardrails & Stopping Rules Protection */}
-        <GuardrailsPanel guardrails={dashboardData?.guardrails} />
-
-        {/* 4. Interactive Scenario Simulator (Sandbox) */}
+        {/* 2. Interactive Scenario Simulator (Sandbox) */}
         <WebhookSimulator onEventProcessed={() => loadData()} />
 
-        {/* 5. Revenue Recovery Analytics & Resolution Distribution */}
+        {/* 3. Revenue Recovery Analytics & Resolution Distribution */}
         <RecoveryChart data={dashboardData} />
 
-        {/* 6. Immutable Audit Trail & AI Diagnostic Inspector */}
+        {/* 4. Immutable Audit Trail & AI Diagnostic Inspector */}
         <AuditTable logs={dashboardData?.recent_audit_log || []} />
       </main>
 

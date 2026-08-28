@@ -9,137 +9,125 @@ export function formatINR(paise) {
 }
 
 export default function SummaryCards({ data, loading }) {
-  const totalRecovered   = data?.total_recovered_paise || 0;
-  const totalAtRisk      = data?.total_at_risk_paise   || 0;
-  const recoveryRate     = data?.recovery_rate_pct     || 0;
-  const totalActions     = data?.total_actions         || 0;
-  const successfulActions= data?.successful_actions    || 0;
-  const skippedCount     = data?.breakdown?.skipped_stopping_rule || 0;
+  const totalRecovered    = data?.total_recovered_paise || 0;
+  const totalAtRisk       = data?.total_at_risk_paise   || 0;
+  const recoveryRate      = data?.recovery_rate_pct     || 0;
+  const totalActions      = data?.total_actions         || 0;
+  const successfulActions = data?.successful_actions    || 0;
+  const skippedCount      = data?.breakdown?.skipped_stopping_rule || 0;
+
+  const cards = [
+    {
+      id: 'recovered',
+      title: 'Recovered Revenue',
+      value: loading ? '…' : formatINR(totalRecovered),
+      subtext: `${successfulActions} payments rescued`,
+      icon: TrendingUp,
+      iconBg: 'bg-blue-50 text-[#0c83ff] border-blue-200',
+      badge: 'Autonomous',
+      badgeClass: 'bg-blue-50 text-[#0054b8] border-blue-200',
+      topBorder: 'from-[#0c83ff] to-[#0052cc]',
+      valueClass: 'text-[#0c2340]',
+    },
+    {
+      id: 'at_risk',
+      title: 'At-Risk Volume',
+      value: loading ? '…' : formatINR(totalAtRisk),
+      subtext: 'Total failed GMV detected',
+      icon: AlertTriangle,
+      iconBg: 'bg-amber-50 text-amber-700 border-amber-200',
+      badge: 'Degraded',
+      badgeClass: 'bg-amber-50 text-amber-900 border-amber-200',
+      topBorder: 'from-amber-400 to-amber-600',
+      valueClass: 'text-[#0c2340]',
+    },
+    {
+      id: 'recovery_rate',
+      title: 'Recovery Success Rate',
+      value: loading ? '…' : `${recoveryRate}%`,
+      subtext: `(${successfulActions}/${totalActions} settled)`,
+      icon: Activity,
+      iconBg: 'bg-sky-50 text-[#0c83ff] border-sky-200',
+      badge: `${Math.round(recoveryRate)}% Rate`,
+      badgeClass: 'bg-sky-50 text-[#0054b8] border-sky-200',
+      topBorder: 'from-[#38bdf8] to-[#0c83ff]',
+      valueClass: 'text-[#0c83ff]',
+      isGauge: true,
+    },
+    {
+      id: 'guardrails',
+      title: 'Safety Guardrails',
+      value: loading ? '…' : `${skippedCount}`,
+      unit: 'Protected',
+      subtext: 'Spam retries blocked safely',
+      icon: ShieldCheck,
+      iconBg: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      badge: 'Active',
+      badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+      topBorder: 'from-emerald-400 to-emerald-600',
+      valueClass: 'text-[#0c2340]',
+    },
+  ];
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {cards.map((card) => {
+        const Icon = card.icon;
 
-      {/* ── 1. Recovered Revenue: Razorpay Dark Space Navy Hero Card ── */}
-      <div
-        className="rounded-2xl p-5 text-white relative overflow-hidden transition-all duration-300 hover:-translate-y-1 cursor-pointer group shadow-card"
-        style={{
-          background: 'linear-gradient(135deg, #02042b 0%, #0c2340 60%, #0054b8 100%)',
-          border: '1px solid rgba(12, 131, 255, 0.35)',
-        }}
-      >
-        {/* Razorpay signature ambient light */}
-        <div
-          className="absolute -right-6 -bottom-6 w-28 h-28 rounded-full pointer-events-none opacity-40 blur-xl"
-          style={{ background: '#0c83ff' }}
-        />
+        return (
+          <div
+            key={card.id}
+            className="rounded-2xl bg-white border border-slate-200/90 shadow-xs p-5 flex flex-col justify-between transition-all duration-200 hover:shadow-md hover:-translate-y-1 relative overflow-hidden group"
+          >
+            {/* Top gradient accent line */}
+            <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${card.topBorder}`} />
 
-        <div className="flex items-center justify-between mb-3 relative z-10">
-          <span className="text-[11px] font-bold tracking-wider uppercase text-blue-200">
-            Recovered Revenue
-          </span>
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/20 border border-blue-400/30 text-cyan-300">
-            <TrendingUp className="w-4 h-4" />
+            {/* Header */}
+            <div>
+              <div className="flex items-center justify-between mb-3.5">
+                <span className="text-[11px] font-bold tracking-wider uppercase text-slate-500">
+                  {card.title}
+                </span>
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center border shadow-2xs group-hover:scale-105 transition-transform ${card.iconBg}`}>
+                  <Icon className="w-4 h-4" />
+                </div>
+              </div>
+
+              {/* Metric Value */}
+              <div className="flex items-baseline gap-1.5">
+                <span className={`text-3xl font-extrabold tracking-tight leading-tight ${card.valueClass}`}>
+                  {card.value}
+                </span>
+                {card.unit && (
+                  <span className="text-sm font-bold text-slate-500">
+                    {card.unit}
+                  </span>
+                )}
+              </div>
+
+              {/* Optional Progress Gauge for Recovery Rate */}
+              {card.isGauge && (
+                <div className="mt-3 w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-[#0c83ff] to-[#38bdf8] transition-all duration-700 ease-out"
+                    style={{ width: `${Math.min(recoveryRate, 100)}%` }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Footer / Subtext & Badge */}
+            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+              <span className="text-[11.5px] text-slate-500 font-medium truncate pr-2">
+                {card.subtext}
+              </span>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border uppercase tracking-wider shrink-0 ${card.badgeClass}`}>
+                {card.badge}
+              </span>
+            </div>
           </div>
-        </div>
-
-        <div className="text-3xl font-extrabold tracking-tight text-white relative z-10 leading-tight">
-          {loading ? <span className="shimmer bg-white/20" /> : formatINR(totalRecovered)}
-        </div>
-
-        {!loading && (
-          <div className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-cyan-300 relative z-10">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>{successfulActions} transactions recovered autonomously</span>
-          </div>
-        )}
-      </div>
-
-      {/* ── 2. Failed Payments Volume: Crisp Razorpay White Card ── */}
-      <div
-        className="glass-card-interactive p-5 fade-in-delay-1 relative overflow-hidden"
-        style={{
-          borderLeft: '4px solid #f59e0b',
-        }}
-      >
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-[11px] font-bold tracking-wider uppercase text-slate-500">
-            At-Risk Volume
-          </span>
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-amber-50 border border-amber-200 text-amber-700">
-            <AlertTriangle className="w-4 h-4" />
-          </div>
-        </div>
-
-        <div className="text-3xl font-extrabold tracking-tight text-slate-900 leading-tight">
-          {loading ? <span className="shimmer" /> : formatINR(totalAtRisk)}
-        </div>
-
-        {!loading && (
-          <div className="mt-3 flex items-center justify-between text-xs text-slate-500 font-medium">
-            <span>Total failed GMV detected</span>
-            <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-amber-100/90 text-amber-900 border border-amber-200">
-              Degraded
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* ── 3. Recovery Success Rate: Razorpay Electric Blue Gauge ── */}
-      <div className="glass-card-interactive p-5 fade-in-delay-2">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-[11px] font-bold tracking-wider uppercase text-[#0c2340]">
-            Recovery Success Rate
-          </span>
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-50 border border-blue-200 text-[#0c83ff]">
-            <Activity className="w-4 h-4" />
-          </div>
-        </div>
-
-        <div className="flex items-baseline gap-2 mb-2.5">
-          <span className="text-3xl font-extrabold tracking-tight text-[#0c2340] leading-tight">
-            {loading ? '…' : `${recoveryRate}%`}
-          </span>
-          {!loading && (
-            <span className="text-xs font-semibold text-slate-500">
-              ({successfulActions}/{totalActions})
-            </span>
-          )}
-        </div>
-
-        <div className="progress-track">
-          <div className="progress-fill" style={{ width: loading ? '0%' : `${Math.min(recoveryRate,100)}%` }} />
-        </div>
-      </div>
-
-      {/* ── 4. Safety Guardrails: Razorpay Shield Card ── */}
-      <div
-        className="glass-card-interactive p-5 fade-in-delay-3"
-        style={{
-          borderLeft: '4px solid #10b981',
-        }}
-      >
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-[11px] font-bold tracking-wider uppercase text-[#0c2340]">
-            Safety Guardrails
-          </span>
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-50 border border-emerald-200 text-emerald-700">
-            <ShieldCheck className="w-4 h-4" />
-          </div>
-        </div>
-
-        <div className="text-3xl font-extrabold tracking-tight text-[#0c2340] leading-tight">
-          {loading ? <span className="shimmer" /> : `${skippedCount}`}
-          <span className="text-lg font-bold text-slate-600 ml-1.5">Protected</span>
-        </div>
-
-        {!loading && (
-          <div className="mt-3 flex items-center gap-1.5 text-xs text-emerald-700 font-semibold">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Spam charges throttled safely</span>
-          </div>
-        )}
-      </div>
-
+        );
+      })}
     </div>
   );
 }

@@ -13,7 +13,7 @@ export default function Header({ onRefresh, onSeedData, onResetData, isRefreshin
           <div className="flex items-center gap-3.5">
             {/* Razorpay Logo Orb with Indian Rupee Symbol */}
             <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 relative shadow-sm"
+              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
               style={{
                 background: 'linear-gradient(135deg, #02042b 0%, #0c2340 50%, #0c83ff 100%)',
                 border: '1px solid rgba(12, 131, 255, 0.4)',
@@ -22,9 +22,6 @@ export default function Header({ onRefresh, onSeedData, onResetData, isRefreshin
             >
               {/* Rupee Symbol Icon */}
               <IndianRupee className="w-5 h-5 text-white" strokeWidth={2.5} />
-              
-              {/* Live Gateway Pulse */}
-              <span className="pulse-dot absolute -top-1 -right-1 w-2.5 h-2.5 border-2 border-white" />
             </div>
 
             <div>
@@ -45,12 +42,6 @@ export default function Header({ onRefresh, onSeedData, onResetData, isRefreshin
 
           {/* ── Razorpay Action Bar ── */}
           <div className="flex items-center flex-wrap gap-2.5">
-            {/* Live Gateway Indicator */}
-            <div className="hidden md:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>HMAC Secured</span>
-            </div>
-
             {/* Refresh Button */}
             <button
               onClick={onRefresh}

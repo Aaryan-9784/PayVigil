@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Activity, Zap } from 'lucide-react';
+import { Zap } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -20,20 +20,9 @@ export default function Footer() {
           <span>Powered by <strong className="text-[#0c2340] font-bold">Razorpay Autonomous Recovery Engine</strong></span>
         </div>
 
-        {/* Right — status pills */}
-        <div className="flex items-center gap-3 text-xs">
-          <span
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold bg-emerald-50 text-emerald-800 border border-emerald-200"
-          >
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            Safety Guardrails Active
-          </span>
-          <span
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold bg-blue-50 text-[#0054b8] border border-blue-200"
-          >
-            <Activity className="w-3.5 h-3.5 text-[#0c83ff]" />
-            System Healthy
-          </span>
+        {/* Right — copyright/info */}
+        <div className="text-xs text-slate-400 font-medium">
+          Enterprise Payment Failure Triage &amp; Recovery
         </div>
       </div>
     </footer>

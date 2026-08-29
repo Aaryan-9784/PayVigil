@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime, timezone, timedelta
 import logging
 from sqlalchemy import select, func
@@ -5,8 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import Action, Event, AuditLog, Diagnosis
 from app.config import settings
 from app.razorpay_client import retry_payment_on_razorpay
-from app.email_client import send_reminder_email as send_email
+from app.messaging_client import send_multichannel_recovery_message
 from app.slack_client import send_slack_alert
+from app.crm_client import create_or_update_crm_ticket
 
 logger = logging.getLogger("revenue_recovery.executor")
 
@@ -82,28 +84,45 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
     amount_recovered = 0
 
     try:
+        # BRANCH 1: RETRY (Wait buffer -> HTTP Request to Razorpay)
         if action_type == "retry_payment":
+            delay_sec = action_input.get("delay_seconds", 0)
+            if delay_sec > 0:
+                logger.info(f"[Retry Flow] Waiting {delay_sec} seconds before retrying payment {event.razorpay_payment_id}...")
+                await asyncio.sleep(delay_sec)
+            
             success = await retry_payment_on_razorpay(action_input.get("razorpay_payment_id", event.razorpay_payment_id))
             status = "success" if success else "failed"
             amount_recovered = event.amount_paise if success else 0
+            
+        # BRANCH 2: MESSAGE (Multi-channel: Email + WhatsApp + SMS)
         elif action_type == "send_reminder_email":
-            success = await send_email(
-                action_input.get("customer_id", event.customer_id or "cust_default"),
-                action_input.get("reason", event.error_description or "Payment retry reminder")
+            success = await send_multichannel_recovery_message(
+                customer_id=action_input.get("customer_id", event.customer_id or "cust_default"),
+                reason=action_input.get("reason", event.error_description or "Payment retry reminder"),
+                payment_id=event.razorpay_payment_id
             )
             status = "success" if success else "failed"
+            
+        # BRANCH 3: HUMAN (Slack Alert -> CRM Ticket Update)
         elif action_type == "escalate_to_human":
-            success = await send_slack_alert(
+            slack_ok = await send_slack_alert(
                 action_input.get("razorpay_payment_id", event.razorpay_payment_id),
                 action_input.get("reason", "Escalated to human ops")
             )
-            status = "success" if success else "failed"
+            crm_ok = await create_or_update_crm_ticket(
+                payment_id=action_input.get("razorpay_payment_id", event.razorpay_payment_id),
+                reason=action_input.get("reason", "Escalated to human ops"),
+                customer_id=event.customer_id or ""
+            )
+            status = "success" if (slack_ok and crm_ok) else "failed"
         else:
             status = "failed"
     except Exception as e:
         logger.error(f"Execution error: {e}")
         status = "failed"
 
+    # SAVE RESULT: Store action & audit records in Database
     action = Action(
         event_id=event.id,
         action_type=action_type,

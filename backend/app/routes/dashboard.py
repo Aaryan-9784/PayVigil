@@ -7,6 +7,8 @@ from app.config import settings
 
 router = APIRouter()
 
+import hmac
+
 async def require_api_key(request: Request):
     key = request.headers.get("x-api-key") or request.headers.get("X-API-KEY") or request.headers.get("x_api_key")
     valid_keys = {
@@ -15,8 +17,10 @@ async def require_api_key(request: Request):
         "TSDkf1pltC2m41sm95baMx1TJmKt7769iK99TU8BQDD",
         "bH8JHwtm8qx41BQXSmUkG5kWmLKJ8ovjaKumCOIagsi"
     }
-    if key and key in valid_keys:
-        return True
+    if key:
+        for valid in valid_keys:
+            if hmac.compare_digest(key, valid):
+                return True
     raise HTTPException(status_code=401, detail="Unauthorized - Invalid or missing API key")
 
 def _generate_customer_messages(event_id_short: str, amount_inr: float, reason: str, action_type: str):
@@ -91,12 +95,24 @@ async def get_dashboard(db: AsyncSession = Depends(get_db)):
 
         msg_en, msg_hinglish = _generate_customer_messages(short_id, amt_inr, reason, action_type)
 
+        from app.security import mask_phone, mask_email, decrypt_sensitive_field
+
+        raw_cust = event.customer_id if event else "cust_anonymous"
+        # Decrypt if encrypted token, then mask for frontend display safety
+        decrypted_cust = decrypt_sensitive_field(raw_cust)
+        if "@" in decrypted_cust:
+            safe_customer = mask_email(decrypted_cust)
+        elif decrypted_cust.startswith("+") or any(char.isdigit() for char in decrypted_cust):
+            safe_customer = mask_phone(decrypted_cust)
+        else:
+            safe_customer = decrypted_cust
+
         enriched_logs.append({
             "id": str(audit.id),
             "summary": audit.summary,
             "created_at": audit.created_at.isoformat() if hasattr(audit.created_at, "isoformat") else str(audit.created_at),
             "payment_id": pay_id,
-            "customer_id": event.customer_id if event else "cust_anonymous",
+            "customer_id": safe_customer,
             "amount_paise": amt_paise,
             "amount_inr": amt_inr,
             "amount_recovered_inr": (action.amount_recovered_paise / 100) if action else 0,

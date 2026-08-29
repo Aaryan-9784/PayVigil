@@ -7,6 +7,9 @@ from app.routes import webhooks, dashboard, dev_tools
 from app.config import settings
 from app.database import init_db
 
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
+
 limiter = Limiter(key_func=get_remote_address)
 
 @asynccontextmanager
@@ -25,6 +28,7 @@ app = FastAPI(
     lifespan=lifespan
 )
 app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS Configuration
 origins = ["https://YOUR-FRONTEND-DOMAIN.vercel.app"] if settings.environment == "production" else [
@@ -41,6 +45,31 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
+
+# Enterprise Security Headers Middleware (OWASP Standard)
+@app.middleware("http")
+async def add_enterprise_security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+    return response
+
+from fastapi.responses import JSONResponse
+import logging
+
+app_logger = logging.getLogger("revenue_recovery.app")
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    app_logger.error(f"Unhandled exception on {request.url.path}: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An internal server error occurred. Security incident logged."}
+    )
 
 # Route registration
 app.include_router(webhooks.router)

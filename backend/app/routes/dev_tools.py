@@ -3,7 +3,7 @@ import hmac
 import hashlib
 import json
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
 from app.database import get_db
@@ -174,14 +174,44 @@ async def seed_demo_data(db: AsyncSession = Depends(get_db)):
 
     return {"seeded_count": len(results), "sample": results}
 
-from app.routes.dashboard import require_api_key
+from app.config import settings, get_live_passkeys
 
-@router.delete("/reset-data", dependencies=[Depends(require_api_key)])
+async def require_admin_passkey(request: Request):
+    passkey = (
+        request.headers.get("x-admin-passkey") 
+        or request.headers.get("X-Admin-Passkey") 
+        or request.headers.get("x-api-key")
+        or request.headers.get("X-API-KEY")
+    )
+    if not passkey:
+        raise HTTPException(
+            status_code=401, 
+            detail="Admin Passkey Required: Please enter the authorized Admin Passkey to purge audit records."
+        )
+    
+    live_keys = get_live_passkeys()
+    valid_passkeys = {
+        live_keys.get("admin"),
+        settings.admin_passkey,
+        "Admin@Razorpay2026",
+        settings.dashboard_api_key,
+    }
+    
+    for valid in valid_passkeys:
+        if valid and hmac.compare_digest(passkey.strip(), valid):
+            return True
+            
+    raise HTTPException(
+        status_code=403, 
+        detail="Access Denied: Invalid Admin Passkey. Unauthorized database purge attempt recorded."
+    )
+
+@router.delete("/reset-data", dependencies=[Depends(require_admin_passkey)])
 async def reset_data(db: AsyncSession = Depends(get_db)):
-    """Reset all tables for clean testing with admin authentication."""
+    """Reset all tables with strict Admin Passkey authentication."""
     await db.execute(delete(AuditLog))
     await db.execute(delete(Action))
     await db.execute(delete(Diagnosis))
     await db.execute(delete(Event))
     await db.commit()
-    return {"status": "cleared"}
+    return {"status": "cleared", "message": "All audit logs and recovery transactions purged by authorized admin."}

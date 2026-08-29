@@ -1,9 +1,9 @@
 # ==============================================================================
-# Git Ignore Configuration - AI Revenue Recovery Agent
+# Git Ignore Configuration - AI Revenue Recovery Agent for Razorpay
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
-# 1. Environment & Secrets
+# 1. Environment & Secret Credentials (Never Commit Secrets)
 # ------------------------------------------------------------------------------
 .env
 .env.*
@@ -11,12 +11,16 @@
 .env.development.local
 .env.test.local
 .env.production.local
-# Keep example templates committed
+backend/.env
+frontend/.env
+*.env
+
+# Keep template examples committed
 !.env.example
 !*/.env.example
 
 # ------------------------------------------------------------------------------
-# 2. Python & Virtual Environments
+# 2. Python, Virtual Environments & Caches
 # ------------------------------------------------------------------------------
 __pycache__/
 *.py[cod]
@@ -33,7 +37,6 @@ lib/
 lib64/
 parts/
 sdist/
-var/
 wheels/
 *.egg-info/
 .installed.cfg
@@ -48,9 +51,11 @@ ENV/
 env.bak/
 venv.bak/
 virtualenv/
+backend/venv/
+backend/.venv/
 
 # ------------------------------------------------------------------------------
-# 3. Databases & Local Storage
+# 3. Databases, State & Local Storage
 # ------------------------------------------------------------------------------
 *.db
 *.sqlite
@@ -62,7 +67,7 @@ revenue_recovery.db
 backend/revenue_recovery.db
 
 # ------------------------------------------------------------------------------
-# 4. Testing & Code Quality
+# 4. Testing, Coverage & Type Checking
 # ------------------------------------------------------------------------------
 .pytest_cache/
 .coverage
@@ -77,10 +82,11 @@ coverage.xml
 .mypy_cache/
 
 # ------------------------------------------------------------------------------
-# 5. Node.js & Frontend (Vite / React)
+# 5. Node.js & Frontend (React 18 + Vite)
 # ------------------------------------------------------------------------------
 node_modules/
 frontend/node_modules/
+dist/
 frontend/dist/
 frontend/dist-ssr/
 .vite/
@@ -129,7 +135,7 @@ ehthumbs.db
 ehthumbs_vista.db
 desktop.ini
 
-# Editors & IDEs
+# IDEs & Code Editors
 .idea/
 *.sublime-workspace
 *.sublime-project

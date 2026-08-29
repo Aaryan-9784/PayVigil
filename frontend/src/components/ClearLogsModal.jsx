@@ -1,148 +1,186 @@
 import React, { useState } from 'react';
-import { ShieldAlert, Lock, X, AlertTriangle, KeyRound, Loader2 } from 'lucide-react';
+import { ShieldAlert, X, AlertTriangle, KeyRound, Eye, EyeOff, Loader2, Trash2 } from 'lucide-react';
 
 export default function ClearLogsModal({ isOpen, onClose, onConfirm, isClearing }) {
-  const [confirmationText, setConfirmationText] = useState('');
-  const [adminKey, setAdminKey] = useState('');
+  const [adminPasskey, setAdminPasskey] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isAcknowledged, setIsAcknowledged] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   if (!isOpen) return null;
 
-  const isConfirmed = confirmationText.trim().toUpperCase() === 'CONFIRM';
+  const isValid = adminPasskey.trim().length > 0 && isAcknowledged;
 
   const handleExecute = async (e) => {
     e.preventDefault();
-    if (!isConfirmed) {
-      setErrorMsg('Please type CONFIRM to authorize log purge.');
+    if (!adminPasskey.trim()) {
+      setErrorMsg('Please enter the Admin Security Passkey.');
+      return;
+    }
+    if (!isAcknowledged) {
+      setErrorMsg('Please confirm acknowledgment before proceeding.');
       return;
     }
     setErrorMsg('');
-    await onConfirm(adminKey.trim() || null);
+    await onConfirm(adminPasskey.trim());
   };
 
   const handleClose = () => {
-    setConfirmationText('');
-    setAdminKey('');
+    if (isClearing) return;
+    setAdminPasskey('');
+    setShowPassword(false);
+    setIsAcknowledged(false);
     setErrorMsg('');
     onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
+      {/* Blurred Deep Navy Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
-        onClick={!isClearing ? handleClose : undefined}
+        className="fixed inset-0 bg-[#02042b]/75 backdrop-blur-sm transition-opacity"
+        onClick={handleClose}
       />
 
-      {/* Modal Container */}
+      {/* Modal Glass Container */}
       <div
-        className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-10"
-        style={{ animation: 'fadeSlideUp 0.25s ease-out' }}
+        className="relative w-full max-w-lg rounded-3xl overflow-hidden z-10 text-white shadow-2xl backdrop-blur-2xl"
+        style={{
+          background: 'linear-gradient(145deg, rgba(12, 35, 64, 0.95) 0%, rgba(5, 16, 32, 0.98) 100%)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(239, 68, 68, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+          animation: 'fadeSlideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+        }}
       >
-        {/* Header Banner */}
-        <div className="bg-gradient-to-r from-red-600 to-rose-700 px-6 py-5 text-white flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/20">
-              <ShieldAlert className="w-5 h-5 text-white" />
+        {/* Header */}
+        <div className="px-7 pt-7 pb-5 flex items-center justify-between border-b border-white/10">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-400 shrink-0 shadow-lg shadow-red-500/10">
+              <ShieldAlert className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold tracking-tight text-white">Admin Security Verification</h3>
+                <h3 className="text-lg font-bold tracking-tight text-white font-sans">
+                  Admin Authorization
+                </h3>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
+                  Protected
+                </span>
               </div>
-              <p className="text-xs text-red-100 font-medium">Protected Database Reset Action</p>
+              <p className="text-xs text-slate-400 font-medium mt-0.5">
+                Passkey verification required to purge recovery database
+              </p>
             </div>
           </div>
+
           <button
             onClick={handleClose}
             disabled={isClearing}
-            className="p-1 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Modal Body */}
-        <form onSubmit={handleExecute} className="p-6 space-y-4">
-          <div className="bg-red-50 border border-red-200 rounded-xl p-3.5 flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
-            <p className="text-xs text-red-800 leading-relaxed font-medium">
-              This action will permanently delete all <strong>recovery events</strong>, <strong>AI diagnosis logs</strong>, and <strong>audit trails</strong> from PostgreSQL. This cannot be undone.
-            </p>
+        {/* Modal Form */}
+        <form onSubmit={handleExecute} className="p-7 space-y-5">
+          {/* Warning Banner */}
+          <div className="bg-red-500/10 border border-red-500/25 rounded-2xl p-4 flex items-start gap-3.5">
+            <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+            <div className="text-xs text-red-200 leading-relaxed font-normal">
+              This action will permanently purge all <strong>recovery transactions</strong>, <strong>AI diagnosis audit logs</strong>, and <strong>event records</strong> from PostgreSQL.
+            </div>
           </div>
 
-          {/* Confirmation Input */}
+          {/* Admin Passkey Input */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-slate-700">
-              Type <span className="font-mono text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-200 font-bold">CONFIRM</span> to authorize:
+            <label className="block text-xs font-semibold text-slate-300">
+              Admin Security Passkey <span className="text-red-400">*</span>
             </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <KeyRound className="w-4 h-4" />
+              </div>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="admin-authorization-passkey"
+                id="admin-authorization-passkey"
+                autoComplete="one-time-code"
+                data-lpignore="true"
+                value={adminPasskey}
+                onChange={(e) => {
+                  setAdminPasskey(e.target.value);
+                  if (errorMsg) setErrorMsg('');
+                }}
+                placeholder="Enter Admin Security Passkey"
+                disabled={isClearing}
+                autoFocus
+                className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-white/10 bg-[#030914]/70 text-sm font-mono text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500 transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Safety Checkbox */}
+          <label className="flex items-start gap-3 pt-0.5 cursor-pointer select-none">
             <input
-              type="text"
-              value={confirmationText}
+              type="checkbox"
+              checked={isAcknowledged}
               onChange={(e) => {
-                setConfirmationText(e.target.value);
+                setIsAcknowledged(e.target.checked);
                 if (errorMsg) setErrorMsg('');
               }}
-              placeholder="CONFIRM"
               disabled={isClearing}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-slate-50/50"
-              autoFocus
+              className="mt-0.5 w-4 h-4 rounded border-white/20 bg-[#030914]/70 text-red-600 focus:ring-red-500/40 cursor-pointer"
             />
-          </div>
+            <span className="text-xs text-slate-300 font-normal leading-tight">
+              I understand this action is irreversible and purges all live recovery audit logs.
+            </span>
+          </label>
 
-          {/* Optional Admin Passkey Input */}
-          <div className="space-y-1.5">
-            <label className="flex items-center justify-between text-xs font-semibold text-slate-700">
-              <span className="flex items-center gap-1.5">
-                <KeyRound className="w-3.5 h-3.5 text-slate-500" />
-                Admin Passkey (Optional Override)
-              </span>
-              <span className="text-[10px] text-slate-400 font-normal">Defaults to Environment Key</span>
-            </label>
-            <input
-              type="password"
-              value={adminKey}
-              onChange={(e) => setAdminKey(e.target.value)}
-              placeholder="••••••••••••••••••••"
-              disabled={isClearing}
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-slate-400 bg-slate-50/50"
-            />
-          </div>
-
+          {/* Error Message */}
           {errorMsg && (
-            <p className="text-xs font-semibold text-red-600 animate-shake">
-              {errorMsg}
-            </p>
+            <div className="p-3 rounded-xl bg-red-950/70 border border-red-500/40 text-xs font-semibold text-red-300 flex items-center gap-2 animate-shake">
+              <AlertTriangle className="w-4 h-4 shrink-0 text-red-400" />
+              <span>{errorMsg}</span>
+            </div>
           )}
 
-          {/* Action Buttons */}
-          <div className="pt-2 flex items-center justify-end gap-2.5">
+          {/* Modal Footer CTA Buttons */}
+          <div className="pt-3 border-t border-white/10 flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={handleClose}
               disabled={isClearing}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
+              className="px-4 py-2.5 text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={!isConfirmed || isClearing}
-              className={`px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm ${
-                isConfirmed && !isClearing
-                  ? 'bg-red-600 text-white hover:bg-red-700 shadow-red-600/25 cursor-pointer'
-                  : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+              disabled={!isValid || isClearing}
+              className={`px-5 py-2.5 text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-md ${
+                isValid && !isClearing
+                  ? 'bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white shadow-red-600/30 cursor-pointer active:scale-98'
+                  : 'bg-slate-800 text-slate-500 border border-white/5 cursor-not-allowed'
               }`}
             >
               {isClearing ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  Purging Logs...
+                  <span>Verifying &amp; Purging...</span>
                 </>
               ) : (
                 <>
-                  <Lock className="w-3.5 h-3.5" />
-                  Confirm &amp; Clear Database
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Verify &amp; Clear Database</span>
                 </>
               )}
             </button>

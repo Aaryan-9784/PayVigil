@@ -58,6 +58,79 @@ def _generate_customer_messages(event_id_short: str, amount_inr: float, reason: 
 
     return en, hinglish
 
+from pydantic import BaseModel
+from app.config import settings, get_live_passkeys
+
+class AdminLoginRequest(BaseModel):
+    username: str = "admin"
+    passkey: str
+
+import time
+from collections import defaultdict
+
+# Brute-force & credential stuffing defense
+FAILED_LOGIN_ATTEMPTS = defaultdict(list)
+
+def _check_rate_limit(ip: str):
+    now = time.time()
+    attempts = [t for t in FAILED_LOGIN_ATTEMPTS[ip] if now - t < 60]
+    FAILED_LOGIN_ATTEMPTS[ip] = attempts
+    if len(attempts) >= 8:
+        raise HTTPException(
+            status_code=429, 
+            detail="Too many failed login attempts. Security throttling active. Please wait 60 seconds."
+        )
+
+def _record_failed_attempt(ip: str):
+    FAILED_LOGIN_ATTEMPTS[ip].append(time.time())
+
+@router.post("/api/auth/login")
+async def user_login(req: AdminLoginRequest, request: Request):
+    """Authenticate Admin or Customer Support team session with brute-force defense."""
+    client_ip = request.client.host if request.client else "unknown"
+    _check_rate_limit(client_ip)
+
+    user_str = req.username.strip().lower()
+    pass_str = req.passkey.strip()
+    
+    live_keys = get_live_passkeys()
+    
+    # 1. Admin Verification
+    admin_keys = {
+        live_keys.get("admin"),
+        settings.admin_passkey,
+        settings.dashboard_api_key,
+    }
+    for valid in admin_keys:
+        if valid and hmac.compare_digest(pass_str, valid):
+            return {
+                "success": True,
+                "role": "admin",
+                "username": req.username or "Administrator",
+                "email": "admin@razorpay.internal",
+                "token": settings.dashboard_api_key,
+                "message": "Admin session authenticated successfully"
+            }
+            
+    # 2. Customer Support Team Verification
+    support_keys = {
+        live_keys.get("support"),
+        settings.customer_support_passkey,
+    }
+    for valid in support_keys:
+        if valid and hmac.compare_digest(pass_str, valid):
+            return {
+                "success": True,
+                "role": "support",
+                "username": req.username if req.username and req.username.lower() != "admin" else "Support Specialist",
+                "email": "support@razorpay.com",
+                "token": settings.dashboard_api_key,
+                "message": "Customer Support session authenticated successfully"
+            }
+            
+    _record_failed_attempt(client_ip)
+    raise HTTPException(status_code=401, detail="Invalid credentials or security passkey")
+
 @router.get("/api/dashboard", dependencies=[Depends(require_api_key)])
 async def get_dashboard(db: AsyncSession = Depends(get_db)):
     total_recovered = await db.execute(select(func.coalesce(func.sum(Action.amount_recovered_paise), 0)))

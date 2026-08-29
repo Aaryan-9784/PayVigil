@@ -30,9 +30,20 @@ export async function seedDemoData() {
   return response.data;
 }
 
-export async function resetDatabase(customKey = null) {
+export async function loginAdmin(username, passkey) {
+  const response = await axios.post(`${API_BASE}/api/auth/login`, {
+    username: username || "admin",
+    passkey: passkey
+  });
+  return response.data;
+}
+
+export async function resetDatabase(adminPasskey) {
   const response = await axios.delete(`${API_BASE}/api/dev/reset-data`, {
-    headers: { "x-api-key": customKey || API_KEY }
+    headers: { 
+      "x-admin-passkey": adminPasskey || "",
+      "x-api-key": adminPasskey || API_KEY 
+    }
   });
   return response.data;
 }

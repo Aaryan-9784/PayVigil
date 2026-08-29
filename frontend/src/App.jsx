@@ -5,24 +5,32 @@ import RecoveryChart from './components/RecoveryChart';
 import AuditTable from './components/AuditTable';
 import Footer from './components/Footer';
 import ClearLogsModal from './components/ClearLogsModal';
+import LoginPage from './components/LoginPage';
 import { fetchDashboard, resetDatabase } from './api';
 import { AlertCircle, CheckCircle2, X } from 'lucide-react';
 
 export default function App() {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [notification, setNotification] = useState(null);
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('rzp_user_session');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
 
   const showToast = (message, type = 'success') => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 3500);
   };
 
-  const loadData = useCallback(async (isManual = false) => {
-    if (isManual) setIsRefreshing(true);
+  const loadData = useCallback(async () => {
+    if (!currentUser) return;
     try {
       const data = await fetchDashboard();
       setDashboardData(data);
@@ -31,21 +39,44 @@ export default function App() {
       showToast('Could not connect to server', 'error');
     } finally {
       setLoading(false);
-      if (isManual) setIsRefreshing(false);
     }
-  }, []);
+  }, [currentUser]);
 
-  useEffect(() => { loadData(); }, [loadData]);
+  useEffect(() => { 
+    if (currentUser) loadData(); 
+  }, [currentUser, loadData]);
 
   useEffect(() => {
+    if (!currentUser) return;
     const interval = setInterval(() => loadData(), 10000);
     return () => clearInterval(interval);
-  }, [loadData]);
+  }, [currentUser, loadData]);
 
-  const handleConfirmReset = async (customKey) => {
+  const handleLoginSuccess = (userData) => {
+    setCurrentUser(userData);
+    try {
+      localStorage.setItem('rzp_user_session', JSON.stringify(userData));
+    } catch (e) {
+      console.error('Storage error:', e);
+    }
+    const roleLabel = userData.role === 'admin' ? 'System Administrator' : 'Customer Support Specialist';
+    showToast(`Welcome ${userData.username} (${roleLabel})`);
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    try {
+      localStorage.removeItem('rzp_user_session');
+    } catch (e) {
+      console.error('Storage error:', e);
+    }
+    showToast('Signed out of session');
+  };
+
+  const handleConfirmReset = async (passkey) => {
     setIsClearing(true);
     try {
-      await resetDatabase(customKey);
+      await resetDatabase(passkey);
       showToast('All recovery logs and transactions purged successfully');
       setIsClearModalOpen(false);
       await loadData();
@@ -57,10 +88,16 @@ export default function App() {
     }
   };
 
+  // ── First Gateway: Show Login Page if not authenticated ──
+  if (!currentUser) {
+    return <LoginPage onLoginSuccess={handleLoginSuccess} />;
+  }
+
+  // ── Authenticated View: Full Dashboard ──
   return (
     <div className="min-h-screen flex flex-col grid-bg text-[#0c2340]" style={{ fontFamily: "'Inter', sans-serif" }}>
 
-      {/* Premium Toast Notification (Razorpay Theme) */}
+      {/* Toast Notification */}
       {notification && (
         <div
           className="fixed bottom-5 right-5 z-50"
@@ -106,9 +143,9 @@ export default function App() {
 
       {/* Header Navigation */}
       <Header
-        onRefresh={() => loadData(true)}
         onResetData={() => setIsClearModalOpen(true)}
-        isRefreshing={isRefreshing}
+        onLogout={handleLogout}
+        currentUser={currentUser}
       />
 
       {/* Main Dashboard Layout */}
@@ -123,7 +160,7 @@ export default function App() {
         <AuditTable logs={dashboardData?.recent_audit_log || []} />
       </main>
 
-      {/* Security Confirmation Modal for Database/Log Purge */}
+      {/* Security Confirmation Modal for Database/Log Purge (Admin Only) */}
       <ClearLogsModal
         isOpen={isClearModalOpen}
         onClose={() => setIsClearModalOpen(false)}

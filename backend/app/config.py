@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     razorpay_key_id: str = "rzp_test_mock_key"
     razorpay_key_secret: str = "rzp_secret_mock"
     razorpay_webhook_secret: str = "rzp_webhook_secret_mock_12345"
-    database_url: str = "sqlite+aiosqlite:///./revenue_recovery.db"
+    database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/revenue_recovery"
     resend_api_key: str = "re_mock_key_12345"
     slack_webhook_url: str = "https://hooks.slack.com/services/mock/123/456"
     dashboard_api_key: str = "rev-recovery-dev-secret-key-2025"

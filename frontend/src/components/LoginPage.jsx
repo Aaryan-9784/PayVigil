@@ -85,7 +85,7 @@ export default function LoginPage({ onLoginSuccess }) {
               <div className="flex items-center gap-2.5">
                 <span className="text-2xl font-black tracking-tight text-white font-sans">Razorpay</span>
                 <span className="text-[10.5px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#0c83ff]/20 text-[#38a5ff] border border-[#0c83ff]/40">
-                  AI Recovery
+                  AI Revenue Recovery
                 </span>
               </div>
               <p className="text-xs text-slate-400 font-medium tracking-wide mt-0.5">

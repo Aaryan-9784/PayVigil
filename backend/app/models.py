@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import String, BigInteger, TIMESTAMP, ForeignKey, Integer, CheckConstraint, JSON, Uuid
+from sqlalchemy import String, BigInteger, TIMESTAMP, ForeignKey, Integer, CheckConstraint, JSON, Uuid, Boolean
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -10,6 +10,17 @@ UUID_TYPE = PG_UUID(as_uuid=True).with_variant(Uuid(as_uuid=True), "sqlite")
 
 class Base(DeclarativeBase):
     pass
+
+class User(Base):
+    __tablename__ = "users"
+    id: Mapped[uuid.UUID] = mapped_column(UUID_TYPE, primary_key=True, default=uuid.uuid4)
+    username: Mapped[str] = mapped_column(String, unique=True, nullable=False, index=True)
+    email: Mapped[str] = mapped_column(String, nullable=False)
+    role: Mapped[str] = mapped_column(String, nullable=False, default="support")  # "admin" or "support"
+    password_hash: Mapped[str] = mapped_column(String, nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
 class Event(Base):
     __tablename__ = "events"

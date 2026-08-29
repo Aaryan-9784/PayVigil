@@ -172,11 +172,11 @@ async def seed_demo_data(db: AsyncSession = Depends(get_db)):
         res = await simulate_webhook(req, db)
         results.append(res)
 
-    return {"seeded_count": len(results), "sample": results}
+from app.config import settings
+from app.models import Event, Action, AuditLog, Diagnosis, User
+from app.security import verify_password
 
-from app.config import settings, get_live_passkeys
-
-async def require_admin_passkey(request: Request):
+async def require_admin_passkey(request: Request, db: AsyncSession = Depends(get_db)):
     passkey = (
         request.headers.get("x-admin-passkey") 
         or request.headers.get("X-Admin-Passkey") 
@@ -189,18 +189,16 @@ async def require_admin_passkey(request: Request):
             detail="Admin Passkey Required: Please enter the authorized Admin Passkey to purge audit records."
         )
     
-    live_keys = get_live_passkeys()
-    valid_passkeys = {
-        live_keys.get("admin"),
-        settings.admin_passkey,
-        "Admin@Razorpay2026",
-        settings.dashboard_api_key,
-    }
+    passkey_str = passkey.strip()
     
-    for valid in valid_passkeys:
-        if valid and hmac.compare_digest(passkey.strip(), valid):
-            return True
-            
+    # 1. Database-backed Admin Passkey Check
+    stmt = select(User).where(User.role == "admin", User.is_active == True)
+    res = await db.execute(stmt)
+    admin_user = res.scalars().first()
+    
+    if admin_user and admin_user.password_hash and verify_password(passkey_str, admin_user.password_hash):
+        return True
+        
     raise HTTPException(
         status_code=403, 
         detail="Access Denied: Invalid Admin Passkey. Unauthorized database purge attempt recorded."

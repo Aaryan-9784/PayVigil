@@ -149,17 +149,19 @@ export default function Header({
 
                     {/* Actions Menu */}
                     <div className="p-1.5 space-y-0.5">
-                      {/* Clear Recovery Logs (Requires Admin Passkey Authorization) */}
-                      <button
-                        onClick={() => {
-                          setDropdownOpen(false);
-                          onResetData();
-                        }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50/80 rounded-xl transition-colors cursor-pointer text-left"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-500 shrink-0" />
-                        <span>Clear Recovery Logs</span>
-                      </button>
+                      {/* Only Admins have permissions to Clear Recovery Logs */}
+                      {isAdmin && (
+                        <button
+                          onClick={() => {
+                            setDropdownOpen(false);
+                            onResetData();
+                          }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50/80 rounded-xl transition-colors cursor-pointer text-left"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-500 shrink-0" />
+                          <span>Clear Recovery Logs</span>
+                        </button>
+                      )}
 
                       {/* Sign Out for all users */}
                       <button

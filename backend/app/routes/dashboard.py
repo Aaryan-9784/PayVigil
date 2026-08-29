@@ -59,11 +59,12 @@ def _generate_customer_messages(event_id_short: str, amount_inr: float, reason: 
     return en, hinglish
 
 from pydantic import BaseModel
-from app.config import settings, get_live_passkeys
+from app.config import settings
 
 class AdminLoginRequest(BaseModel):
     username: str = "admin"
     passkey: str
+    role: str = "admin"
 
 import time
 from collections import defaultdict
@@ -84,52 +85,110 @@ def _check_rate_limit(ip: str):
 def _record_failed_attempt(ip: str):
     FAILED_LOGIN_ATTEMPTS[ip].append(time.time())
 
+from app.models import Action, AuditLog, Event, Diagnosis, User
+from app.security import verify_password
+
 @router.post("/api/auth/login")
-async def user_login(req: AdminLoginRequest, request: Request):
-    """Authenticate Admin or Customer Support team session with brute-force defense."""
+async def user_login(
+    req: AdminLoginRequest, 
+    request: Request,
+    db: AsyncSession = Depends(get_db)
+):
+    """Authenticate Admin or Customer Support session strictly against database User table."""
     client_ip = request.client.host if request.client else "unknown"
     _check_rate_limit(client_ip)
 
-    user_str = req.username.strip().lower()
+    user_str = req.username.strip()
     pass_str = req.passkey.strip()
+    target_role = (req.role or "admin").strip().lower()
     
-    live_keys = get_live_passkeys()
-    
-    # 1. Admin Verification
-    admin_keys = {
-        live_keys.get("admin"),
-        settings.admin_passkey,
-        settings.dashboard_api_key,
-    }
-    for valid in admin_keys:
-        if valid and hmac.compare_digest(pass_str, valid):
+    if target_role == "admin":
+        # Database-backed Admin User Verification
+        stmt = select(User).where(User.role == "admin", User.is_active == True)
+        res = await db.execute(stmt)
+        admin_db_user = res.scalars().first()
+        
+        if admin_db_user and admin_db_user.password_hash and verify_password(pass_str, admin_db_user.password_hash):
             return {
                 "success": True,
                 "role": "admin",
-                "username": req.username or "Administrator",
-                "email": "admin@razorpay.internal",
+                "username": admin_db_user.username or (user_str or "Administrator"),
+                "email": admin_db_user.email or "admin@razorpay.internal",
                 "token": settings.dashboard_api_key,
-                "message": "Admin session authenticated successfully"
+                "message": "Admin session authenticated successfully from database"
             }
             
-    # 2. Customer Support Team Verification
-    support_keys = {
-        live_keys.get("support"),
-        settings.customer_support_passkey,
-    }
-    for valid in support_keys:
-        if valid and hmac.compare_digest(pass_str, valid):
+        _record_failed_attempt(client_ip)
+        raise HTTPException(
+            status_code=401, 
+            detail="Invalid Admin passkey. Please enter the authorized Admin Security Passkey."
+        )
+
+    elif target_role in ("support", "customer_support"):
+        # Database-backed Customer Support User Verification
+        stmt = select(User).where(User.role == "support", User.is_active == True)
+        res = await db.execute(stmt)
+        support_db_user = res.scalars().first()
+        
+        if support_db_user and support_db_user.password_hash and verify_password(pass_str, support_db_user.password_hash):
             return {
                 "success": True,
                 "role": "support",
-                "username": req.username if req.username and req.username.lower() != "admin" else "Support Specialist",
-                "email": "support@razorpay.com",
+                "username": support_db_user.username or (user_str or "Support Agent"),
+                "email": support_db_user.email or "support@razorpay.com",
                 "token": settings.dashboard_api_key,
-                "message": "Customer Support session authenticated successfully"
+                "message": "Customer Support session authenticated successfully from database"
             }
             
+        _record_failed_attempt(client_ip)
+        raise HTTPException(
+            status_code=401, 
+            detail="Invalid Customer Support passkey. Please enter the authorized Support Passkey."
+        )
+
     _record_failed_attempt(client_ip)
-    raise HTTPException(status_code=401, detail="Invalid credentials or security passkey")
+    raise HTTPException(status_code=400, detail="Invalid role specified for authentication")
+
+from app.security import hash_password
+
+class ChangePasswordRequest(BaseModel):
+    role: str = "admin"
+    current_passkey: str
+    new_passkey: str
+
+@router.post("/api/auth/change-password")
+async def change_user_password(
+    req: ChangePasswordRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """Securely update a user's passkey directly in the database with salted PBKDF2 hashing."""
+    target_role = (req.role or "admin").strip().lower()
+    curr_pass = req.current_passkey.strip()
+    new_pass = req.new_passkey.strip()
+    
+    if len(new_pass) < 6:
+        raise HTTPException(status_code=400, detail="New passkey must be at least 6 characters.")
+        
+    stmt = select(User).where(User.role == target_role, User.is_active == True)
+    res = await db.execute(stmt)
+    user = res.scalars().first()
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User account not found in database.")
+        
+    # Verify current passkey against stored hash
+    if not verify_password(curr_pass, user.password_hash):
+        raise HTTPException(status_code=401, detail="Current passkey is incorrect.")
+        
+    # Store salted PBKDF2 hash
+    user.password_hash = hash_password(new_pass)
+    await db.commit()
+    
+    return {
+        "success": True, 
+        "role": target_role,
+        "message": f"Passkey for '{target_role}' updated and encrypted with PBKDF2 in database."
+    }
 
 @router.get("/api/dashboard", dependencies=[Depends(require_api_key)])
 async def get_dashboard(db: AsyncSession = Depends(get_db)):

@@ -3,8 +3,35 @@ import hmac
 import hashlib
 import base64
 import time
+import secrets
 from typing import Any, Dict, Optional
 from fastapi import HTTPException, Request
+
+# ---------------------------------------------------------------------------
+# 0. Cryptographic Password Hashing & Verification (PBKDF2-HMAC-SHA256)
+# ---------------------------------------------------------------------------
+def hash_password(password: str) -> str:
+    """Hashes a password/passkey with PBKDF2-HMAC-SHA256 and a random 16-byte cryptographic salt."""
+    if not password:
+        return ""
+    salt = secrets.token_bytes(16)
+    key = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 100_000)
+    return "pbkdf2_sha256$" + base64.b64encode(salt).decode("utf-8") + "$" + base64.b64encode(key).decode("utf-8")
+
+def verify_password(plain_password: str, password_hash: str) -> bool:
+    """Verifies a plain passkey against a stored PBKDF2 hash using constant-time comparison."""
+    if not password_hash or not plain_password:
+        return False
+    try:
+        parts = password_hash.split("$")
+        if len(parts) != 3 or parts[0] != "pbkdf2_sha256":
+            return False
+        salt = base64.b64decode(parts[1])
+        expected_key = base64.b64decode(parts[2])
+        computed_key = hashlib.pbkdf2_hmac("sha256", plain_password.encode("utf-8"), salt, 100_000)
+        return hmac.compare_digest(expected_key, computed_key)
+    except Exception:
+        return False
 
 # Regex to detect potential credit/debit card numbers (13 to 19 digits)
 CARD_PATTERN = re.compile(r'\b(?:\d[ -]*?){13,19}\b')

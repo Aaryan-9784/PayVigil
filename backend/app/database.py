@@ -57,7 +57,47 @@ async def get_db():
             await session.close()
 
 async def init_db():
-    from app.models import Base
+    from app.models import Base, User
+    from app.security import hash_password
+    from sqlalchemy import select
+    
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        
+    # Ensure default Admin and Customer Support user accounts exist in DB if empty
+    try:
+        async with AsyncSessionLocal() as session:
+            # 1. Admin user in DB
+            stmt = select(User).where(User.role == "admin")
+            result = await session.execute(stmt)
+            admin_user = result.scalars().first()
+            
+            if not admin_user:
+                admin_user = User(
+                    username="Administrator",
+                    email="admin@razorpay.internal",
+                    role="admin",
+                    password_hash=hash_password("Aryan@9784"),
+                    is_active=True
+                )
+                session.add(admin_user)
+
+            # 2. Customer Support user in DB
+            stmt = select(User).where(User.role == "support")
+            result = await session.execute(stmt)
+            support_user = result.scalars().first()
+            
+            if not support_user:
+                support_user = User(
+                    username="Support Agent",
+                    email="support@razorpay.com",
+                    role="support",
+                    password_hash=hash_password("Aryan@3306"),
+                    is_active=True
+                )
+                session.add(support_user)
+                
+            await session.commit()
+    except Exception as e:
+        print(f"User seeding warning: {e}")
 

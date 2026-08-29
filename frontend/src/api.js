@@ -30,10 +30,11 @@ export async function seedDemoData() {
   return response.data;
 }
 
-export async function loginAdmin(username, passkey) {
+export async function loginAdmin(username, passkey, role = "admin") {
   const response = await axios.post(`${API_BASE}/api/auth/login`, {
-    username: username || "admin",
-    passkey: passkey
+    username: username || (role === 'admin' ? 'Administrator' : 'Support Agent'),
+    passkey: passkey,
+    role: role
   });
   return response.data;
 }

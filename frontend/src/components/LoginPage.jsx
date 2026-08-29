@@ -27,7 +27,7 @@ export default function LoginPage({ onLoginSuccess }) {
     setErrorMsg('');
 
     try {
-      const data = await loginAdmin(username.trim(), passkey.trim());
+      const data = await loginAdmin(username.trim(), passkey.trim(), selectedRole);
       if (data.success) {
         onLoginSuccess({
           username: data.username || username,

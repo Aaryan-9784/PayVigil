@@ -30,11 +30,13 @@ def encrypt_sensitive_field(plaintext: str, secret_seed: str = "master-revenue-r
     encrypted = bytes([b ^ key[i % len(key)] for i, b in enumerate(raw_bytes)])
     return "enc::" + base64.b64encode(encrypted).decode("utf-8")
 
-def decrypt_sensitive_field(ciphertext: str, secret_seed: str = "master-revenue-recovery-key-2025") -> str:
+def decrypt_sensitive_field(ciphertext: Optional[str], secret_seed: str = "master-revenue-recovery-key-2025") -> str:
     """
     Decrypts encrypted customer PII token back to original phone/email on demand.
     """
-    if not ciphertext or not ciphertext.startswith("enc::"):
+    if not ciphertext or not isinstance(ciphertext, str):
+        return ""
+    if not ciphertext.startswith("enc::"):
         return ciphertext
     try:
         raw_b64 = ciphertext.replace("enc::", "", 1)

@@ -97,9 +97,9 @@ async def get_dashboard(db: AsyncSession = Depends(get_db)):
 
         from app.security import mask_phone, mask_email, decrypt_sensitive_field
 
-        raw_cust = event.customer_id if event else "cust_anonymous"
+        raw_cust = (event.customer_id if event and event.customer_id else "") or "cust_anonymous"
         # Decrypt if encrypted token, then mask for frontend display safety
-        decrypted_cust = decrypt_sensitive_field(raw_cust)
+        decrypted_cust = decrypt_sensitive_field(raw_cust) or raw_cust
         if "@" in decrypted_cust:
             safe_customer = mask_email(decrypted_cust)
         elif decrypted_cust.startswith("+") or any(char.isdigit() for char in decrypted_cust):

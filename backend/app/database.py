@@ -13,27 +13,27 @@ if database_url.startswith("postgres://"):
 elif database_url.startswith("postgresql://") and not database_url.startswith("postgresql+asyncpg://"):
     database_url = database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
 
-# Specific engine arguments for PostgreSQL / Supabase vs SQLite
+# Supabase PgBouncer (port 6543) breaks asyncpg prepared statements; auto-route to port 5432 (session pooler / direct)
+if "supabase.com:6543" in database_url:
+    database_url = database_url.replace(":6543", ":5432")
+
+# Specific engine arguments for PostgreSQL / Supabase
 connect_args = {}
 engine_kwargs = {
     "echo": False,
     "future": True,
 }
 
-if "postgresql" in database_url:
+if "postgresql" in database_url or "supabase" in database_url:
     # 1. Supabase SSL Enforcement (Encrypted in-transit to cloud)
-    connect_args["ssl"] = "require"
+    if "localhost" not in database_url and "127.0.0.1" not in database_url:
+        connect_args["ssl"] = "require"
 
-    # 2. Supabase Connection Pooler / PgBouncer compatibility (Port 6543)
-    if ":6543" in database_url or "pooler.supabase.com" in database_url:
-        connect_args["statement_cache_size"] = 0
-        connect_args["prepared_statement_cache_size"] = 0
-
-    # 3. Cloud Connection Pool Resiliency
+    # 2. Cloud Connection Pool Resiliency
     engine_kwargs.update({
         "pool_size": 10,
         "max_overflow": 20,
-        "pool_pre_ping": True,       # Auto-reconnects if cloud connection drops
+        "pool_pre_ping": True,       # Auto-reconnects if connection drops
         "pool_recycle": 300,        # Refreshes idle connections every 5 mins
     })
 

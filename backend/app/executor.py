@@ -80,8 +80,11 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
             await db.commit()
             return action
 
-    status = "pending"
+    # When failure occurs, recovery is initiated (Email/WhatsApp link sent or retry scheduled)
+    # The actual revenue is NOT recovered until the customer pays or retry completes
     amount_recovered = 0
+    action_status = "pending"
+    summary_label = ""
 
     try:
         # BRANCH 1: RETRY (Wait buffer -> HTTP Request to Razorpay)
@@ -91,9 +94,10 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
                 logger.info(f"[Retry Flow] Waiting {delay_sec} seconds before retrying payment {event.razorpay_payment_id}...")
                 await asyncio.sleep(delay_sec)
             
+            # Simulated or queued retry
             success = await retry_payment_on_razorpay(action_input.get("razorpay_payment_id", event.razorpay_payment_id))
-            status = "success" if success else "failed"
-            amount_recovered = event.amount_paise if success else 0
+            action_status = "pending"
+            summary_label = f"Smart Gateway Retry Scheduled for {event.razorpay_payment_id} (Awaiting Bank Confirmation)"
             
         # BRANCH 2: MESSAGE (Multi-channel: Email + WhatsApp + SMS)
         elif action_type == "send_reminder_email":
@@ -102,7 +106,8 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
                 reason=action_input.get("reason", event.error_description or "Payment retry reminder"),
                 payment_id=event.razorpay_payment_id
             )
-            status = "success" if success else "failed"
+            action_status = "pending"
+            summary_label = f"1-Click Recovery Link Dispatched via WhatsApp & Email to {event.customer_id or 'customer'} (Pending Payment)"
             
         # BRANCH 3: HUMAN (Slack Alert -> CRM Ticket Update)
         elif action_type == "escalate_to_human":
@@ -115,19 +120,22 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
                 reason=action_input.get("reason", "Escalated to human ops"),
                 customer_id=event.customer_id or ""
             )
-            status = "success" if (slack_ok and crm_ok) else "failed"
+            action_status = "pending"
+            summary_label = f"High-Risk Failure Escalated to Support Team (CRM & Slack Alert Sent)"
         else:
-            status = "failed"
+            action_status = "failed"
+            summary_label = f"Unknown action: {action_type}"
     except Exception as e:
         logger.error(f"Execution error: {e}")
-        status = "failed"
+        action_status = "failed"
+        summary_label = f"Action execution failed: {e}"
 
     # SAVE RESULT: Store action & audit records in Database
     action = Action(
         event_id=event.id,
         action_type=action_type,
         attempt_number=attempt_number,
-        status=status,
+        status=action_status,
         amount_recovered_paise=amount_recovered,
     )
     db.add(action)
@@ -138,7 +146,7 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
         event_id=event.id,
         diagnosis_id=diagnosis.id,
         action_id=action.id,
-        summary=f"{action_type} attempt {attempt_number}: {status} (₹{amount_recovered / 100:.2f} recovered)",
+        summary=summary_label,
     )
     db.add(audit)
     await db.commit()

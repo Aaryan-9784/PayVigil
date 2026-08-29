@@ -192,10 +192,10 @@ async def change_user_password(
 
 @router.get("/api/dashboard", dependencies=[Depends(require_api_key)])
 async def get_dashboard(db: AsyncSession = Depends(get_db)):
-    total_recovered = await db.execute(select(func.coalesce(func.sum(Action.amount_recovered_paise), 0)))
+    total_recovered = await db.execute(select(func.coalesce(func.sum(Action.amount_recovered_paise), 0)).where(Action.status == "success"))
     total_at_risk = await db.execute(select(func.coalesce(func.sum(Event.amount_paise), 0)))
     total_actions = await db.execute(select(func.count()).select_from(Action))
-    successful_actions = await db.execute(select(func.count()).select_from(Action).where(Action.status == "success"))
+    successful_actions = await db.execute(select(func.count()).select_from(Action).where(Action.status == "success", Action.amount_recovered_paise > 0))
     total_events = await db.execute(select(func.count()).select_from(Event))
 
     # Action type breakdowns

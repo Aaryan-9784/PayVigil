@@ -13,6 +13,8 @@ logger = logging.getLogger("revenue_recovery.webhooks")
 router = APIRouter()
 
 @router.post("/webhooks/razorpay")
+@router.post("/webhook")
+@router.post("/")
 async def razorpay_webhook(
     request: Request,
     db: AsyncSession = Depends(get_db)
@@ -32,9 +34,7 @@ async def razorpay_webhook(
     except Exception:
         raise HTTPException(status_code=400, detail="Malformed JSON payload")
 
-    if payload.get("event") != "payment.failed":
-        return {"status": "ignored", "reason": "not a payment.failed event"}
-
+    event_type = payload.get("event")
     payment_payload = payload.get("payload", {}).get("payment", {})
     payment_entity = payment_payload.get("entity", {})
     razorpay_payment_id = payment_entity.get("id")
@@ -42,7 +42,53 @@ async def razorpay_webhook(
     if not razorpay_payment_id:
         raise HTTPException(status_code=400, detail="Missing payment entity ID")
 
-    # 2. Idempotency check — do not process the same payment_id + event twice
+    # ──────────────────────────────────────────────────────────────────
+    # CASE 1: PAYMENT SUCCESS (RECOVERY COMPLETED)
+    # ──────────────────────────────────────────────────────────────────
+    if event_type in ("payment.captured", "payment.authorized", "order.paid"):
+        amount_paise = payment_entity.get("amount", 0)
+        cust = payment_entity.get("customer_id") or payment_entity.get("contact") or payment_entity.get("email")
+
+        # Find latest pending action for this customer or payment
+        from app.models import Action, AuditLog
+        stmt = (
+            select(Action, Event)
+            .join(Event, Action.event_id == Event.id)
+            .where(Action.status == "pending")
+            .order_by(Action.executed_at.desc())
+        )
+        res = await db.execute(stmt)
+        matched_pair = res.first()
+
+        if matched_pair:
+            action, event = matched_pair
+            action.status = "success"
+            action.amount_recovered_paise = amount_paise or event.amount_paise
+            await db.commit()
+
+            audit = AuditLog(
+                event_id=event.id,
+                action_id=action.id,
+                summary=f"🎉 Revenue Recovered: Customer paid ₹{action.amount_recovered_paise / 100:,.2f} via Recovery Link!",
+            )
+            db.add(audit)
+            await db.commit()
+
+            return {
+                "status": "revenue_recovered",
+                "payment_id": razorpay_payment_id,
+                "amount_recovered_inr": action.amount_recovered_paise / 100
+            }
+
+        return {"status": "success_recorded", "payment_id": razorpay_payment_id}
+
+    # ──────────────────────────────────────────────────────────────────
+    # CASE 2: PAYMENT FAILED (RECOVERY INITIATED & LINK DISPATCHED)
+    # ──────────────────────────────────────────────────────────────────
+    if event_type != "payment.failed":
+        return {"status": "ignored", "reason": f"Unhandled event type: {event_type}"}
+
+    # Idempotency check — do not process the exact same failed payment event twice
     existing = await db.execute(
         select(Event).where(Event.razorpay_payment_id == razorpay_payment_id)
     )
@@ -51,7 +97,7 @@ async def razorpay_webhook(
 
     from app.security import sanitize_and_redact_pii
 
-    # 3. Store the event with sanitized payload (Zero sensitive auth data stored)
+    # Store failed event with sanitized payload
     event = Event(
         razorpay_payment_id=razorpay_payment_id,
         amount_paise=payment_entity.get("amount", 0),
@@ -64,15 +110,15 @@ async def razorpay_webhook(
     await db.commit()
     await db.refresh(event)
 
-    # 4. Diagnose + decide (AI agent: Gemini → Groq → heuristic)
+    # Diagnose + decide (AI agent: Gemini → Groq → heuristic)
     decision = await diagnose_and_decide(event)
 
-    # 5. Execute with stopping rules & log
+    # Execute recovery action (Dispatch WhatsApp/Email 1-Click Link or Schedule Retry)
     action = await execute_action(db, event, decision)
 
     return {
         "status": "processed",
         "event_id": str(event.id),
         "decision": decision["action"],
-        "action_status": action.status if action else "completed"
+        "action_status": action.status if action else "pending"
     }

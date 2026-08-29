@@ -170,7 +170,7 @@ async def _try_gemini(event: Event) -> Optional[dict]:
     try:
         prompt = f"{SYSTEM_PROMPT}\n\nPayment event:\n{_build_user_message(event)}"
         # Try active Gemini models
-        for m in ["gemini-2.5-flash", "gemini-1.5-flash"]:
+        for m in ["gemini-2.0-flash", "gemini-1.5-flash"]:
             try:
                 response = client.models.generate_content(
                     model=m,
@@ -192,25 +192,25 @@ async def _try_groq(event: Event) -> Optional[dict]:
     client = _get_groq_client()
     if client is None:
         return None
-    try:
-        completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": _build_user_message(event)},
-            ],
-            temperature=0,
-            max_tokens=512,
-        )
-        raw = completion.choices[0].message.content
-        result = _parse_llm_response(raw, event)
-        if result:
-            logger.info("Diagnosis completed via Groq (Llama 3.3 70B).")
-            return result
-        return None
-    except Exception as e:
-        logger.warning(f"Groq API request failed ({e}), trying next provider.")
-        return None
+    for model_name in ["llama-3.3-70b-versatile", "llama-3.1-70b-versatile", "llama3-70b-8192"]:
+        try:
+            completion = client.chat.completions.create(
+                model=model_name,
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": _build_user_message(event)},
+                ],
+                temperature=0,
+                max_tokens=512,
+            )
+            raw = completion.choices[0].message.content
+            result = _parse_llm_response(raw, event)
+            if result:
+                logger.info(f"Diagnosis completed via Groq ({model_name}).")
+                return result
+        except Exception:
+            continue
+    return None
 
 
 # ---------------------------------------------------------------------------

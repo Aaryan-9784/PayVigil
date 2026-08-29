@@ -78,7 +78,7 @@ async def test_stopping_rule_2_cooldown_window_skips_execution():
             "input": {"razorpay_payment_id": event.razorpay_payment_id, "delay_hours": 4}
         }
         act1 = await execute_action(session, event, decision)
-        assert act1.status in ("success", "failed")
+        assert act1.status in ("success", "failed", "pending")
 
         # 2nd action executed immediately (within 12h cooldown window)
         act2 = await execute_action(session, event, decision)

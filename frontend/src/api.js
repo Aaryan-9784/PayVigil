@@ -30,7 +30,9 @@ export async function seedDemoData() {
   return response.data;
 }
 
-export async function resetDatabase() {
-  const response = await axios.delete(`${API_BASE}/api/dev/reset-data`);
+export async function resetDatabase(customKey = null) {
+  const response = await axios.delete(`${API_BASE}/api/dev/reset-data`, {
+    headers: { "x-api-key": customKey || API_KEY }
+  });
   return response.data;
 }

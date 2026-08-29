@@ -1,7 +1,7 @@
 import React from 'react';
-import { IndianRupee, RefreshCw, Zap, Trash2, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { IndianRupee, RefreshCw, Trash2 } from 'lucide-react';
 
-export default function Header({ onRefresh, onSeedData, onResetData, isRefreshing }) {
+export default function Header({ onRefresh, onResetData, isRefreshing }) {
   return (
     <header className="sticky top-0 z-40 bg-white/95 border-b border-slate-200/90 backdrop-blur-md shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -54,16 +54,17 @@ export default function Header({ onRefresh, onSeedData, onResetData, isRefreshin
               />
             </button>
 
-            {/* Load Demo Data Button (Razorpay Blue CTA) */}
-            <button onClick={onSeedData} className="btn-primary">
-              <Zap className="w-3.5 h-3.5" />
-              Load Test Webhooks
-            </button>
-
-            {/* Reset Database Button */}
-            <button onClick={onResetData} className="btn-danger">
-              <Trash2 className="w-3.5 h-3.5" />
-              Clear Logs
+            {/* Protected Reset Database Button */}
+            <button 
+              onClick={onResetData} 
+              title="Admin Authorized Action: Purge Database & Logs"
+              className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100/80 border border-red-200 hover:border-red-300 transition-all cursor-pointer shadow-xs active:scale-95"
+            >
+              <Trash2 className="w-3.5 h-3.5 text-red-600" />
+              <span>Clear Logs</span>
+              <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.2 rounded bg-red-200/70 text-red-800 font-bold ml-0.5">
+                Admin
+              </span>
             </button>
           </div>
 

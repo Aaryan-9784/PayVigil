@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import SummaryCards from './components/SummaryCards';
-import WebhookSimulator from './components/WebhookSimulator';
 import RecoveryChart from './components/RecoveryChart';
 import AuditTable from './components/AuditTable';
 import Footer from './components/Footer';
-import { fetchDashboard, seedDemoData, resetDatabase } from './api';
+import ClearLogsModal from './components/ClearLogsModal';
+import { fetchDashboard, resetDatabase } from './api';
 import { AlertCircle, CheckCircle2, X } from 'lucide-react';
 
 export default function App() {
@@ -13,6 +13,8 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [isClearModalOpen, setIsClearModalOpen] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
 
   const showToast = (message, type = 'success') => {
     setNotification({ message, type });
@@ -40,24 +42,18 @@ export default function App() {
     return () => clearInterval(interval);
   }, [loadData]);
 
-  const handleSeedData = async () => {
+  const handleConfirmReset = async (customKey) => {
+    setIsClearing(true);
     try {
-      await seedDemoData();
-      showToast('Demo transactions loaded successfully');
+      await resetDatabase(customKey);
+      showToast('All recovery logs and transactions purged successfully');
+      setIsClearModalOpen(false);
       await loadData();
     } catch (err) {
-      showToast('Failed to load demo data', 'error');
-    }
-  };
-
-  const handleResetData = async () => {
-    if (!window.confirm('Reset all logs and transactions?')) return;
-    try {
-      await resetDatabase();
-      showToast('Database reset successfully');
-      await loadData();
-    } catch (err) {
-      showToast('Failed to reset database', 'error');
+      const msg = err.response?.data?.detail || 'Failed to clear database (Invalid Authorization)';
+      showToast(msg, 'error');
+    } finally {
+      setIsClearing(false);
     }
   };
 
@@ -111,8 +107,7 @@ export default function App() {
       {/* Header Navigation */}
       <Header
         onRefresh={() => loadData(true)}
-        onSeedData={handleSeedData}
-        onResetData={handleResetData}
+        onResetData={() => setIsClearModalOpen(true)}
         isRefreshing={isRefreshing}
       />
 
@@ -121,15 +116,20 @@ export default function App() {
         {/* 1. Key Metrics & Financial Recovery KPIs */}
         <SummaryCards data={dashboardData} loading={loading} />
 
-        {/* 2. Interactive Scenario Simulator (Sandbox) */}
-        <WebhookSimulator onEventProcessed={() => loadData()} />
-
-        {/* 3. Revenue Recovery Analytics & Resolution Distribution */}
+        {/* 2. Revenue Recovery Analytics & Resolution Distribution */}
         <RecoveryChart data={dashboardData} />
 
-        {/* 4. Immutable Audit Trail & AI Diagnostic Inspector */}
+        {/* 3. Immutable Audit Trail & AI Diagnostic Inspector */}
         <AuditTable logs={dashboardData?.recent_audit_log || []} />
       </main>
+
+      {/* Security Confirmation Modal for Database/Log Purge */}
+      <ClearLogsModal
+        isOpen={isClearModalOpen}
+        onClose={() => setIsClearModalOpen(false)}
+        onConfirm={handleConfirmReset}
+        isClearing={isClearing}
+      />
 
       {/* Footer */}
       <Footer />

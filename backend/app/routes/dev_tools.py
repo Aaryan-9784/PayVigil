@@ -174,9 +174,11 @@ async def seed_demo_data(db: AsyncSession = Depends(get_db)):
 
     return {"seeded_count": len(results), "sample": results}
 
-@router.delete("/reset-data")
+from app.routes.dashboard import require_api_key
+
+@router.delete("/reset-data", dependencies=[Depends(require_api_key)])
 async def reset_data(db: AsyncSession = Depends(get_db)):
-    """Reset all tables for clean testing."""
+    """Reset all tables for clean testing with admin authentication."""
     await db.execute(delete(AuditLog))
     await db.execute(delete(Action))
     await db.execute(delete(Diagnosis))

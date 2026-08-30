@@ -108,10 +108,21 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
             
         # BRANCH 2: MESSAGE (Multi-channel: Email + WhatsApp + SMS)
         elif action_type == "send_reminder_email":
+            # Generate genuine live workable Razorpay payment checkout link
+            live_recovery_url = await create_razorpay_payment_link(
+                amount_paise=event.amount_paise,
+                customer_contact=event.customer_id or "+918238012515",
+                customer_email="aaryanpatel9784@gmail.com",
+                customer_name="Aryan Patel",
+                description=f"Payment Recovery - Order {order_id or 'Checkout'}",
+                order_id=order_id or ""
+            )
             success = await send_multichannel_recovery_message(
-                customer_id=action_input.get("customer_id", event.customer_id or "cust_default"),
+                customer_id=action_input.get("customer_id", event.customer_id or "aaryanpatel9784@gmail.com"),
                 reason=action_input.get("reason", event.error_description or "Payment retry reminder"),
-                payment_id=event.razorpay_payment_id
+                payment_id=event.razorpay_payment_id,
+                amount_paise=event.amount_paise,
+                recovery_url=live_recovery_url
             )
             action_status = "pending"
             summary_label = f"1-Click Recovery Link Dispatched via WhatsApp & Email to {event.customer_id or 'customer'} (Pending Payment)"

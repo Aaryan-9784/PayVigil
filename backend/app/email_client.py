@@ -4,13 +4,62 @@ from app.config import settings
 
 logger = logging.getLogger("revenue_recovery.email")
 
-async def send_reminder_email(customer_id: str, reason: str) -> bool:
+async def send_reminder_email(
+    customer_id: str,
+    reason: str,
+    payment_id: str = "",
+    amount_paise: int = 50000,
+    recovery_url: str = ""
+) -> bool:
     """
-    Sends customer reminder email to update payment method or fix authentication.
-    Uses Resend API if configured, otherwise logs clean notification.
+    Sends customer reminder email with direct 1-click recovery checkout link.
     """
-    logger.info(f"[Email Client] Sending reminder email to Customer {customer_id} for reason: {reason}")
+    logger.info(f"[Email Client] Sending customer recovery reminder to {customer_id} (Reason: {reason})")
     
+    amount_inr = f"₹{amount_paise / 100:,.2f}" if amount_paise > 0 else "₹500.00"
+    short_id = payment_id[-8:] if len(payment_id) > 8 else (payment_id or "ORDER")
+    recovery_link = recovery_url or f"https://rzp.io/rzp/recovery_{short_id}"
+    
+    # Send to user's inbox for live verification
+    recipient = customer_id if "@" in customer_id else "aaryanpatel9784@gmail.com"
+
+    html_content = f"""
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background-color: #ffffff;">
+        <div style="background: linear-gradient(135deg, #0c2340 0%, #0c83ff 100%); padding: 22px 26px; color: #ffffff;">
+            <span style="background: #2563eb; color: #ffffff; font-size: 10px; font-weight: bold; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;">PAYMENT RECOVERY REMINDER</span>
+            <h2 style="margin: 10px 0 4px 0; font-size: 19px; font-weight: bold; color: #ffffff;">Complete Your Payment - {amount_inr}</h2>
+            <p style="margin: 0; font-size: 12px; opacity: 0.9;">Your transaction could not be processed due to a temporary issue.</p>
+        </div>
+        
+        <div style="padding: 24px 26px; color: #1e293b; font-size: 13px; line-height: 1.6;">
+            <p style="font-size: 14px; margin-top: 0;">Hello Aryan,</p>
+            <p style="color: #475569;">
+                We noticed an issue while processing your recent payment of <strong>{amount_inr}</strong>.
+            </p>
+
+            <div style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px 16px; margin: 16px 0; color: #991b1b; font-size: 12.5px;">
+                <strong>Reason:</strong> {reason}
+            </div>
+
+            <p style="color: #475569;">
+                No worries! You can complete your transaction in one click using UPI, Cards, or Netbanking:
+            </p>
+
+            <div style="text-align: center; margin: 24px 0 15px 0;">
+                <a href="{recovery_link}" style="background-color: #0c83ff; color: #ffffff; padding: 12px 26px; border-radius: 8px; font-weight: 700; text-decoration: none; display: inline-block; font-size: 14px; box-shadow: 0 4px 10px rgba(12, 131, 255, 0.3);">Complete Payment in 1-Click ➔</a>
+            </div>
+
+            <p style="font-size: 11.5px; color: #64748b; text-align: center; margin: 0;">
+                Direct link: <a href="{recovery_link}" style="color: #0c83ff;">{recovery_link}</a>
+            </p>
+        </div>
+
+        <div style="background-color: #f1f5f9; padding: 14px 24px; border-top: 1px solid #e2e8f0; font-size: 11px; color: #64748b; text-align: center;">
+            Razorpay AI Revenue Recovery Engine • Secure 256-Bit SSL Checkout
+        </div>
+    </div>
+    """
+
     if settings.resend_api_key and not settings.resend_api_key.startswith("re_mock"):
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
@@ -18,18 +67,19 @@ async def send_reminder_email(customer_id: str, reason: str) -> bool:
                     "https://api.resend.com/emails",
                     headers={"Authorization": f"Bearer {settings.resend_api_key}"},
                     json={
-                        "from": "Revenue Recovery Admin <onboarding@resend.dev>",
-                        "to": [f"{customer_id}@example.com" if "@" not in customer_id else customer_id],
-                        "subject": "Action Required: Update your payment method",
-                        "html": f"<p>Hello,</p><p>We noticed an issue with your recent payment: <strong>{reason}</strong>.</p><p>Please update your billing details to maintain uninterrupted service.</p>"
+                        "from": "Razorpay AI Revenue Recovery <onboarding@resend.dev>",
+                        "to": [recipient],
+                        "subject": f"⚡ [Action Required] Complete Your Payment of {amount_inr}",
+                        "html": html_content
                     }
                 )
+                logger.info(f"[Email Client] Customer reminder sent with status {response.status_code}")
                 return response.status_code in (200, 201)
         except Exception as e:
-            logger.warning(f"[Email Client] Note: {e}")
+            logger.warning(f"[Email Client] Customer reminder note: {e}")
             return True
             
-    logger.info(f"[Email Client] [Simulated] Reminder email sent to {customer_id}")
+    logger.info(f"[Email Client] [Simulated] Reminder email sent to {recipient}")
     return True
 
 

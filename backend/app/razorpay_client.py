@@ -57,8 +57,8 @@ async def create_razorpay_payment_link(
                     "contact": clean_phone or "+918238012515",
                     "email": clean_email or "customer@example.com"
                 },
-                "notify": {"sms": False, "email": False},
-                "reminder_enable": False
+                "notify": {"sms": True, "email": True},
+                "reminder_enable": True
             }
 
             pl = await asyncio.wait_for(

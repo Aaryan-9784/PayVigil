@@ -192,8 +192,12 @@ async def change_user_password(
 
 @router.get("/api/dashboard", dependencies=[Depends(require_api_key)])
 async def get_dashboard(db: AsyncSession = Depends(get_db)):
-    total_recovered = await db.execute(select(func.coalesce(func.sum(Action.amount_recovered_paise), 0)).where(Action.status == "success"))
-    total_at_risk = await db.execute(select(func.coalesce(func.sum(Event.amount_paise), 0)))
+    recovered_paise = (await db.execute(select(func.coalesce(func.sum(Action.amount_recovered_paise), 0)).where(Action.status == "success"))).scalar() or 0
+    total_failed_paise = (await db.execute(select(func.coalesce(func.sum(Event.amount_paise), 0)))).scalar() or 0
+    
+    # Active At-Risk Volume: Only unrecovered/pending failure amounts remain at risk
+    active_at_risk_paise = max(0, total_failed_paise - recovered_paise)
+
     total_actions = await db.execute(select(func.count()).select_from(Action))
     successful_actions = await db.execute(select(func.count()).select_from(Action).where(Action.status == "success", Action.amount_recovered_paise > 0))
     total_events = await db.execute(select(func.count()).select_from(Event))
@@ -270,8 +274,9 @@ async def get_dashboard(db: AsyncSession = Depends(get_db)):
     successful_count = successful_actions.scalar() or 0
 
     return {
-        "total_recovered_paise": total_recovered.scalar() or 0,
-        "total_at_risk_paise": total_at_risk.scalar() or 0,
+        "total_recovered_paise": recovered_paise,
+        "total_at_risk_paise": active_at_risk_paise,
+        "total_failed_gmv_paise": total_failed_paise,
         "recovery_rate_pct": round((successful_count / total_actions_count) * 100, 1) if total_actions_count else 0,
         "total_actions": total_actions_count,
         "successful_actions": successful_count,

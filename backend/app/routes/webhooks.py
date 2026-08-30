@@ -34,10 +34,19 @@ async def razorpay_webhook(
     except Exception:
         raise HTTPException(status_code=400, detail="Malformed JSON payload")
 
-    event_type = payload.get("event")
-    payment_payload = payload.get("payload", {}).get("payment", {})
+    event_type = payload.get("event", "")
+    payload_data = payload.get("payload", {})
+    payment_payload = payload_data.get("payment", {})
     payment_entity = payment_payload.get("entity", {})
-    razorpay_payment_id = payment_entity.get("id")
+    payment_link_entity = payload_data.get("payment_link", {}).get("entity", {})
+    order_entity = payload_data.get("order", {}).get("entity", {})
+
+    razorpay_payment_id = (
+        payment_entity.get("id")
+        or payment_link_entity.get("id")
+        or order_entity.get("id")
+        or payload.get("id")
+    )
 
     if not razorpay_payment_id:
         raise HTTPException(status_code=400, detail="Missing payment entity ID")
@@ -45,11 +54,24 @@ async def razorpay_webhook(
     # ──────────────────────────────────────────────────────────────────
     # CASE 1: PAYMENT SUCCESS (RECOVERY COMPLETED)
     # ──────────────────────────────────────────────────────────────────
-    if event_type in ("payment.captured", "payment.authorized", "order.paid"):
-        amount_paise = payment_entity.get("amount", 0)
-        cust = payment_entity.get("customer_id") or payment_entity.get("contact") or payment_entity.get("email")
+    if event_type in ("payment.captured", "payment.authorized", "order.paid", "payment_link.paid", "payment_link.partially_paid"):
+        amount_paise = (
+            payment_entity.get("amount")
+            or payment_link_entity.get("amount_paid")
+            or payment_link_entity.get("amount")
+            or order_entity.get("amount_paid")
+            or order_entity.get("amount")
+            or 0
+        )
+        cust = (
+            payment_entity.get("customer_id")
+            or payment_entity.get("contact")
+            or payment_entity.get("email")
+            or payment_link_entity.get("customer", {}).get("contact")
+            or payment_link_entity.get("customer", {}).get("email")
+        )
 
-        # Find latest pending action for this customer or payment
+        # Find latest pending action for recovery reconciliation
         from app.models import Action, AuditLog
         stmt = (
             select(Action, Event)

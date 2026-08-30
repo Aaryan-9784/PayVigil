@@ -149,5 +149,6 @@ def verify_razorpay_signature(body: bytes, signature: str, secret: str, timestam
     # Constant-time string comparison to prevent side-channel timing attacks
     if not hmac.compare_digest(expected, signature):
         raise HTTPException(status_code=400, detail="Invalid webhook signature")
+    return True
 
 

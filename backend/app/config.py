@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     dashboard_api_key: str = "rev-recovery-dev-secret-key-2025"
     environment: str = "development"
     max_retry_attempts: int = 3
+    retry_cooldown_hours: int = 12
     support_email: str = "support@yourdomain.com"
     fast2sms_api_key: str = ""
     twilio_account_sid: str = ""

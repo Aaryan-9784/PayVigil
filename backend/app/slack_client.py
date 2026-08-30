@@ -36,6 +36,12 @@ async def send_slack_alert(
 
     if is_real_slack:
         try:
+            import urllib.parse
+            clean_digits = raw_phone.replace("+", "").replace(" ", "").replace("-", "")[-10:]
+            wa_text = f"🚨 *Razorpay AI Revenue Recovery • Payment Recovery*\n\nNamaste! We noticed your payment of *{amount_inr}* had an issue. Complete your checkout securely here: {recovery_url or f'https://rzp.io/rzp/{razorpay_payment_id}'}"
+            wa_link = f"https://wa.me/91{clean_digits}?text={urllib.parse.quote(wa_text)}"
+            pay_link = recovery_url or f"https://rzp.io/rzp/{razorpay_payment_id}"
+
             payload = {
                 "blocks": [
                     {
@@ -60,6 +66,21 @@ async def send_slack_alert(
                         "fields": [
                             {"type": "mrkdwn", "text": f"*Payment ID:*\n`{razorpay_payment_id}`"},
                             {"type": "mrkdwn", "text": f"*Failure Cause:*\n{reason}"}
+                        ]
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "💬 1-Click WhatsApp Chat with Customer",
+                                    "emoji": True
+                                },
+                                "url": wa_link,
+                                "style": "primary"
+                            }
                         ]
                     },
                     {"type": "divider"}

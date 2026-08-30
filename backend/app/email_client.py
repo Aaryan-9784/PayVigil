@@ -144,6 +144,11 @@ async def send_support_escalation_ticket_email(
     # Clean, professional subject line with Project Branding
     subject = f"🚨 [Razorpay AI Revenue Recovery] High-Priority Incident (Ref: #{order_ref}) - {amount_inr}"
 
+    import urllib.parse
+    clean_digits = raw_phone.replace("+", "").replace(" ", "").replace("-", "")[-10:]
+    wa_text = f"🚨 *Razorpay AI Revenue Recovery • Payment Recovery*\n\nNamaste {name_display}! 👋\n\nWe noticed your payment of *{amount_inr}* had an issue ({reason}).\n\n👉 *Complete your payment in 1-click here:*\n{recovery_link}\n\n_(Secured by Razorpay 256-bit SSL Checkout)_"
+    wa_url = f"https://wa.me/91{clean_digits}?text={urllib.parse.quote(wa_text)}"
+
     html_content = f"""
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
         <!-- Header Banner -->
@@ -200,23 +205,19 @@ async def send_support_escalation_ticket_email(
             <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 14px 18px; margin-bottom: 22px;">
                 <span style="font-size: 11px; font-weight: 700; color: #166534; text-transform: uppercase; display: block; margin-bottom: 6px; letter-spacing: 0.5px;">✓ Recommended Support Specialist Action:</span>
                 <p style="margin: 0; color: #15803d; font-size: 12.5px; line-height: 1.5;">
-                    Contact <strong>{name_display}</strong> ({phone_display}) via WhatsApp/Phone and share the secure 1-click checkout recovery link below.
+                    Click the <strong>1-Click WhatsApp</strong> button below to open a pre-filled chat with <strong>{name_display}</strong> ({phone_display}) and assist them in recovering this payment.
                 </p>
             </div>
 
             <!-- Call to Action Button -->
             <div style="text-align: center; margin: 26px 0 16px 0;">
-                <a href="{recovery_link}" style="background: linear-gradient(135deg, #0c83ff 0%, #0056b3 100%); color: #ffffff; padding: 13px 32px; border-radius: 8px; font-weight: 700; text-decoration: none; display: inline-block; font-size: 14.5px; box-shadow: 0 4px 12px rgba(12, 131, 255, 0.35); letter-spacing: 0.2px;">Open Customer Recovery Checkout ➔</a>
+                <a href="{wa_url}" style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: #ffffff; padding: 13px 32px; border-radius: 8px; font-weight: 700; text-decoration: none; display: inline-block; font-size: 14px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.35); letter-spacing: 0.2px;">💬 1-Click WhatsApp Chat with Customer ➔</a>
             </div>
-
-            <p style="font-size: 11.5px; color: #64748b; text-align: center; margin: 0;">
-                Direct secure link: <a href="{recovery_link}" style="color: #0c83ff; font-weight: 600; text-decoration: underline;">{recovery_link}</a>
-            </p>
         </div>
 
         <!-- Footer -->
         <div style="background-color: #f1f5f9; padding: 14px 28px; border-top: 1px solid #e2e8f0; font-size: 11.5px; color: #64748b; text-align: center;">
-            Razorpay AI Revenue Recovery Engine • Incident #{short_id} • Secure 256-Bit SSL Checkout
+            Razorpay AI Revenue Recovery Engine • Incident #{short_id} • Internal Support Ticket
         </div>
     </div>
     """

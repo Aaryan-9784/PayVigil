@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     environment: str = "development"
     max_retry_attempts: int = 3
     retry_cooldown_hours: int = 12
+    support_email: str = "support@yourdomain.com"
 
     model_config = SettingsConfigDict(
         env_file=".env",

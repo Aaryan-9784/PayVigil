@@ -5,10 +5,11 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import Action, Event, AuditLog, Diagnosis
 from app.config import settings
-from app.razorpay_client import retry_payment_on_razorpay
+from app.razorpay_client import retry_payment_on_razorpay, create_razorpay_payment_link
 from app.messaging_client import send_multichannel_recovery_message
 from app.slack_client import send_slack_alert
 from app.crm_client import create_or_update_crm_ticket
+from app.email_client import send_support_escalation_ticket_email
 
 logger = logging.getLogger("revenue_recovery.executor")
 
@@ -26,32 +27,38 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
     await db.commit()
     await db.refresh(diagnosis)
 
-    # Count prior attempts for this payment
-    result = await db.execute(
-        select(func.count()).select_from(Action)
-        .join(Event, Action.event_id == Event.id)
-        .where(Event.razorpay_payment_id == event.razorpay_payment_id)
-    )
-    attempt_number = (result.scalar() or 0) + 1
+    # Extract order_id / payment_link_id / customer from event.raw_payload to track retries across attempts
+    p_entity = (event.raw_payload or {}).get("payload", {}).get("payment", {}).get("entity", {})
+    pl_entity = (event.raw_payload or {}).get("payload", {}).get("payment_link", {}).get("entity", {})
+    order_id = p_entity.get("order_id")
+    plink_id = pl_entity.get("id") or p_entity.get("payment_link_id")
 
-    # STOPPING RULE 1: max retry attempts exceeded -> escalate to human
-    if action_type == "retry_payment" and attempt_number > settings.max_retry_attempts:
+    from sqlalchemy import or_
+    conds = [Event.razorpay_payment_id == event.razorpay_payment_id]
+    if event.customer_id:
+        conds.append((Event.customer_id == event.customer_id) & (Event.amount_paise == event.amount_paise))
+
+    all_events_res = await db.execute(
+        select(Action)
+        .join(Event, Action.event_id == Event.id)
+        .where(Event.id != event.id, or_(*conds))
+        .order_by(Action.executed_at.desc())
+        .limit(20)
+    )
+    matched_prior_actions = all_events_res.scalars().all()
+    attempt_number = len(matched_prior_actions) + 1
+
+    # STOPPING RULE 1: max retry attempts exceeded -> escalate to human (Case 3)
+    if attempt_number > settings.max_retry_attempts:
         action_type = "escalate_to_human"
         action_input = {
             "razorpay_payment_id": event.razorpay_payment_id,
-            "reason": f"Max retry attempts ({settings.max_retry_attempts}) exceeded. Guardrail triggered escalation."
+            "reason": f"Max recovery threshold ({settings.max_retry_attempts}) exceeded ({attempt_number} failures on this order). Escalating to Support."
         }
 
     # STOPPING RULE 2: cooldown between actions on the same payment
-    last_action_res = await db.execute(
-        select(Action)
-        .join(Event, Action.event_id == Event.id)
-        .where(Event.razorpay_payment_id == event.razorpay_payment_id)
-        .order_by(Action.executed_at.desc())
-    )
-    last = last_action_res.scalars().first()
-    
-    if last is not None:
+    if matched_prior_actions and action_type != "escalate_to_human":
+        last = matched_prior_actions[0]
         last_time = last.executed_at
         now_time = datetime.now(timezone.utc)
         if last_time.tzinfo is None:
@@ -74,7 +81,7 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
                 event_id=event.id,
                 diagnosis_id=diagnosis.id,
                 action_id=action.id,
-                summary=f"Guardrail triggered: {action_type} skipped due to active cooldown window ({diff.total_seconds() / 3600:.1f}h < {settings.retry_cooldown_hours}h)",
+                summary=f"Guardrail triggered: Attempt #{attempt_number} ({action_type}) skipped due to active cooldown window ({diff.total_seconds() / 3600:.1f}h < {settings.retry_cooldown_hours}h)",
             )
             db.add(audit)
             await db.commit()
@@ -109,19 +116,46 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
             action_status = "pending"
             summary_label = f"1-Click Recovery Link Dispatched via WhatsApp & Email to {event.customer_id or 'customer'} (Pending Payment)"
             
-        # BRANCH 3: HUMAN (Slack Alert -> CRM Ticket Update)
+        # BRANCH 3: ESCALATE (CRM Support Ticket + Direct Admin Email + Slack Alert)
         elif action_type == "escalate_to_human":
+            # Generate genuine live workable Razorpay payment checkout link
+            live_recovery_url = await create_razorpay_payment_link(
+                amount_paise=event.amount_paise,
+                customer_contact=event.customer_id or "+918238012515",
+                customer_email="aaryanpatel9784@gmail.com",
+                customer_name="Aryan Patel",
+                description=f"Payment Recovery - Order {order_id or 'Checkout'}",
+                order_id=order_id or ""
+            )
+
             slack_ok = await send_slack_alert(
-                action_input.get("razorpay_payment_id", event.razorpay_payment_id),
-                action_input.get("reason", "Escalated to human ops")
+                razorpay_payment_id=action_input.get("razorpay_payment_id", event.razorpay_payment_id),
+                reason=action_input.get("reason", "Max retry attempts exceeded"),
+                customer_id=event.customer_id or "",
+                amount_paise=event.amount_paise,
+                attempt_count=attempt_number,
+                recovery_url=live_recovery_url,
+                customer_email="aaryanpatel9784@gmail.com"
             )
             crm_ok = await create_or_update_crm_ticket(
                 payment_id=action_input.get("razorpay_payment_id", event.razorpay_payment_id),
                 reason=action_input.get("reason", "Escalated to human ops"),
                 customer_id=event.customer_id or ""
             )
+            email_ok = await send_support_escalation_ticket_email(
+                payment_id=action_input.get("razorpay_payment_id", event.razorpay_payment_id),
+                customer_id=event.customer_id or "Anonymous Customer",
+                amount_paise=event.amount_paise,
+                reason=action_input.get("reason", "Max retry attempts exceeded"),
+                attempt_count=attempt_number,
+                order_id=order_id or "",
+                recovery_url=live_recovery_url,
+                customer_name="Aryan Patel",
+                customer_email="aaryanpatel9784@gmail.com",
+                customer_phone="+91 82380 12515"
+            )
             action_status = "pending"
-            summary_label = f"High-Risk Failure Escalated to Support Team (CRM & Slack Alert Sent)"
+            summary_label = f"Support Review (Escalated to Human) - CRM Ticket & Direct Support Email Sent"
         else:
             action_status = "failed"
             summary_label = f"Unknown action: {action_type}"

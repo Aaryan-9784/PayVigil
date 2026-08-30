@@ -195,8 +195,70 @@ async def get_dashboard(db: AsyncSession = Depends(get_db)):
     recovered_paise = (await db.execute(select(func.coalesce(func.sum(Action.amount_recovered_paise), 0)).where(Action.status == "success"))).scalar() or 0
     total_failed_paise = (await db.execute(select(func.coalesce(func.sum(Event.amount_paise), 0)))).scalar() or 0
     
-    # Active At-Risk Volume: Only unrecovered/pending failure amounts remain at risk
-    active_at_risk_paise = max(0, total_failed_paise - recovered_paise)
+    # Accurate Deduplicated Order At-Risk GMV Calculation:
+    # Multiple failed attempts on the same order/payment link count as ONE at-risk transaction of ₹X (with N retry attempts)
+    all_events_res = await db.execute(
+        select(Event, Action).outerjoin(Action, Action.event_id == Event.id)
+    )
+    event_action_pairs = all_events_res.all()
+
+    from app.security import mask_phone, mask_email, decrypt_sensitive_field
+
+    unresolved_orders = {}
+    for ev, act in event_action_pairs:
+        if not ev:
+            continue
+        p_entity = (ev.raw_payload or {}).get("payload", {}).get("payment", {}).get("entity", {})
+        pl_entity = (ev.raw_payload or {}).get("payload", {}).get("payment_link", {}).get("entity", {})
+        order_key = (
+            p_entity.get("order_id")
+            or pl_entity.get("id")
+            or p_entity.get("payment_link_id")
+            or (f"{ev.customer_id}_{ev.amount_paise}" if ev.customer_id else str(ev.id))
+        )
+        
+        is_success = (act is not None and act.status == "success" and act.amount_recovered_paise > 0)
+        
+        raw_cust = (ev.customer_id if ev and ev.customer_id else "") or "cust_anonymous"
+        decrypted_cust = decrypt_sensitive_field(raw_cust) or raw_cust
+        if "@" in decrypted_cust:
+            safe_customer = mask_email(decrypted_cust)
+        elif decrypted_cust.startswith("+") or any(char.isdigit() for char in decrypted_cust):
+            safe_customer = mask_phone(decrypted_cust)
+        else:
+            safe_customer = decrypted_cust
+
+        if order_key not in unresolved_orders:
+            unresolved_orders[order_key] = {
+                "order_id": order_key,
+                "latest_payment_id": ev.razorpay_payment_id,
+                "amount_paise": ev.amount_paise,
+                "amount_inr": ev.amount_paise / 100,
+                "customer_id": safe_customer,
+                "latest_action": act.action_type if act else "retry_payment",
+                "action_status": act.status if act else "pending",
+                "error_code": ev.error_code or "BAD_REQUEST_ERROR",
+                "error_description": ev.error_description or "Payment processing failed",
+                "is_recovered": is_success,
+                "fail_count": 1,
+                "last_failed_at": ev.received_at.isoformat() if hasattr(ev.received_at, "isoformat") else str(ev.received_at)
+            }
+        else:
+            unresolved_orders[order_key]["fail_count"] += 1
+            if is_success:
+                unresolved_orders[order_key]["is_recovered"] = True
+            if ev.received_at and str(ev.received_at) >= str(unresolved_orders[order_key].get("last_failed_at", "")):
+                unresolved_orders[order_key]["latest_payment_id"] = ev.razorpay_payment_id
+                if act:
+                    unresolved_orders[order_key]["latest_action"] = act.action_type
+                    unresolved_orders[order_key]["action_status"] = act.status
+                if ev.error_description:
+                    unresolved_orders[order_key]["error_description"] = ev.error_description
+
+    at_risk_items = [v for v in unresolved_orders.values() if not v["is_recovered"]]
+    active_at_risk_paise = sum(item["amount_paise"] for item in at_risk_items)
+    at_risk_fail_attempts = sum(item["fail_count"] for item in at_risk_items)
+    gross_at_risk_paise = sum(item["amount_paise"] * item["fail_count"] for item in at_risk_items)
 
     total_actions = await db.execute(select(func.count()).select_from(Action))
     successful_actions = await db.execute(select(func.count()).select_from(Action).where(Action.status == "success", Action.amount_recovered_paise > 0))
@@ -276,7 +338,10 @@ async def get_dashboard(db: AsyncSession = Depends(get_db)):
     return {
         "total_recovered_paise": recovered_paise,
         "total_at_risk_paise": active_at_risk_paise,
-        "total_failed_gmv_paise": total_failed_paise,
+        "total_failed_gmv_paise": gross_at_risk_paise,
+        "at_risk_orders_count": len(at_risk_items),
+        "at_risk_fail_attempts": at_risk_fail_attempts,
+        "at_risk_orders": at_risk_items,
         "recovery_rate_pct": round((successful_count / total_actions_count) * 100, 1) if total_actions_count else 0,
         "total_actions": total_actions_count,
         "successful_actions": successful_count,

@@ -57,7 +57,7 @@ async def create_razorpay_payment_link(
                     "contact": clean_phone or "+918238012515",
                     "email": clean_email or "customer@example.com"
                 },
-                "notify": {"sms": True, "email": True},
+                "notify": {"sms": True, "email": True, "whatsapp": True},
                 "reminder_enable": True
             }
 

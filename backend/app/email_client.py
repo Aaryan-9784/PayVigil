@@ -21,7 +21,7 @@ async def send_reminder_email(
     amount_inr = f"₹{amount_paise / 100:,.2f}" if amount_paise > 0 else "₹500.00"
     short_id = payment_id[-8:] if len(payment_id) > 8 else (payment_id or "RECOVERY")
     recovery_link = recovery_url or f"https://rzp.io/rzp/recovery_{short_id}"
-    name_display = customer_name.strip() if customer_name and customer_name.strip() else "Aryan Patel"
+    name_display = customer_name.strip() if customer_name and customer_name.strip() else "Valued Customer"
     
     # Send to user's inbox for live verification
     recipient = customer_id if "@" in customer_id else "aaryanpatel9784@gmail.com"
@@ -134,7 +134,7 @@ async def send_support_escalation_ticket_email(
         recipient = "delivered@resend.dev"
 
     # Separate customer info for body table with Security PII Masking
-    name_display = customer_name or "Aryan Patel"
+    name_display = customer_name.strip() if customer_name and customer_name.strip() else "Valued Customer"
     raw_email = customer_email or (customer_id if "@" in customer_id else "aaryanpatel9784@gmail.com")
     email_display = mask_email(raw_email)
     

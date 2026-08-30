@@ -35,8 +35,8 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
 
     from sqlalchemy import or_
     conds = [Event.razorpay_payment_id == event.razorpay_payment_id]
-    if event.customer_id:
-        conds.append((Event.customer_id == event.customer_id) & (Event.amount_paise == event.amount_paise))
+    if order_id:
+        conds.append(Event.raw_payload["payload"]["payment"]["entity"]["order_id"].astext == order_id)
 
     all_events_res = await db.execute(
         select(Action)
@@ -48,12 +48,23 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
     matched_prior_actions = all_events_res.scalars().all()
     attempt_number = len(matched_prior_actions) + 1
 
-    # STOPPING RULE 1: max retry attempts exceeded -> escalate to human (Case 3)
-    if attempt_number > settings.max_retry_attempts:
+    # ──────────────────────────────────────────────────────────────────
+    # CONDITIONAL ESCALATION RULE:
+    # If payment failed > 3 times -> Escalate to Support Specialist (Case 3)
+    # Otherwise (<= 3 attempts) -> Follow Case 2 (Customer 1-Click Recovery)
+    # ──────────────────────────────────────────────────────────────────
+    if attempt_number > 3:
         action_type = "escalate_to_human"
         action_input = {
             "razorpay_payment_id": event.razorpay_payment_id,
-            "reason": f"Max recovery threshold ({settings.max_retry_attempts}) exceeded ({attempt_number} failures on this order). Escalating to Support."
+            "reason": f"Payment failed {attempt_number} times (exceeded 3-attempt limit). Dispatched to Customer Support specialist."
+        }
+    elif action_type == "escalate_to_human" and attempt_number <= 3:
+        # If <= 3 attempts, prioritize Case 2 customer 1-click recovery
+        action_type = "send_reminder_email"
+        action_input = {
+            "customer_id": event.customer_id,
+            "reason": event.error_description or "Payment retry reminder"
         }
 
     # STOPPING RULE 2: cooldown between actions on the same payment
@@ -93,6 +104,40 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
     action_status = "pending"
     summary_label = ""
 
+    # Extract genuine real customer metadata from the incoming Razorpay event payload
+    p_entity = (event.raw_payload or {}).get("payload", {}).get("payment", {}).get("entity", {})
+    pl_entity = (event.raw_payload or {}).get("payload", {}).get("payment_link", {}).get("entity", {})
+    notes_data = p_entity.get("notes", {}) if isinstance(p_entity.get("notes"), dict) else {}
+
+    real_name = (
+        notes_data.get("name")
+        or notes_data.get("customer_name")
+        or pl_entity.get("customer", {}).get("name")
+        or action_input.get("customer_name")
+        or "Valued Customer"
+    )
+
+    real_email = (
+        p_entity.get("email")
+        or pl_entity.get("customer", {}).get("email")
+        or (event.customer_id if "@" in (event.customer_id or "") else None)
+        or settings.support_email
+    )
+
+    real_phone = (
+        p_entity.get("contact")
+        or pl_entity.get("customer", {}).get("contact")
+        or (event.customer_id if (event.customer_id or "").startswith("+") or (event.customer_id or "").isdigit() else None)
+        or "+918238012515"
+    )
+
+    real_reason = (
+        event.error_description
+        or action_input.get("reason")
+        or event.error_code
+        or "Payment processing delay"
+    )
+
     try:
         # BRANCH 1: RETRY (Wait buffer -> HTTP Request to Razorpay)
         if action_type == "retry_payment":
@@ -111,63 +156,63 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
             # Generate genuine live workable Razorpay payment checkout link
             live_recovery_url = await create_razorpay_payment_link(
                 amount_paise=event.amount_paise,
-                customer_contact=event.customer_id or "+918238012515",
-                customer_email="aaryanpatel9784@gmail.com",
-                customer_name="Aryan Patel",
-                description=f"Payment Recovery - Order {order_id or 'Checkout'}",
+                customer_contact=real_phone,
+                customer_email=real_email,
+                customer_name=real_name,
+                description=f"Payment Recovery - Order {order_id or event.razorpay_payment_id}",
                 order_id=order_id or ""
             )
             success = await send_multichannel_recovery_message(
-                customer_id=action_input.get("customer_id", event.customer_id or "aaryanpatel9784@gmail.com"),
-                reason=action_input.get("reason", event.error_description or "Payment retry reminder"),
+                customer_id=real_email,
+                reason=real_reason,
                 payment_id=event.razorpay_payment_id,
                 amount_paise=event.amount_paise,
                 recovery_url=live_recovery_url,
-                customer_name=action_input.get("customer_name", "Aryan Patel")
+                customer_name=real_name
             )
             action_status = "pending"
-            summary_label = f"1-Click Recovery Link Dispatched via WhatsApp & Email to {event.customer_id or 'customer'} (Pending Payment)"
+            summary_label = f"1-Click Recovery Link Dispatched via WhatsApp & Email to {real_name} (Pending Payment)"
             
         # BRANCH 3: ESCALATE (CRM Support Ticket + Direct Admin Email + Slack Alert)
         elif action_type == "escalate_to_human":
             # Generate genuine live workable Razorpay payment checkout link
             live_recovery_url = await create_razorpay_payment_link(
                 amount_paise=event.amount_paise,
-                customer_contact=event.customer_id or "+918238012515",
-                customer_email="aaryanpatel9784@gmail.com",
-                customer_name="Aryan Patel",
-                description=f"Payment Recovery - Order {order_id or 'Checkout'}",
+                customer_contact=real_phone,
+                customer_email=real_email,
+                customer_name=real_name,
+                description=f"Payment Recovery - Order {order_id or event.razorpay_payment_id}",
                 order_id=order_id or ""
             )
 
             slack_ok = await send_slack_alert(
-                razorpay_payment_id=action_input.get("razorpay_payment_id", event.razorpay_payment_id),
-                reason=action_input.get("reason", "Max retry attempts exceeded"),
-                customer_id=event.customer_id or "",
+                razorpay_payment_id=event.razorpay_payment_id,
+                reason=real_reason,
+                customer_id=real_phone,
                 amount_paise=event.amount_paise,
                 attempt_count=attempt_number,
                 recovery_url=live_recovery_url,
-                customer_email="aaryanpatel9784@gmail.com"
+                customer_email=real_email
             )
             crm_ok = await create_or_update_crm_ticket(
-                payment_id=action_input.get("razorpay_payment_id", event.razorpay_payment_id),
-                reason=action_input.get("reason", "Escalated to human ops"),
-                customer_id=event.customer_id or ""
+                payment_id=event.razorpay_payment_id,
+                reason=real_reason,
+                customer_id=real_phone
             )
             email_ok = await send_support_escalation_ticket_email(
-                payment_id=action_input.get("razorpay_payment_id", event.razorpay_payment_id),
-                customer_id=event.customer_id or "Anonymous Customer",
+                payment_id=event.razorpay_payment_id,
+                customer_id=real_phone,
                 amount_paise=event.amount_paise,
-                reason=action_input.get("reason", "Max retry attempts exceeded"),
+                reason=real_reason,
                 attempt_count=attempt_number,
                 order_id=order_id or "",
                 recovery_url=live_recovery_url,
-                customer_name="Aryan Patel",
-                customer_email="aaryanpatel9784@gmail.com",
-                customer_phone="+91 82380 12515"
+                customer_name=real_name,
+                customer_email=real_email,
+                customer_phone=real_phone
             )
             action_status = "pending"
-            summary_label = f"Support Review (Escalated to Human) - CRM Ticket & Direct Support Email Sent"
+            summary_label = f"Support Review (Escalated to Human) - CRM Ticket & Direct Support Email Sent for {real_name}"
         else:
             action_status = "failed"
             summary_label = f"Unknown action: {action_type}"

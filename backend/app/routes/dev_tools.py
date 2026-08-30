@@ -13,7 +13,10 @@ from app.ai_agent import diagnose_and_decide
 from app.executor import execute_action
 from app.schemas import DevSimulatePaymentRequest
 
-router = APIRouter(prefix="/api/dev", tags=["Developer & Testing Tools"])
+from app.security import verify_password, sanitize_and_redact_pii
+from app.routes.dashboard import require_api_key
+
+router = APIRouter(prefix="/api/dev", tags=["Developer & Testing Tools"], dependencies=[Depends(require_api_key)])
 
 SCENARIOS = {
     # ── Track 03: Core Payment Degradation Scenarios ───────────────────
@@ -114,7 +117,7 @@ async def simulate_webhook(
         error_code=scenario_info["error_code"],
         error_description=scenario_info["error_description"],
         customer_id=customer,
-        raw_payload=payload,
+        raw_payload=sanitize_and_redact_pii(payload),
     )
     db.add(event)
     await db.commit()

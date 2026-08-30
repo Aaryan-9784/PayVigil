@@ -41,7 +41,7 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
     all_events_res = await db.execute(
         select(Action)
         .join(Event, Action.event_id == Event.id)
-        .where(Event.id != event.id, or_(*conds))
+        .where(or_(*conds))
         .order_by(Action.executed_at.desc())
         .limit(20)
     )
@@ -122,7 +122,8 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
                 reason=action_input.get("reason", event.error_description or "Payment retry reminder"),
                 payment_id=event.razorpay_payment_id,
                 amount_paise=event.amount_paise,
-                recovery_url=live_recovery_url
+                recovery_url=live_recovery_url,
+                customer_name=action_input.get("customer_name", "Aryan Patel")
             )
             action_status = "pending"
             summary_label = f"1-Click Recovery Link Dispatched via WhatsApp & Email to {event.customer_id or 'customer'} (Pending Payment)"

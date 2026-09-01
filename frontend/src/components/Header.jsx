@@ -189,7 +189,7 @@ export default function Header({
                           className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50/80 rounded-xl transition-colors cursor-pointer text-left"
                         >
                           <Trash2 className="w-4 h-4 text-red-500 shrink-0" />
-                          <span>Clear Recovery Logs</span>
+                          <span>Clear Logs</span>
                         </button>
                       )}
 

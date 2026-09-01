@@ -183,32 +183,38 @@ export default function SummaryCards({ data, loading }) {
 
       {/* React Portal: Separate At-Risk Orders Breakdown Modal for Admin & Support */}
       {showBreakdownModal && createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-          {/* Deep Backdrop overlay */}
+        <div className="fixed inset-0 z-[9999] overflow-y-auto flex items-center justify-center p-3 sm:p-5 bg-[#0c2340]/55 backdrop-blur-sm animate-fade-in">
+          {/* Click outside backdrop */}
           <div 
-            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0"
             onClick={() => setShowBreakdownModal(false)} 
           />
 
           {/* Modal Container */}
-          <div className="relative z-10 bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-150">
-            {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="flex h-2.5 w-2.5 rounded-full bg-amber-500 animate-pulse" />
-                  <h3 className="text-base font-bold text-[#0c2340]">Active At-Risk Orders Queue</h3>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
-                    {atRiskOrders.length} {atRiskOrders.length === 1 ? 'Order' : 'Orders'} Pending
-                  </span>
+          <div className="relative w-full max-w-2xl my-auto rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden flex flex-col z-[10000] max-h-[85vh]">
+            {/* Standardized Corporate Header */}
+            <div className="px-5 py-4 bg-gradient-to-r from-[#0c2340] via-[#0f2d52] to-[#0c83ff] text-white flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-amber-300">
+                  <Shield className="w-4 h-4" />
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Actionable triage list for Customer Support &amp; Administrator review
-                </p>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-white font-sans tracking-tight">Active At-Risk Orders Queue</h3>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/25 text-amber-200 border border-amber-400/30">
+                      {atRiskOrders.length} {atRiskOrders.length === 1 ? 'Order' : 'Orders'} Pending
+                    </span>
+                  </div>
+                  <div className="text-xs text-slate-300 mt-0.5">
+                    Actionable triage list for Customer Support &amp; Administrator review
+                  </div>
+                </div>
               </div>
+
               <button
                 onClick={() => setShowBreakdownModal(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer outline-none focus:outline-none"
+                title="Close"
               >
                 <X className="w-5 h-5" />
               </button>

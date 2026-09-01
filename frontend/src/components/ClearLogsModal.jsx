@@ -50,41 +50,34 @@ export default function ClearLogsModal({ isOpen, onClose, onConfirm, isClearing 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Blurred Deep Backdrop */}
+    <div className="fixed inset-0 z-[9999] overflow-y-auto flex items-center justify-center p-3 sm:p-5 bg-[#0c2340]/55 backdrop-blur-sm animate-fade-in">
+      {/* Click outside to close */}
       <div
-        className="fixed inset-0 bg-[#02042b]/80 backdrop-blur-md transition-opacity"
+        className="fixed inset-0"
         onClick={handleClose}
       />
 
-      {/* Modal Container */}
+      {/* Standardized Razorpay Modal Container */}
       <div
-        className="relative w-full max-w-lg rounded-2xl overflow-hidden z-10 text-white shadow-2xl"
-        style={{
-          background: 'linear-gradient(165deg, rgba(12, 35, 64, 0.96) 0%, rgba(4, 12, 26, 0.98) 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
-          boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
-          animation: 'fadeSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
-        }}
+        className="relative w-full max-w-md my-auto rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden flex flex-col z-[10000]"
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="px-6 py-5 flex items-center justify-between border-b border-white/10 bg-white/[0.02]">
-          <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-400 shrink-0 shadow-inner">
-              <ShieldAlert className="w-5 h-5" />
+        {/* 1. Standardized Corporate Header */}
+        <div className="px-5 py-4 bg-gradient-to-r from-[#0c2340] via-[#0f2d52] to-[#0c83ff] text-white flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-red-300">
+              <ShieldAlert className="w-4 h-4" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold tracking-tight text-white font-sans">
-                  Admin Authorization
-                </h3>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-red-500/20 text-red-300 border border-red-500/30">
+                <h3 className="text-sm font-bold text-white font-sans tracking-tight">Admin Authorization</h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/25 text-red-200 border border-red-400/30 uppercase tracking-wider">
                   Protected
                 </span>
               </div>
-              <p className="text-xs text-slate-400 font-medium mt-0.5">
-                Passkey verification required to purge recovery database
-              </p>
+              <div className="text-xs text-slate-300 mt-0.5">
+                Passkey verification required to purge database
+              </div>
             </div>
           </div>
 
@@ -92,30 +85,31 @@ export default function ClearLogsModal({ isOpen, onClose, onConfirm, isClearing 
             type="button"
             onClick={handleClose}
             disabled={isClearing}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer outline-none focus:outline-none"
+            title="Close"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Modal Form */}
-        <form onSubmit={handleExecute} className="p-6 space-y-5">
+        {/* 2. Modal Body Content */}
+        <form onSubmit={handleExecute} className="p-5 space-y-4 overflow-y-auto bg-white">
           {/* Warning Banner */}
-          <div className="bg-red-500/10 border border-red-500/25 rounded-xl p-4 flex items-start gap-3">
-            <AlertTriangle className="w-4.5 h-4.5 text-red-400 shrink-0 mt-0.5" />
-            <div className="text-xs text-red-200/90 leading-relaxed font-normal">
-              This action will permanently delete all <strong>recovery transactions</strong>, <strong>AI diagnosis logs</strong>, and <strong>audit records</strong> from PostgreSQL.
+          <div className="bg-red-50/80 border border-red-200 rounded-xl p-3.5 flex items-start gap-2.5">
+            <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+            <div className="text-xs text-red-900 leading-relaxed font-medium">
+              This action will permanently delete all <strong>recovery transactions</strong>, <strong>AI diagnosis logs</strong>, and <strong>audit records</strong>.
             </div>
           </div>
 
           {/* Admin Passkey Input */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-slate-300">
-              Admin Security Passkey <span className="text-red-400">*</span>
+            <label className="block text-xs font-bold text-slate-700">
+              Admin Security Passkey <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                <KeyRound className="w-4 h-4 text-[#0c83ff]" />
+                <KeyRound className="w-3.5 h-3.5 text-[#0c83ff]" />
               </div>
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -131,25 +125,25 @@ export default function ClearLogsModal({ isOpen, onClose, onConfirm, isClearing 
                 placeholder="Enter Admin Passkey"
                 disabled={isClearing}
                 autoFocus
-                className={`w-full pl-10 pr-10 py-2.5 rounded-xl border text-sm text-white placeholder:text-slate-500 bg-[#030914]/80 transition-all font-mono ${
+                className={`w-full pl-9 pr-10 py-2 rounded-xl border text-xs font-mono text-slate-900 placeholder:text-slate-400 bg-white transition-all shadow-2xs outline-none ${
                   errorMsg 
-                    ? 'border-red-500/70 focus:ring-2 focus:ring-red-500/40 focus:border-red-500' 
-                    : 'border-white/10 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-[#0c83ff]/40 focus:border-[#0c83ff]'
+                    ? 'border-red-500 focus:ring-2 focus:ring-red-100' 
+                    : 'border-slate-300 focus:border-[#0c83ff] focus:ring-2 focus:ring-blue-100'
                 }`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 tabIndex={-1}
-                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors cursor-pointer outline-none"
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5 text-slate-400" />}
               </button>
             </div>
           </div>
 
           {/* Safety Checkbox */}
-          <label className="flex items-start gap-3 pt-0.5 cursor-pointer select-none">
+          <label className="flex items-start gap-2.5 pt-0.5 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={isAcknowledged}
@@ -158,38 +152,38 @@ export default function ClearLogsModal({ isOpen, onClose, onConfirm, isClearing 
                 if (errorMsg) setErrorMsg('');
               }}
               disabled={isClearing}
-              className="mt-0.5 w-4 h-4 rounded border-white/20 bg-[#030914] text-[#0c83ff] focus:ring-[#0c83ff]/40 cursor-pointer"
+              className="mt-0.5 w-3.5 h-3.5 rounded border-slate-300 text-[#0c83ff] focus:ring-[#0c83ff] cursor-pointer"
             />
-            <span className="text-xs text-slate-300 font-medium leading-relaxed">
+            <span className="text-xs text-slate-600 font-medium leading-tight">
               I understand this action is irreversible and purges all live recovery data.
             </span>
           </label>
 
           {/* Error Message */}
           {errorMsg && (
-            <div className="p-3 rounded-xl bg-red-950/80 border border-red-500/40 text-xs font-semibold text-red-300 flex items-center gap-2 animate-shake">
-              <AlertTriangle className="w-4 h-4 shrink-0 text-red-400" />
+            <div className="p-2.5 rounded-xl bg-red-50 border border-red-200 text-xs font-bold text-red-800 flex items-center gap-2 animate-fade-in">
+              <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-red-600" />
               <span>{errorMsg}</span>
             </div>
           )}
 
-          {/* Modal Footer Buttons */}
-          <div className="pt-3 border-t border-white/10 flex items-center justify-end gap-3">
+          {/* 3. Standardized Modal Footer */}
+          <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2.5">
             <button
               type="button"
               onClick={handleClose}
               disabled={isClearing}
-              className="px-4 py-2.5 text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all cursor-pointer"
+              className="px-4 py-2 text-xs font-bold text-slate-700 hover:text-[#0c2340] bg-white hover:bg-slate-100 border border-slate-300 rounded-xl transition-all cursor-pointer shadow-2xs outline-none"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!isValid || isClearing}
-              className={`px-5 py-2.5 text-xs font-bold rounded-xl flex items-center gap-2 transition-all ${
+              className={`px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all outline-none ${
                 isValid && !isClearing
-                  ? 'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-lg shadow-red-600/30 cursor-pointer active:scale-98'
-                  : 'bg-white/5 text-slate-400 border border-white/10 opacity-70 cursor-not-allowed'
+                  ? 'bg-red-600 hover:bg-red-700 text-white shadow-xs cursor-pointer active:scale-98'
+                  : 'bg-slate-100 text-slate-400 border border-slate-200 opacity-60 cursor-not-allowed'
               }`}
             >
               {isClearing ? (
@@ -200,7 +194,7 @@ export default function ClearLogsModal({ isOpen, onClose, onConfirm, isClearing 
               ) : (
                 <>
                   <Trash2 className="w-3.5 h-3.5" />
-                  <span>Clear Recovery Logs</span>
+                  <span>Clear Logs</span>
                 </>
               )}
             </button>

@@ -48,3 +48,54 @@ export async function resetDatabase(adminPasskey) {
   });
   return response.data;
 }
+
+// ── Indian Support Automation APIs ──
+
+export async function triggerUpiCollectPush({ payment_id, vpa, amount_inr, customer_id, customer_name, auto_capture = true }) {
+  const response = await axios.post(`${API_BASE}/api/support/upi-collect`, {
+    payment_id,
+    vpa,
+    amount_inr,
+    customer_id,
+    customer_name,
+    auto_capture
+  }, {
+    headers: { "x-api-key": API_KEY }
+  });
+  return response.data;
+}
+
+export async function manageCartGuard({ payment_id, action, locked_price_inr, duration_hours = 24, sku_code }) {
+  const response = await axios.post(`${API_BASE}/api/support/cart-guard`, {
+    payment_id,
+    action,
+    locked_price_inr,
+    duration_hours,
+    sku_code
+  }, {
+    headers: { "x-api-key": API_KEY }
+  });
+  return response.data;
+}
+
+export async function fetchCartGuards() {
+  const response = await axios.get(`${API_BASE}/api/support/cart-guards`, {
+    headers: { "x-api-key": API_KEY }
+  });
+  return response.data;
+}
+
+export async function generateVernacularScript({ payment_id, amount_inr, error_code, error_description, customer_name, language = "hindi" }) {
+  const response = await axios.post(`${API_BASE}/api/support/vernacular-script`, {
+    payment_id,
+    amount_inr,
+    error_code,
+    error_description,
+    customer_name,
+    language
+  }, {
+    headers: { "x-api-key": API_KEY }
+  });
+  return response.data;
+}
+

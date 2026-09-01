@@ -104,6 +104,10 @@ export default function App() {
           }
         };
 
+        socket.onerror = () => {
+          // Handled gracefully without console noise
+        };
+
         socket.onclose = () => {
           if (!isCancelled) {
             reconnectTimeout = setTimeout(() => {
@@ -112,7 +116,7 @@ export default function App() {
           }
         };
       } catch (err) {
-        console.warn('WebSocket init exception:', err);
+        // Silently handled
       }
     };
 
@@ -123,7 +127,13 @@ export default function App() {
       if (reconnectTimeout) clearTimeout(reconnectTimeout);
       if (socket) {
         try {
-          socket.close();
+          if (socket.readyState === WebSocket.OPEN) {
+            socket.close();
+          } else if (socket.readyState === WebSocket.CONNECTING) {
+            socket.onopen = () => {
+              try { socket.close(); } catch (e) {}
+            };
+          }
         } catch (e) {}
       }
     };

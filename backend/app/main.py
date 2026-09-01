@@ -3,7 +3,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-from app.routes import webhooks, dashboard, dev_tools
+from app.routes import webhooks, dashboard, dev_tools, indian_recovery
 from app.config import settings
 from app.database import init_db
 from app.ws_manager import ws_manager
@@ -98,6 +98,7 @@ async def websocket_events_endpoint(websocket: WebSocket):
 # Route registration
 app.include_router(webhooks.router)
 app.include_router(dashboard.router)
+app.include_router(indian_recovery.router)
 
 if settings.environment != "production":
     app.include_router(dev_tools.router)

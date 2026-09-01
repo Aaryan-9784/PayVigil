@@ -1,30 +1,60 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { IndianRupee, ChevronDown, Trash2, LogOut, Lock, Headphones, Shield, ShieldCheck } from 'lucide-react';
+import { 
+  IndianRupee, 
+  ChevronDown, 
+  Trash2, 
+  LogOut, 
+  Lock, 
+  Headphones, 
+  Shield, 
+  ShieldCheck, 
+  RefreshCw, 
+  Zap, 
+  Wifi, 
+  WifiOff, 
+  Clock 
+} from 'lucide-react';
 
 export default function Header({ 
   onResetData, 
   onOpenLogin, 
   onLogout, 
-  currentUser 
+  currentUser,
+  autoRefreshEnabled = true,
+  onToggleAutoRefresh,
+  refreshInterval = 10,
+  onChangeRefreshInterval,
+  onManualRefresh,
+  isRefreshing = false,
+  lastUpdated,
+  wsConnected = false
 }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [intervalDropdownOpen, setIntervalDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const intervalRef = useRef(null);
 
-  // Close dropdown on click outside
+  // Close dropdowns on click outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
+      }
+      if (intervalRef.current && !intervalRef.current.contains(event.target)) {
+        setIntervalDropdownOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Close dropdown on ESC key
+  // Close dropdowns on ESC key
   useEffect(() => {
     function handleKeyDown(event) {
-      if (event.key === 'Escape') setDropdownOpen(false);
+      if (event.key === 'Escape') {
+        setDropdownOpen(false);
+        setIntervalDropdownOpen(false);
+      }
     }
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
@@ -35,31 +65,31 @@ export default function Header({
   return (
     <header className="sticky top-0 z-40 bg-white/95 border-b border-slate-200/80 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="py-3 flex items-center justify-between gap-4">
+        <div className="py-2.5 flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
 
           {/* ── Official Razorpay Brand Logo ── */}
-          <div className="flex items-center gap-3.5">
+          <div className="flex items-center gap-3">
             <img
               src="/favicon.svg"
               alt="Razorpay AI Recovery Logo"
-              className="w-9 h-9 rounded-xl shrink-0 shadow-sm"
+              className="w-8 h-8 rounded-xl shrink-0 shadow-sm"
               style={{
                 boxShadow: '0 4px 12px rgba(12, 131, 255, 0.2)',
               }}
             />
 
             <div>
-              <div className="flex items-center gap-2.5 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-base font-black tracking-tight text-[#0c2340] font-sans">
                   Razorpay
                 </span>
-                <span className="h-3.5 w-px bg-slate-300 hidden sm:block" />
-                <span className="text-[11px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-50 text-[#0c83ff] border border-blue-200/80">
+                <span className="h-3 w-px bg-slate-300 hidden sm:block" />
+                <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-50 text-[#0c83ff] border border-blue-200/80">
                   AI Revenue Recovery
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 font-medium leading-none mt-0.5 hidden sm:block">
-                Autonomous Payment Triage • Multi-Channel Retries &amp; Safety Guardrails
+              <p className="text-[10px] text-slate-500 font-medium leading-none mt-0.5 hidden md:block">
+                Autonomous Payment Triage • Real-Time WebSockets &amp; Guardrails
               </p>
             </div>
           </div>
@@ -186,3 +216,4 @@ export default function Header({
     </header>
   );
 }
+

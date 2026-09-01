@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Header from './components/Header';
 import SummaryCards from './components/SummaryCards';
 import RecoveryChart from './components/RecoveryChart';
@@ -15,6 +15,9 @@ export default function App() {
   const [notification, setNotification] = useState(null);
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
+
+  const wsRef = useRef(null);
+
   const [currentUser, setCurrentUser] = useState(() => {
     try {
       const saved = localStorage.getItem('rzp_user_session');
@@ -29,27 +32,101 @@ export default function App() {
     setTimeout(() => setNotification(null), 3500);
   };
 
-  const loadData = useCallback(async () => {
+  const loadData = useCallback(async (showLoadingSpinner = false) => {
     if (!currentUser) return;
+    if (showLoadingSpinner) setLoading(true);
+
     try {
       const data = await fetchDashboard();
       setDashboardData(data);
     } catch (err) {
       console.error('Failed to load dashboard:', err);
-      showToast('Could not connect to server', 'error');
+      if (showLoadingSpinner) {
+        showToast('Could not connect to server', 'error');
+      }
     } finally {
       setLoading(false);
     }
   }, [currentUser]);
 
+  // Initial load on authentication
   useEffect(() => { 
-    if (currentUser) loadData(); 
+    if (currentUser) {
+      loadData(true);
+    } 
   }, [currentUser, loadData]);
 
+  // ── Auto-Refresh: Automatically refresh every 1 minute (60 seconds) ──
   useEffect(() => {
     if (!currentUser) return;
-    const interval = setInterval(() => loadData(), 10000);
-    return () => clearInterval(interval);
+
+    const ONE_MINUTE_MS = 60 * 1000;
+    const timer = setInterval(() => {
+      loadData(false);
+    }, ONE_MINUTE_MS);
+
+    return () => clearInterval(timer);
+  }, [currentUser, loadData]);
+
+  // ── Real-Time WebSocket Streaming Connection for Instant Updates ──
+  useEffect(() => {
+    if (!currentUser) return;
+
+    let socket = null;
+    let reconnectTimeout = null;
+    let isCancelled = false;
+
+    const connectWebSocket = () => {
+      try {
+        const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+        let wsUrl = apiBase.replace(/^http/, 'ws');
+        if (!wsUrl.endsWith('/')) {
+          wsUrl += '/ws/events';
+        } else {
+          wsUrl += 'ws/events';
+        }
+
+        socket = new WebSocket(wsUrl);
+        wsRef.current = socket;
+
+        socket.onmessage = (event) => {
+          if (isCancelled) return;
+          try {
+            const parsed = JSON.parse(event.data);
+            if (parsed.type === 'payment_failed_triaged' || parsed.type === 'revenue_recovered' || parsed.type === 'database_reset') {
+              if (parsed.type === 'revenue_recovered') {
+                showToast(parsed.data?.summary || '🎉 Revenue Recovered!', 'success');
+              }
+              loadData(false);
+            }
+          } catch (e) {
+            // Heartbeat pong or non-JSON
+          }
+        };
+
+        socket.onclose = () => {
+          if (!isCancelled) {
+            reconnectTimeout = setTimeout(() => {
+              if (!isCancelled) connectWebSocket();
+            }, 5000);
+          }
+        };
+      } catch (err) {
+        console.warn('WebSocket init exception:', err);
+      }
+    };
+
+    connectWebSocket();
+
+    return () => {
+      isCancelled = true;
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+      if (socket) {
+        try {
+          socket.close();
+        } catch (e) {}
+      }
+    };
   }, [currentUser, loadData]);
 
   const handleLoginSuccess = (userData) => {
@@ -79,7 +156,7 @@ export default function App() {
       await resetDatabase(passkey);
       showToast('All recovery logs and transactions purged successfully');
       setIsClearModalOpen(false);
-      await loadData();
+      await loadData(true);
     } catch (err) {
       const msg = err.response?.data?.detail || 'Failed to clear database (Invalid Authorization)';
       showToast(msg, 'error');
@@ -149,14 +226,14 @@ export default function App() {
       />
 
       {/* Main Dashboard Layout */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 space-y-6 flex-1 w-full">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 flex-1 w-full">
         {/* 1. Key Metrics & Financial Recovery KPIs */}
         <SummaryCards data={dashboardData} loading={loading} />
 
         {/* 2. Revenue Recovery Analytics & Resolution Distribution */}
         <RecoveryChart data={dashboardData} />
 
-        {/* 3. Immutable Audit Trail & AI Diagnostic Inspector */}
+        {/* 4. Immutable Audit Trail & AI Diagnostic Inspector */}
         <AuditTable logs={dashboardData?.recent_audit_log || []} />
       </main>
 
@@ -173,3 +250,5 @@ export default function App() {
     </div>
   );
 }
+
+

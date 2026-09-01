@@ -12,6 +12,7 @@ from app.models import Event, Action, AuditLog, Diagnosis
 from app.ai_agent import diagnose_and_decide
 from app.executor import execute_action
 from app.schemas import DevSimulatePaymentRequest
+from app.ws_manager import ws_manager
 
 from app.security import verify_password, sanitize_and_redact_pii
 from app.routes.dashboard import require_api_key
@@ -129,6 +130,21 @@ async def simulate_webhook(
     # Execute with Guardrails
     action = await execute_action(db, event, decision)
 
+    # Real-time WebSocket live broadcast
+    await ws_manager.broadcast("payment_failed_triaged", {
+        "event_id": str(event.id),
+        "payment_id": payment_id,
+        "amount_paise": amount,
+        "amount_inr": amount / 100,
+        "error_code": scenario_info.get("error_code", "GATEWAY_ERROR"),
+        "error_description": scenario_info.get("error_description", "Payment processing failed"),
+        "action_type": decision.get("action", "retry_payment"),
+        "action_status": action.status,
+        "root_cause": decision.get("reason", "Simulated AI recovery diagnostic triggered"),
+        "confidence": decision.get("confidence", "98.5% HIGH"),
+        "summary": f"⚡ Live Sim: {payment_id[-8:]} -> {decision.get('action', 'retry_payment')}"
+    })
+
     return {
         "status": "success",
         "simulated_scenario": req.scenario,
@@ -215,4 +231,9 @@ async def reset_data(db: AsyncSession = Depends(get_db)):
     await db.execute(delete(Diagnosis))
     await db.execute(delete(Event))
     await db.commit()
+
+    await ws_manager.broadcast("database_reset", {
+        "message": "All audit logs and recovery transactions purged by authorized admin."
+    })
+
     return {"status": "cleared", "message": "All audit logs and recovery transactions purged by authorized admin."}

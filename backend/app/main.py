@@ -1,11 +1,12 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from app.routes import webhooks, dashboard, dev_tools
 from app.config import settings
 from app.database import init_db
+from app.ws_manager import ws_manager
 
 from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
@@ -72,6 +73,27 @@ async def global_exception_handler(request, exc):
         status_code=500,
         content={"detail": "An internal server error occurred. Security incident logged."}
     )
+
+# WebSocket Endpoint for Real-Time Streaming
+@app.websocket("/ws/events")
+async def websocket_events_endpoint(websocket: WebSocket):
+    await ws_manager.connect(websocket)
+    try:
+        # Send initial handshake ping
+        await websocket.send_json({
+            "type": "connection_established",
+            "message": "Connected to Autonomous AI Revenue Recovery Live Stream",
+            "environment": settings.environment
+        })
+        while True:
+            data = await websocket.receive_text()
+            if data == "ping":
+                await websocket.send_text("pong")
+    except WebSocketDisconnect:
+        ws_manager.disconnect(websocket)
+    except Exception as e:
+        app_logger.warning(f"WebSocket connection exception: {e}")
+        ws_manager.disconnect(websocket)
 
 # Route registration
 app.include_router(webhooks.router)

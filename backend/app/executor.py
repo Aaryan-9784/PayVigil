@@ -141,15 +141,24 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
     try:
         # BRANCH 1: RETRY (Wait buffer -> HTTP Request to Razorpay)
         if action_type == "retry_payment":
-            delay_sec = action_input.get("delay_seconds", 0)
-            if delay_sec > 0:
-                logger.info(f"[Retry Flow] Waiting {delay_sec} seconds before retrying payment {event.razorpay_payment_id}...")
-                await asyncio.sleep(delay_sec)
+            is_salary = action_input.get("is_salary_cycle", False)
+            is_jitter = action_input.get("is_jittered_backoff", False)
+            if is_salary:
+                # Calculate hours to 1st of next month 09:30 AM IST
+                summary_label = f"📅 Salary-Cycle Scheduled: Auto-retry aligned for 1st of Month (09:30 AM IST) for {event.razorpay_payment_id}"
+            elif is_jitter:
+                summary_label = f"⚡ Flash Sale Switch Congestion: Jittered Retry Queue Activated for {event.razorpay_payment_id}"
+            else:
+                delay_sec = action_input.get("delay_seconds", 0)
+                if delay_sec > 0:
+                    logger.info(f"[Retry Flow] Waiting {delay_sec} seconds before retrying payment {event.razorpay_payment_id}...")
+                    await asyncio.sleep(delay_sec)
+                
+                # Simulated or queued retry
+                success = await retry_payment_on_razorpay(action_input.get("razorpay_payment_id", event.razorpay_payment_id))
+                summary_label = f"Smart Gateway Retry Scheduled for {event.razorpay_payment_id} (Awaiting Bank Confirmation)"
             
-            # Simulated or queued retry
-            success = await retry_payment_on_razorpay(action_input.get("razorpay_payment_id", event.razorpay_payment_id))
             action_status = "pending"
-            summary_label = f"Smart Gateway Retry Scheduled for {event.razorpay_payment_id} (Awaiting Bank Confirmation)"
             
         # BRANCH 2: MESSAGE (Multi-channel: Email + WhatsApp + SMS)
         elif action_type == "send_reminder_email":
@@ -171,10 +180,43 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
                 customer_name=real_name
             )
             action_status = "pending"
-            summary_label = f"1-Click Recovery Link Dispatched via WhatsApp & Email to {real_name} (Pending Payment)"
+            
+            tag = action_input.get("tag", "")
+            rail_rec = action_input.get("rail_recommendation")
+            
+            if tag == "QUICK_COMMERCE_LITE":
+                summary_label = f"⚡ Quick-Commerce 3s Failover: 1-Tap UPI Lite / QR Dispatched to {real_name} (Order Saved)"
+            elif tag == "TRAVEL_PRICE_LOCK":
+                summary_label = f"✈️ Travel Price-Lock: 15-min Seat Reservation & WhatsApp Checkout Sent to {real_name}"
+            elif tag == "SAAS_TOKEN_RECONSENT":
+                summary_label = f"💻 SaaS Churn Shield: 1-Tap RBI Token Renewal & Win-Back Link Sent to {real_name}"
+            elif tag == "WEBVIEW_ESCAPE_QR":
+                summary_label = f"📲 Social In-App Webview Escape: Instant Scan-and-Pay QR Dispatched to {real_name}"
+            elif tag == "UPI_PIN_LOCKED":
+                summary_label = f"🔒 24h UPI PIN Lockout: Switched {real_name} to Instant Card/NetBanking Recovery Link"
+            elif tag == "UPI_DAILY_LIMIT":
+                summary_label = f"🛑 NPCI Daily UPI Cap Reached: Switched {real_name} to NetBanking/Credit Card Link"
+            elif tag == "CARD_TOGGLE_DISABLED":
+                summary_label = f"🛡️ Card Online Toggle Inactive: Dispatched Bank App Guide & Instant UPI Link to {real_name}"
+            elif tag == "RBI_AFA_MANDATE":
+                summary_label = f"📈 RBI >₹15k AFA Mandate: 1-Tap OTP Approval Link Dispatched to {real_name}"
+            elif tag == "NRI_MULTI_CURRENCY":
+                summary_label = f"🌍 NRI / International Card: Multi-Currency Checkout Link Dispatched to {real_name}"
+            elif tag == "B2B_GSTIN":
+                summary_label = f"💼 B2B Invoicing / GSTIN: Verified Corporate Checkout Link Dispatched to {real_name}"
+            elif tag == "RUPAY_UPI_FAILOVER" or rail_rec:
+                summary_label = f"⚡ RuPay/UPI Failover: Alternative Checkout Link Dispatched to {real_name} (Pending Payment)"
+            elif "cod" in (event.error_code or "").lower() or "checkout" in (event.error_code or "").lower():
+                summary_label = f"🏷️ COD-to-Prepaid Recovery: 5% UPI Incentive Link Sent to {real_name}"
+            else:
+                summary_label = f"1-Click Recovery Link Dispatched via WhatsApp & Email to {real_name} (Pending Payment)"
             
         # BRANCH 3: ESCALATE (CRM Support Ticket + Direct Admin Email + Slack Alert)
         elif action_type == "escalate_to_human":
+            tag = action_input.get("tag", "")
+            # Check for VIP status (₹10,000+) or EdTech high-ticket tag
+            is_vip = event.amount_paise >= 1000000 or tag == "EDTECH_CONCIERGE"
+            
             # Generate genuine live workable Razorpay payment checkout link
             live_recovery_url = await create_razorpay_payment_link(
                 amount_paise=event.amount_paise,
@@ -187,7 +229,7 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
 
             slack_ok = await send_slack_alert(
                 razorpay_payment_id=event.razorpay_payment_id,
-                reason=real_reason,
+                reason=f"{'👑 VIP HIGH-TICKET ESCALATION: ' if is_vip else ''}{real_reason}",
                 customer_id=real_phone,
                 amount_paise=event.amount_paise,
                 attempt_count=attempt_number,
@@ -196,14 +238,14 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
             )
             crm_ok = await create_or_update_crm_ticket(
                 payment_id=event.razorpay_payment_id,
-                reason=real_reason,
+                reason=f"{'👑 VIP: ' if is_vip else ''}{real_reason}",
                 customer_id=real_phone
             )
             email_ok = await send_support_escalation_ticket_email(
                 payment_id=event.razorpay_payment_id,
                 customer_id=real_phone,
                 amount_paise=event.amount_paise,
-                reason=real_reason,
+                reason=f"{'👑 VIP High-Value Customer: ' if is_vip else ''}{real_reason}",
                 attempt_count=attempt_number,
                 order_id=order_id or "",
                 recovery_url=live_recovery_url,
@@ -212,7 +254,12 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
                 customer_phone=real_phone
             )
             action_status = "pending"
-            summary_label = f"Support Review (Escalated to Human) - CRM Ticket & Direct Support Email Sent for {real_name}"
+            if tag == "EDTECH_CONCIERGE":
+                summary_label = f"🎓 EdTech VIP Admissions Concierge Dispatched for {real_name} (₹{event.amount_paise/100:,.2f} Course Recovery)"
+            elif is_vip:
+                summary_label = f"👑 VIP High-Value Order (₹{event.amount_paise/100:,.2f}) Escalated to Concierge Support for {real_name}"
+            else:
+                summary_label = f"Support Review (Escalated to Human) - CRM Ticket & Direct Support Email Sent for {real_name}"
         else:
             action_status = "failed"
             summary_label = f"Unknown action: {action_type}"

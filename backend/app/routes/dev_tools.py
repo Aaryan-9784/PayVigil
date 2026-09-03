@@ -51,7 +51,7 @@ SCENARIOS = {
         "error_description": "Customer initiated chargeback inquiry on transaction",
         "expected_action": "escalate_to_human",
     },
-    # ── Track 03: Advanced Directions (Subscriptions, B2B, Checkout) ────
+    # ── Track 03: Advanced Directions (Subscriptions, B2B, Checkout, Indian Ecosystem) ────
     "subscription_mandate_failed": {
         "error_code": "SUBSCRIPTION_MANDATE_DEBIT_FAILED",
         "error_description": "Recurring e-mandate debit failed. Bank reported transient clearing network error.",
@@ -65,6 +65,81 @@ SCENARIOS = {
     "checkout_abandoned": {
         "error_code": "CHECKOUT_SESSION_ABANDONED",
         "error_description": "High-intent checkout drop-off detected at OTP payment step. Generated 1-click recovery link.",
+        "expected_action": "send_reminder_email",
+    },
+    "salary_cycle_low_balance": {
+        "error_code": "INSUFFICIENT_FUNDS_MONTH_END",
+        "error_description": "Payment failed due to temporary month-end low balance. Auto-scheduling for 1st of month (Salary Credit Window).",
+        "expected_action": "retry_payment",
+    },
+    "vip_high_ticket_failure": {
+        "error_code": "VIP_HIGH_VALUE_TRANSACTION_FAILED",
+        "error_description": "High-ticket VIP luxury purchase of ₹55,000 failed due to card bank limit. Immediate concierge escalation dispatched.",
+        "expected_action": "escalate_to_human",
+    },
+    "rupay_upi_limit": {
+        "error_code": "RUPAY_UPI_MCC_LIMIT_EXCEEDED",
+        "error_description": "RuPay Credit on UPI daily limit / MCC category exceeded. Switching customer to Instant Savings UPI or Card link.",
+        "expected_action": "send_reminder_email",
+    },
+    "cod_prepaid_recovery": {
+        "error_code": "COD_ORDER_CHECKOUT_ABANDONED",
+        "error_description": "Customer attempted to switch to Cash on Delivery. Dispatched 5% Instant UPI Prepaid Incentive to prevent RTO loss.",
+        "expected_action": "send_reminder_email",
+    },
+    "upi_pin_locked": {
+        "error_code": "UPI_PIN_BLOCKED_24H",
+        "error_description": "Customer entered incorrect UPI PIN 3 times. Bank 24h lockout triggered. Switched to Card / Netbanking recovery link.",
+        "expected_action": "send_reminder_email",
+    },
+    "upi_daily_limit": {
+        "error_code": "UPI_DAILY_LIMIT_EXCEEDED",
+        "error_description": "Customer reached NPCI daily UPI transaction/amount limit (₹1 Lakh / 20 txns cap). Switched to NetBanking link.",
+        "expected_action": "send_reminder_email",
+    },
+    "card_toggle_disabled": {
+        "error_code": "DOMESTIC_ONLINE_TXN_DISABLED",
+        "error_description": "Card e-commerce online usage is disabled in customer mobile banking app (RBI Card Controls). Provided bank app guide & UPI fallback.",
+        "expected_action": "send_reminder_email",
+    },
+    "rbi_afa_mandate": {
+        "error_code": "RECURRING_AFA_REQUIRED",
+        "error_description": "RBI Additional Factor Authentication (AFA) required for recurring subscription >₹15,000. 1-Tap OTP approval link dispatched.",
+        "expected_action": "send_reminder_email",
+    },
+    "nri_multi_currency": {
+        "error_code": "INTERNATIONAL_CARD_FEMA_RESTRICTION",
+        "error_description": "International card detected on domestic INR checkout. Auto-converted to Multi-Currency (USD/EUR/GBP) recovery gateway.",
+        "expected_action": "send_reminder_email",
+    },
+    "flash_sale_spike": {
+        "error_code": "BANK_CONCURRENCY_503_SPIKE",
+        "error_description": "High-traffic flash sale spike caused bank switch congestion. Exponential jittered retry queue activated.",
+        "expected_action": "retry_payment",
+    },
+    "quick_commerce_drop": {
+        "error_code": "QUICK_COMMERCE_10M_DELIVERY_DROP",
+        "error_description": "10-minute grocery checkout failed due to UPI timeout. Activated 3-second 1-tap UPI Lite fallback to prevent competitor switch.",
+        "expected_action": "send_reminder_email",
+    },
+    "travel_price_lock": {
+        "error_code": "TRAVEL_SEAT_LOCK_EXPIRING",
+        "error_description": "Flight booking OTP delay. Activated 15-min seat reservation hold & price-lock protocol with WhatsApp recovery.",
+        "expected_action": "send_reminder_email",
+    },
+    "edtech_high_ticket": {
+        "error_code": "EDTECH_COURSE_CHECKOUT_DECLINED",
+        "error_description": "₹45,000 professional course checkout declined. Dispatched to VIP Admissions Concierge for No-Cost EMI assistance.",
+        "expected_action": "escalate_to_human",
+    },
+    "saas_involuntary_churn": {
+        "error_code": "SAAS_TOKEN_SUSPENDED_CHURN",
+        "error_description": "B2B SaaS subscription failed due to RBI replaced card token suspension. Dispatched 1-tap Token Re-Consent link.",
+        "expected_action": "send_reminder_email",
+    },
+    "webview_sandbox_lock": {
+        "error_code": "INSTAGRAM_WEBVIEW_DEEP_LINK_BLOCKED",
+        "error_description": "Social media in-app browser blocked upi:// deep-link. Deployed Browser Escape Dynamic QR checkout modal.",
         "expected_action": "send_reminder_email",
     }
 }

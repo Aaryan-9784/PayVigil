@@ -114,6 +114,270 @@ function renderStructuredLogDetails(log) {
   const clean = raw.replace(/^[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1FA70}-\u{1FAFF}\u{FE0F}\s]+/u, '').trim();
   const lower = clean.toLowerCase();
 
+  // 0. VIP High-Value Escalation / EdTech Concierge
+  if (lower.includes('vip high-value') || lower.includes('vip:') || lower.includes('edtech vip')) {
+    const amtMatch = clean.match(/₹[\d,.]+/i);
+    const isEdTech = lower.includes('edtech') || lower.includes('course');
+    return (
+      <div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded text-xs inline-flex items-center gap-1">
+            {isEdTech ? '🎓 EdTech VIP Admissions Concierge' : '👑 VIP High-Value Order Escalation'}
+          </span>
+          {amtMatch && (
+            <span className="font-extrabold text-amber-900 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded text-xs">
+              {amtMatch[0]}
+            </span>
+          )}
+        </div>
+        <div className="text-[11px] text-slate-600 mt-1 flex items-center gap-1.5">
+          <span>{isEdTech ? 'No-Cost EMI & Admissions Support: Direct outreach dispatched to student' : 'Priority Concierge SLA: High-ticket order flagged for direct sales/support outreach'}</span>
+        </div>
+      </div>
+    );
+  }
+
+  // 0a1. Quick-Commerce 3s Instant Delivery Failover
+  if (lower.includes('quick-commerce') || lower.includes('quick_commerce')) {
+    return (
+      <div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-bold text-emerald-950 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded text-xs inline-flex items-center gap-1">
+            ⚡ Quick-Commerce 3s Failover
+          </span>
+          <span className="font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded text-[11px]">
+            1-Tap UPI Lite / Instant QR
+          </span>
+        </div>
+        <div className="text-[11px] text-slate-500 mt-1">
+          10-minute instant delivery drop prevented. Seamless fast-failover saved customer from switching to competitor app.
+        </div>
+      </div>
+    );
+  }
+
+  // 0a2. Travel & Flight Booking Price-Lock
+  if (lower.includes('travel price-lock') || lower.includes('seat reservation')) {
+    return (
+      <div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-bold text-sky-950 bg-sky-100 border border-sky-300 px-2 py-0.5 rounded text-xs inline-flex items-center gap-1">
+            ✈️ Travel Price-Lock Protocol
+          </span>
+          <span className="font-bold text-sky-800 bg-sky-50 border border-sky-200 px-1.5 py-0.2 rounded text-[11px]">
+            15-Min Seat Hold Active
+          </span>
+        </div>
+        <div className="text-[11px] text-slate-500 mt-1">
+          Flight booking 2FA delay intercepted. Locked fare &amp; seat reservation held with 1-click WhatsApp checkout.
+        </div>
+      </div>
+    );
+  }
+
+  // 0a3. SaaS Involuntary Churn & Token Re-Consent
+  if (lower.includes('saas churn shield') || lower.includes('token renewal')) {
+    return (
+      <div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-bold text-violet-950 bg-violet-100 border border-violet-300 px-2 py-0.5 rounded text-xs inline-flex items-center gap-1">
+            💻 SaaS Involuntary Churn Shield
+          </span>
+          <span className="font-bold text-violet-800 bg-violet-50 border border-violet-200 px-1.5 py-0.2 rounded text-[11px]">
+            1-Tap RBI Token Renewal
+          </span>
+        </div>
+        <div className="text-[11px] text-slate-500 mt-1">
+          Replaced card token suspension resolved. Win-back link dispatched before recurring account cancellation.
+        </div>
+      </div>
+    );
+  }
+
+  // 0a4. Social In-App Webview Escape
+  if (lower.includes('social in-app webview') || lower.includes('escape qr')) {
+    return (
+      <div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-bold text-pink-950 bg-pink-100 border border-pink-300 px-2 py-0.5 rounded text-xs inline-flex items-center gap-1">
+            📲 Social Webview Sandbox Escape
+          </span>
+          <span className="font-bold text-pink-800 bg-pink-50 border border-pink-200 px-1.5 py-0.2 rounded text-[11px]">
+            Dynamic Scan QR
+          </span>
+        </div>
+        <div className="text-[11px] text-slate-500 mt-1">
+          Instagram/Facebook in-app browser UPI deep-link block bypassed via on-screen QR modal.
+        </div>
+      </div>
+    );
+  }
+
+  // 0b. Salary-Cycle Auto-Scheduled Retry
+  if (lower.includes('salary-cycle') || lower.includes('salary credit window')) {
+    return (
+      <div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-bold text-indigo-900 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded text-xs inline-flex items-center gap-1">
+            📅 Salary-Cycle Scheduled
+          </span>
+          <span className="font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded text-[11px]">
+            1st of Month (09:30 AM IST)
+          </span>
+        </div>
+        <div className="text-[11px] text-slate-500 mt-1">
+          Month-end balance depletion detected. Auto-retry synchronized with Indian payroll deposit window.
+        </div>
+      </div>
+    );
+  }
+
+  // 0c. RuPay / Alternative Rail Failover
+  if (lower.includes('rupay/upi') || lower.includes('alternative rail')) {
+    return (
+      <div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-bold text-cyan-900 bg-cyan-50 border border-cyan-200 px-2 py-0.5 rounded text-xs inline-flex items-center gap-1">
+            ⚡ RuPay/UPI Failover
+          </span>
+        </div>
+        <div className="text-[11px] text-slate-500 mt-1">
+          RuPay Credit on UPI limit/category bypassed $\rightarrow$ Routed to instant Savings UPI / Card link.
+        </div>
+      </div>
+    );
+  }
+
+  // 0d. COD-to-Prepaid Recovery
+  if (lower.includes('cod-to-prepaid') || lower.includes('cod')) {
+    return (
+      <div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-bold text-emerald-900 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-xs inline-flex items-center gap-1">
+            🏷️ COD-to-Prepaid Incentive
+          </span>
+          <span className="font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.2 rounded text-[11px]">
+            5% Instant UPI Discount Link
+          </span>
+        </div>
+        <div className="text-[11px] text-slate-500 mt-1">
+          Intercepted COD order drop to eliminate 30% RTO courier return loss.
+        </div>
+      </div>
+    );
+  }
+
+  // 0e. UPI PIN 24h Lockout
+  if (lower.includes('upi pin lockout') || lower.includes('pin_blocked')) {
+    return (
+      <div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-bold text-rose-900 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded text-xs inline-flex items-center gap-1">
+            🔒 24h UPI PIN Lockout
+          </span>
+          <span className="font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-1.5 py-0.2 rounded text-[11px]">
+            Bypassed to Card / NetBanking
+          </span>
+        </div>
+        <div className="text-[11px] text-slate-500 mt-1">
+          Customer entered incorrect PIN 3 times. Automatically switched to alternative operational payment rail.
+        </div>
+      </div>
+    );
+  }
+
+  // 0f. NPCI UPI Daily Limit
+  if (lower.includes('daily upi cap') || lower.includes('daily_limit')) {
+    return (
+      <div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-bold text-amber-900 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded text-xs inline-flex items-center gap-1">
+            🛑 NPCI Daily Limit Reached
+          </span>
+          <span className="font-bold text-slate-700 bg-slate-100 px-1.5 py-0.2 rounded text-[11px]">
+            ₹1 Lakh / 20 TXN Cap
+          </span>
+        </div>
+        <div className="text-[11px] text-slate-500 mt-1">
+          NPCI bank account limit exhausted. Recovery link pre-selects NetBanking &amp; Credit Cards.
+        </div>
+      </div>
+    );
+  }
+
+  // 0g. Card Online Toggle Inactive
+  if (lower.includes('card online toggle') || lower.includes('domestic_online')) {
+    return (
+      <div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-bold text-purple-900 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded text-xs inline-flex items-center gap-1">
+            🛡️ RBI Card Controls Inactive
+          </span>
+        </div>
+        <div className="text-[11px] text-slate-500 mt-1">
+          E-commerce usage toggle disabled in customer's bank app. Sent self-service guide &amp; 1-click UPI fallback.
+        </div>
+      </div>
+    );
+  }
+
+  // 0h. RBI >₹15k AFA Mandate
+  if (lower.includes('afa mandate') || lower.includes('recurring_afa')) {
+    return (
+      <div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-bold text-blue-900 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded text-xs inline-flex items-center gap-1">
+            📈 RBI &gt;₹15k AFA Mandate
+          </span>
+          <span className="font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded text-[11px]">
+            1-Tap OTP Pre-Approval
+          </span>
+        </div>
+        <div className="text-[11px] text-slate-500 mt-1">
+          Dispatched 1-tap OTP verification link to comply with RBI recurring threshold.
+        </div>
+      </div>
+    );
+  }
+
+  // 0i. NRI Multi-Currency Recovery
+  if (lower.includes('nri') || lower.includes('multi-currency')) {
+    return (
+      <div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-bold text-teal-900 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded text-xs inline-flex items-center gap-1">
+            🌍 NRI / International Card
+          </span>
+          <span className="font-bold text-teal-800 bg-teal-100 px-1.5 py-0.2 rounded text-[11px]">
+            Multi-Currency Gateway (USD/EUR/GBP)
+          </span>
+        </div>
+        <div className="text-[11px] text-slate-500 mt-1">
+          Foreign card detected. Switched to FEMA-compliant multi-currency checkout.
+        </div>
+      </div>
+    );
+  }
+
+  // 0j. Flash Sale Switch Congestion (Jittered Backoff)
+  if (lower.includes('flash sale') || lower.includes('jittered')) {
+    return (
+      <div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-bold text-orange-900 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded text-xs inline-flex items-center gap-1">
+            ⚡ Flash Sale Spike Backoff
+          </span>
+          <span className="font-bold text-orange-800 bg-orange-100 px-1.5 py-0.2 rounded text-[11px]">
+            Jittered Retry Queue
+          </span>
+        </div>
+        <div className="text-[11px] text-slate-500 mt-1">
+          High-concurrency bank gateway surge detected. Randomized millisecond retry deployed.
+        </div>
+      </div>
+    );
+  }
+
   // 1. UPI Push
   if (lower.includes('upi collect') || lower.includes('upi_collect')) {
     const vpaMatch = clean.match(/customer@\w+|[\w.-]+@[\w.-]+/i);

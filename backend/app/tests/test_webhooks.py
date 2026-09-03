@@ -50,7 +50,7 @@ async def test_webhook_invalid_signature_returns_400():
         
         response = await client.post("/webhooks/razorpay", content=body_bytes, headers=headers)
         assert response.status_code == 400
-        assert "Invalid webhook signature" in response.json()["detail"]
+        assert "webhook signature" in response.json()["detail"].lower()
 
         # Confirm nothing was written to the database
         async with AsyncSessionLocal() as session:

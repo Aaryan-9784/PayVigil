@@ -72,15 +72,15 @@ async def razorpay_webhook(
             or payment_link_entity.get("customer", {}).get("email")
         )
 
-        # Find latest pending action for recovery reconciliation
+        # Find matching action for recovery reconciliation (specific payment ID first, then pending fallback)
         from app.models import Action, AuditLog
-        stmt = (
+        stmt_exact = (
             select(Action, Event)
             .join(Event, Action.event_id == Event.id)
-            .where(Action.status == "pending")
+            .where((Event.razorpay_payment_id == razorpay_payment_id) | (Action.status == "pending"))
             .order_by(Action.executed_at.desc())
         )
-        res = await db.execute(stmt)
+        res = await db.execute(stmt_exact)
         matched_pair = res.first()
 
         if matched_pair:

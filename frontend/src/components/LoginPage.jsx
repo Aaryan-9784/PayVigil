@@ -205,7 +205,7 @@ export default function LoginPage({ onLoginSuccess }) {
         setTimeout(() => {
           setShowForgotModal(false);
           onLoginSuccess({
-            username: res.username || 'Administrator',
+            username: res.username || 'Aryan Patel',
             role: res.role || 'admin',
             email: res.email || forgotIdentifier.trim(),
             token: res.token

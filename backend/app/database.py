@@ -74,13 +74,13 @@ async def init_db():
     try:
         async with AsyncSessionLocal() as session:
             # 1. Admin user in DB
-            stmt = select(User).where(User.role == "admin")
+            stmt = select(User).where((User.role == "admin") | (User.email == "aaryanpatel9784@gmail.com"))
             result = await session.execute(stmt)
             admin_user = result.scalars().first()
             
             if not admin_user:
                 admin_user = User(
-                    username="Administrator",
+                    username="Aryan Patel",
                     email="aaryanpatel9784@gmail.com",
                     role="admin",
                     password_hash=hash_password("Aryan@9784"),
@@ -88,8 +88,9 @@ async def init_db():
                 )
                 session.add(admin_user)
             else:
-                # Permanently upgrade admin email to aaryanpatel9784@gmail.com
+                # Permanently upgrade admin email to aaryanpatel9784@gmail.com and username to Aryan Patel
                 admin_user.email = "aaryanpatel9784@gmail.com"
+                admin_user.username = "Aryan Patel"
 
             # 2. Customer Support user in DB
             stmt = select(User).where(User.role == "support")

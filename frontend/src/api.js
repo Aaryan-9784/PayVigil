@@ -98,10 +98,24 @@ export async function fetchCurrentUser(token) {
 }
 
 export async function resetDatabase(adminPasskey) {
+  let authHeader = {};
+  try {
+    const saved = localStorage.getItem('rzp_user_session');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed && parsed.token) {
+        authHeader["Authorization"] = `Bearer ${parsed.token}`;
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+
   const response = await axios.delete(`${API_BASE}/api/dev/reset-data`, {
     headers: { 
       "x-admin-passkey": adminPasskey || "",
-      "x-api-key": adminPasskey || API_KEY 
+      "x-api-key": adminPasskey || API_KEY,
+      ...authHeader
     }
   });
   return response.data;

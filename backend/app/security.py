@@ -296,7 +296,7 @@ async def get_current_user_payload(request: Request) -> dict:
     # 2. Direct API Key authentication (Master system / dashboard key)
     if api_key_header == settings.dashboard_api_key or auth_header == settings.dashboard_api_key:
         return {
-            "username": "Administrator",
+            "username": "Aryan Patel",
             "role": "admin",
             "email": "aaryanpatel9784@gmail.com",
             "is_system_key": True

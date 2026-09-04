@@ -33,15 +33,10 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
     order_id = p_entity.get("order_id")
     plink_id = pl_entity.get("id") or p_entity.get("payment_link_id")
 
-    from sqlalchemy import or_
-    conds = [Event.razorpay_payment_id == event.razorpay_payment_id]
-    if order_id:
-        conds.append(Event.raw_payload["payload"]["payment"]["entity"]["order_id"].astext == order_id)
-
     all_events_res = await db.execute(
         select(Action)
         .join(Event, Action.event_id == Event.id)
-        .where(or_(*conds))
+        .where(Event.razorpay_payment_id == event.razorpay_payment_id)
         .order_by(Action.executed_at.desc())
         .limit(20)
     )

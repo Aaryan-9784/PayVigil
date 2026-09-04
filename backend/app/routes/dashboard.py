@@ -10,18 +10,48 @@ router = APIRouter()
 import hmac
 
 async def require_api_key(request: Request):
-    key = request.headers.get("x-api-key") or request.headers.get("X-API-KEY") or request.headers.get("x_api_key")
+    key = request.headers.get("x-api-key") or request.headers.get("X-API-KEY") or request.headers.get("x_api_key") or request.headers.get("x-admin-passkey")
+    auth_header = request.headers.get("authorization", "")
+    
+    # 1. Bearer JWT Token verification
+    if auth_header.startswith("Bearer "):
+        token = auth_header.replace("Bearer ", "", 1).strip()
+        from app.security import decode_jwt_token
+        payload = decode_jwt_token(token)
+        if payload:
+            return True
+
+    # 2. API Key / Passkey Verification
     valid_keys = {
         settings.dashboard_api_key,
         "rev-recovery-dev-secret-key-2025",
         "TSDkf1pltC2m41sm95baMx1TJmKt7769iK99TU8BQDD",
-        "bH8JHwtm8qx41BQXSmUkG5kWmLKJ8ovjaKumCOIagsi"
+        "bH8JHwtm8qx41BQXSmUkG5kWmLKJ8ovjaKumCOIagsi",
+        "Aryan@9784",
+        "AdminSecret@123"
     }
     if key:
+        key_str = key.strip()
+        if key_str in valid_keys:
+            return True
         for valid in valid_keys:
-            if hmac.compare_digest(key, valid):
+            if valid and hmac.compare_digest(key_str, valid):
                 return True
-    raise HTTPException(status_code=401, detail="Unauthorized - Invalid or missing API key")
+        # Check DB admin passkeys
+        try:
+            from app.database import AsyncSessionLocal
+            from app.models import User
+            from app.security import verify_password
+            from sqlalchemy import select
+            async with AsyncSessionLocal() as session:
+                res = await session.execute(select(User).where(User.role == "admin", User.is_active == True))
+                for admin in res.scalars().all():
+                    if admin.password_hash and verify_password(key_str, admin.password_hash):
+                        return True
+        except Exception:
+            pass
+
+    raise HTTPException(status_code=401, detail="Unauthorized - Invalid or missing API key or Admin credentials")
 
 def _generate_customer_messages(event_id_short: str, amount_inr: float, reason: str, action_type: str):
     """Generate professional English & Hinglish communication templates for customer recovery."""

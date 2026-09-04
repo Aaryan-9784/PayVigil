@@ -131,7 +131,7 @@ export default function Header({
                   {/* Username & Role Label */}
                   <div className="text-left hidden sm:block">
                     <span className="text-xs font-bold text-slate-800 capitalize font-sans leading-none block">
-                      {currentUser.username || (isAdmin ? 'Admin' : 'Support')}
+                      {currentUser.username || (isAdmin ? 'Aryan Patel' : 'Support')}
                     </span>
                     <span className="text-[10px] text-slate-400 font-medium leading-none block mt-0.5">
                       {isAdmin ? 'System Admin' : 'Support Team'}
@@ -169,7 +169,7 @@ export default function Header({
                       </div>
                       <div className="overflow-hidden">
                         <div className="text-xs font-bold text-slate-900 capitalize truncate">
-                          {currentUser.username || (isAdmin ? 'Administrator' : 'Customer Support')}
+                          {currentUser.username || (isAdmin ? 'Aryan Patel' : 'Customer Support')}
                         </div>
                         <div className="text-[11px] text-slate-400 font-medium truncate">
                           {currentUser.email || (isAdmin ? 'aaryanpatel9784@gmail.com' : 'support@razorpay.com')}

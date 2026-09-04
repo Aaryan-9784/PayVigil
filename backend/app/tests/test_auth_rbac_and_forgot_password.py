@@ -16,14 +16,14 @@ async def setup_test_users():
         if not admin_u:
             admin_u = User(
                 username="TestAdmin",
-                email="aaryanpatel9784@gmail.com",
+                email="test_admin@razorpay.com",
                 role="admin",
                 password_hash=hash_password("AdminSecret@123"),
                 is_active=True
             )
             session.add(admin_u)
         else:
-            admin_u.email = "aaryanpatel9784@gmail.com"
+            admin_u.email = "test_admin@razorpay.com"
             admin_u.password_hash = hash_password("AdminSecret@123")
             admin_u.reset_token = None
             admin_u.reset_token_expires_at = None

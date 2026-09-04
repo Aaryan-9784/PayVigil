@@ -35,7 +35,6 @@ export default function LoginPage({ onLoginSuccess }) {
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotError, setForgotError] = useState('');
   const [forgotSuccess, setForgotSuccess] = useState('');
-  const [devOtpHint, setDevOtpHint] = useState('');
 
   // ── Password Strength Calculator ──
   const computeStrength = (pass) => {
@@ -157,9 +156,6 @@ export default function LoginPage({ onLoginSuccess }) {
       const res = await requestPasswordReset(forgotIdentifier.trim());
       if (res.success) {
         setForgotSuccess(res.message);
-        if (res.dev_otp) {
-          setDevOtpHint(res.dev_otp);
-        }
         setForgotStep(2);
       }
     } catch (err) {
@@ -796,18 +792,7 @@ export default function LoginPage({ onLoginSuccess }) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="block text-xs font-semibold text-slate-300">6-Digit verification code</label>
-                    {devOtpHint && (
-                      <button
-                        type="button"
-                        onClick={() => setForgotOtp(devOtpHint)}
-                        className="text-[11px] font-bold text-[#38a5ff] hover:text-[#70baff] transition-colors cursor-pointer bg-blue-500/15 border border-blue-500/30 px-2.5 py-0.5 rounded-md"
-                      >
-                        ⚡ Auto-fill ({devOtpHint})
-                      </button>
-                    )}
-                  </div>
+                  <label className="block text-xs font-semibold text-slate-300">6-Digit verification code</label>
                   <input
                     type="text"
                     maxLength={6}
@@ -827,7 +812,6 @@ export default function LoginPage({ onLoginSuccess }) {
                     onClick={() => {
                       setForgotStep(1);
                       setForgotOtp('');
-                      setDevOtpHint('');
                       setForgotError('');
                     }}
                     className="text-xs font-semibold text-slate-400 hover:text-white cursor-pointer"

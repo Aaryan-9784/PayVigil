@@ -101,43 +101,55 @@ async def test_auth_get_me_profile():
 
 @pytest.mark.asyncio
 async def test_forgot_password_flow_end_to_end():
+    from unittest.mock import patch, AsyncMock
     transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        # Step 1: Request reset code
-        forgot_res = await client.post("/api/auth/forgot-password", json={
-            "identifier": "TestAdmin"
-        })
-        assert forgot_res.status_code == 200
-        data = forgot_res.json()
-        assert data["success"] is True
-        otp_code = data["dev_otp"]
-        assert len(otp_code) == 6
+    
+    with patch("app.email_client.send_password_reset_email", new_callable=AsyncMock) as mock_send:
+        mock_send.return_value = True
+        
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            # Step 1: Request reset code
+            forgot_res = await client.post("/api/auth/forgot-password", json={
+                "identifier": "TestAdmin"
+            })
+            assert forgot_res.status_code == 200
+            data = forgot_res.json()
+            assert data["success"] is True
+            # Security verification: dev_otp must NOT be exposed in API response
+            assert "dev_otp" not in data
+            
+            # Retrieve OTP dispatched via email client
+            mock_send.assert_awaited_once()
+            call_kwargs = mock_send.await_args.kwargs
+            otp_code = call_kwargs.get("otp_code")
+            assert otp_code is not None
+            assert len(otp_code) == 6
 
-        # Step 2: Verify reset code
-        verify_res = await client.post("/api/auth/verify-reset-code", json={
-            "identifier": "TestAdmin",
-            "code": otp_code
-        })
-        assert verify_res.status_code == 200
-        assert verify_res.json()["verified"] is True
+            # Step 2: Verify reset code
+            verify_res = await client.post("/api/auth/verify-reset-code", json={
+                "identifier": "TestAdmin",
+                "code": otp_code
+            })
+            assert verify_res.status_code == 200
+            assert verify_res.json()["verified"] is True
 
-        # Step 3: Set new password
-        reset_res = await client.post("/api/auth/reset-password", json={
-            "identifier": "TestAdmin",
-            "code": otp_code,
-            "new_passkey": "BrandNewAdminPass@2026"
-        })
-        assert reset_res.status_code == 200
-        assert reset_res.json()["success"] is True
+            # Step 3: Set new password
+            reset_res = await client.post("/api/auth/reset-password", json={
+                "identifier": "TestAdmin",
+                "code": otp_code,
+                "new_passkey": "BrandNewAdminPass@2026"
+            })
+            assert reset_res.status_code == 200
+            assert reset_res.json()["success"] is True
 
-        # Step 4: Verify login with NEW password
-        login_new = await client.post("/api/auth/login", json={
-            "username": "TestAdmin",
-            "passkey": "BrandNewAdminPass@2026",
-            "role": "admin"
-        })
-        assert login_new.status_code == 200
-        assert login_new.json()["success"] is True
+            # Step 4: Verify login with NEW password
+            login_new = await client.post("/api/auth/login", json={
+                "username": "TestAdmin",
+                "passkey": "BrandNewAdminPass@2026",
+                "role": "admin"
+            })
+            assert login_new.status_code == 200
+            assert login_new.json()["success"] is True
 
 @pytest.mark.asyncio
 async def test_auth_signup_and_email_password_login():

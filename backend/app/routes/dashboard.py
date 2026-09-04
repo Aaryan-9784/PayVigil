@@ -452,8 +452,7 @@ async def forgot_password(
         "email": user.email,
         "username": user.username,
         "role": user.role,
-        "email_sent": email_dispatched,
-        "dev_otp": otp_code  # Provided for seamless sandbox / demo verification
+        "email_sent": email_dispatched
     }
 
 class VerifyResetCodeRequest(BaseModel):

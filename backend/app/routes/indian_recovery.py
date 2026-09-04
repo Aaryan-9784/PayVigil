@@ -12,6 +12,7 @@ from app.models import Action, AuditLog, Event, Diagnosis
 from app.config import settings
 from app.ws_manager import ws_manager
 from app.routes.dashboard import require_api_key
+from app.security import mask_vpa
 
 router = APIRouter(prefix="/api/support", tags=["Indian Support Features"])
 logger = logging.getLogger("revenue_recovery.indian_support")
@@ -46,6 +47,7 @@ async def trigger_upi_collect_push(
 
     amount_paise = int(payload.amount_inr * 100)
     ref_id = f"upi_col_{payload.payment_id[-8:] if len(payload.payment_id) >= 8 else payload.payment_id}_{int(datetime.datetime.now().timestamp())}"
+    safe_vpa = mask_vpa(vpa_clean)
 
     # Lookup associated event in DB if it exists
     stmt = select(Event).where(Event.razorpay_payment_id == payload.payment_id).order_by(Event.received_at.desc())
@@ -60,7 +62,7 @@ async def trigger_upi_collect_push(
             error_code="UPI_COLLECT_INITIATED",
             error_description="Customer requested direct UPI Collect push to smartphone",
             customer_id=payload.customer_id or "cust_anonymous",
-            raw_payload={"type": "upi_collect", "vpa": vpa_clean, "amount": payload.amount_inr}
+            raw_payload={"type": "upi_collect", "vpa": safe_vpa, "amount": payload.amount_inr}
         )
         db.add(event)
         await db.flush()
@@ -80,7 +82,7 @@ async def trigger_upi_collect_push(
         event_id=event.id,
         diagnosis_id=None,
         action_id=action.id,
-        summary=f"📲 Instant UPI Collect Push dispatched to {vpa_clean} (₹{payload.amount_inr:,.2f}) — Customer approved via UPI PIN"
+        summary=f"📲 Instant UPI Collect Push dispatched to {safe_vpa} (₹{payload.amount_inr:,.2f}) — Customer approved via UPI PIN"
     )
     db.add(audit)
     await db.commit()
@@ -88,26 +90,26 @@ async def trigger_upi_collect_push(
     # Broadcast via WebSocket for real-time dashboard update
     await ws_manager.broadcast("upi_collect_dispatched", {
         "payment_id": payload.payment_id,
-        "vpa": vpa_clean,
+        "vpa": safe_vpa,
         "amount_inr": payload.amount_inr,
         "reference_id": ref_id,
         "status": "approved_by_pin" if payload.auto_capture else "push_delivered",
-        "summary": f"🎉 UPI Collect Approved: ₹{payload.amount_inr:,.2f} recovered from {vpa_clean}"
+        "summary": f"🎉 UPI Collect Approved: ₹{payload.amount_inr:,.2f} recovered from {safe_vpa}"
     })
 
     if payload.auto_capture:
         await ws_manager.broadcast("revenue_recovered", {
             "amount_recovered_paise": amount_paise,
             "payment_id": payload.payment_id,
-            "summary": f"🎉 UPI Instant Push Recovery: ₹{payload.amount_inr:,.2f} captured via {vpa_clean}"
+            "summary": f"🎉 UPI Instant Push Recovery: ₹{payload.amount_inr:,.2f} captured via {safe_vpa}"
         })
 
     return {
         "success": True,
-        "message": f"UPI Collect Push delivered to {vpa_clean}",
+        "message": f"UPI Collect Push delivered to {safe_vpa}",
         "reference_id": ref_id,
         "amount_inr": payload.amount_inr,
-        "vpa": vpa_clean,
+        "vpa": safe_vpa,
         "status": "APPROVED_CAPTURED" if payload.auto_capture else "PUSH_DELIVERED_AWAITING_PIN",
         "customer_app": "Google Pay / PhonePe / Paytm / BHIM"
     }

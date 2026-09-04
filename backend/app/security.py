@@ -117,6 +117,32 @@ def mask_phone(phone: str) -> str:
         return f"{cleaned[:5]}****{cleaned[-4:]}"
     return f"{cleaned[:2]}****{cleaned[-2:]}"
 
+def mask_vpa(vpa: str) -> str:
+    """Masks customer UPI VPA handle (e.g., 9876543210@paytm -> 98****3210@paytm, rahul@okhdfcbank -> r***l@okhdfcbank)."""
+    if not vpa or "@" not in vpa:
+        return "u***@upi"
+    handle, provider = vpa.split("@", 1)
+    if handle.isdigit():
+        if len(handle) >= 10:
+            masked_handle = f"{handle[:2]}****{handle[-4:]}"
+        else:
+            masked_handle = f"{handle[:1]}****{handle[-1:]}"
+    else:
+        if len(handle) <= 2:
+            masked_handle = handle[0] + "*"
+        else:
+            masked_handle = handle[0] + "*" * (len(handle) - 2) + handle[-1]
+    return f"{masked_handle}@{provider}"
+
+def mask_bank_account(account_no: str) -> str:
+    """Masks bank account number adhering to PCI/RBI guidelines (e.g., 501002345678 -> ********5678)."""
+    if not account_no:
+        return "********0000"
+    cleaned = str(account_no).strip()
+    if len(cleaned) <= 4:
+        return "****"
+    return "*" * (len(cleaned) - 4) + cleaned[-4:]
+
 # ---------------------------------------------------------------------------
 # 3. Comprehensive Sensitive Data Redaction & Sanitization
 # ---------------------------------------------------------------------------
@@ -130,7 +156,8 @@ AADHAAR_PATTERN = re.compile(r'\b\d{4}\s\d{4}\s\d{4}\b')
 SENSITIVE_KEY_NAMES = {
     "cvv", "card_number", "pin", "otp", "password", "secret", "token",
     "cvv2", "cvc", "api_key", "secret_key", "auth_token", "private_key",
-    "bank_account", "account_number", "ssn", "aadhaar", "pan_card"
+    "bank_account", "account_number", "account_no", "ssn", "aadhaar", 
+    "pan_card", "upi_pin", "mpin", "card_cvv", "security_code"
 }
 
 def sanitize_and_redact_pii(data: Any) -> Any:

@@ -1,5 +1,6 @@
 import logging
 import urllib.parse
+import html
 import httpx
 from app.config import settings
 from app.security import mask_phone, mask_email
@@ -20,14 +21,17 @@ async def send_reminder_email(
 ) -> bool:
     """
     Sends customer reminder email with direct 1-click recovery checkout link.
+    All dynamic values are HTML-escaped for complete injection immunity.
     """
     logger.info(f"[Email Client] Sending customer recovery reminder to {customer_id} (Reason: {reason})")
     
     amount_inr = f"₹{amount_paise / 100:,.2f}" if amount_paise > 0 else "₹500.00"
     short_id = payment_id[-8:] if len(payment_id) > 8 else (payment_id or "RECOVERY")
     recovery_link = recovery_url or f"https://rzp.io/rzp/recovery_{short_id}"
-    name_display = customer_name.strip() if customer_name and customer_name.strip() else "Valued Customer"
+    name_display = html.escape(customer_name.strip()) if customer_name and customer_name.strip() else "Valued Customer"
     recipient = customer_id if "@" in customer_id else "aaryanpatel9784@gmail.com"
+    safe_reason = html.escape(reason)
+    safe_payment_id = html.escape(payment_id or "pay_recovery")
 
     html_content = f"""
     <!DOCTYPE html>
@@ -142,12 +146,14 @@ async def send_support_escalation_ticket_email(
     recovery_link = recovery_url or f"https://rzp.io/i/{short_id}"
     recipient = settings.support_email or "aaryanpatel9784@gmail.com"
 
-    name_display = customer_name.strip() if customer_name and customer_name.strip() else "Customer"
+    name_display = html.escape(customer_name.strip()) if customer_name and customer_name.strip() else "Customer"
     raw_email = customer_email or (customer_id if "@" in customer_id else "aaryanpatel9784@gmail.com")
-    email_display = mask_email(raw_email)
+    email_display = html.escape(mask_email(raw_email))
     
     raw_phone = customer_phone or (customer_id if (customer_id.startswith("+") or customer_id.isdigit()) else "+918238012515")
-    phone_display = mask_phone(raw_phone)
+    phone_display = html.escape(mask_phone(raw_phone))
+    safe_reason = html.escape(reason)
+    safe_payment_id = html.escape(payment_id)
 
     clean_digits = raw_phone.replace("+", "").replace(" ", "").replace("-", "")[-10:]
     wa_text = f"🚨 *Razorpay AI Revenue Recovery • Payment Recovery*\n\nNamaste {name_display}! 👋\n\nWe noticed your payment of *{amount_inr}* had an issue ({reason}).\n\n👉 *Complete your payment in 1-click here:*\n{recovery_link}"
@@ -194,11 +200,11 @@ async def send_support_escalation_ticket_email(
                     </tr>
                     <tr style="border-bottom: 1px solid #e2e8f0;">
                         <td style="padding: 10px 16px; color: #64748b; font-weight: 600;">Failure Diagnosis:</td>
-                        <td style="padding: 10px 16px; color: #dc2626; font-size: 12.5px; font-weight: 600;">{reason}</td>
+                        <td style="padding: 10px 16px; color: #dc2626; font-size: 12.5px; font-weight: 600;">{safe_reason}</td>
                     </tr>
                     <tr>
                         <td style="padding: 10px 16px; color: #64748b; font-weight: 600;">Payment ID:</td>
-                        <td style="padding: 10px 16px; font-family: monospace; color: #334155; font-size: 12.5px; font-weight: bold;">{payment_id}</td>
+                        <td style="padding: 10px 16px; font-family: monospace; color: #334155; font-size: 12.5px; font-weight: bold;">{safe_payment_id}</td>
                     </tr>
                 </table>
 
@@ -262,7 +268,9 @@ async def send_password_reset_email(
     """
     logger.info(f"[Email Client] Dispatching Password Reset OTP to {recipient_email}")
     
-    name_display = username.strip() if username and username.strip() else recipient_email.split("@")[0]
+    name_display = html.escape(username.strip()) if username and username.strip() else html.escape(recipient_email.split("@")[0])
+    safe_email = html.escape(recipient_email)
+    safe_otp = html.escape(otp_code)
     
     html_content = f"""
     <!DOCTYPE html>
@@ -282,14 +290,14 @@ async def send_password_reset_email(
             <div style="padding: 26px 28px; color: #1e293b; font-size: 13.5px; line-height: 1.6;">
                 <p style="font-size: 15px; margin-top: 0; font-weight: 600; color: #0c2340;">Hello {name_display},</p>
                 <p style="color: #475569; margin-bottom: 20px;">
-                    We received a request to reset your password for your <strong>Razorpay AI Revenue Recovery</strong> account (<strong style="color: #0c2340;">{recipient_email}</strong>).
+                    We received a request to reset your password for your <strong>Razorpay AI Revenue Recovery</strong> account (<strong style="color: #0c2340;">{safe_email}</strong>).
                 </p>
 
                 <!-- Structured Details Table -->
                 <table style="width: 100%; border-collapse: collapse; margin-bottom: 22px; background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden;">
                     <tr style="border-bottom: 1px solid #e2e8f0;">
                         <td style="padding: 10px 16px; color: #64748b; font-weight: 600; width: 38%;">Account Email:</td>
-                        <td style="padding: 10px 16px; font-family: monospace; color: #0c83ff; font-weight: 600;">{recipient_email}</td>
+                        <td style="padding: 10px 16px; font-family: monospace; color: #0c83ff; font-weight: 600;">{safe_email}</td>
                     </tr>
                     <tr style="border-bottom: 1px solid #e2e8f0;">
                         <td style="padding: 10px 16px; color: #64748b; font-weight: 600;">Request Type:</td>
@@ -305,7 +313,7 @@ async def send_password_reset_email(
                 <div style="background-color: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 22px 16px; text-align: center; margin: 24px 0 22px 0;">
                     <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 6px;">Your 6-Digit Verification Code</span>
                     <div style="font-family: 'SF Mono', Consolas, Menlo, Monaco, monospace; font-size: 36px; font-weight: 800; color: #0c2340; letter-spacing: 8px; padding: 4px 0;">
-                        {otp_code}
+                        {safe_otp}
                     </div>
                     <p style="margin: 6px 0 0 0; font-size: 12px; color: #64748b;">
                         Enter this code on the verification screen to set your new password.

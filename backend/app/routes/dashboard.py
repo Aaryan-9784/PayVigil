@@ -432,15 +432,27 @@ async def forgot_password(
     user.reset_token_expires_at = datetime.now(timezone.utc) + timedelta(minutes=15)
     await db.commit()
 
-    # Optional: Send via Resend Email or Twilio if keys available
-    logger.info(f"Password reset OTP generated for user {user.username} ({user.email}): {otp_code}")
+    # Dispatch real verification email to user's inbox via Resend
+    from app.email_client import send_password_reset_email
+    email_dispatched = False
+    try:
+        email_dispatched = await send_password_reset_email(
+            recipient_email=user.email,
+            otp_code=otp_code,
+            username=user.username
+        )
+    except Exception as exc:
+        logger.error(f"Failed to dispatch password reset email to {user.email}: {exc}")
+
+    logger.info(f"Password reset OTP generated for user {user.username} ({user.email}): {otp_code} (email_sent: {email_dispatched})")
 
     return {
         "success": True,
-        "message": f"Security verification code dispatched to {user.email}. Valid for 15 minutes.",
+        "message": f"Security verification code dispatched to {user.email}. Please check your inbox (and Spam folder). Valid for 15 minutes.",
         "email": user.email,
         "username": user.username,
         "role": user.role,
+        "email_sent": email_dispatched,
         "dev_otp": otp_code  # Provided for seamless sandbox / demo verification
     }
 

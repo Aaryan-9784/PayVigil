@@ -35,6 +35,7 @@ export default function LoginPage({ onLoginSuccess }) {
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotError, setForgotError] = useState('');
   const [forgotSuccess, setForgotSuccess] = useState('');
+  const [devOtpHint, setDevOtpHint] = useState('');
 
   // ── Password Strength Calculator ──
   const computeStrength = (pass) => {
@@ -156,6 +157,9 @@ export default function LoginPage({ onLoginSuccess }) {
       const res = await requestPasswordReset(forgotIdentifier.trim());
       if (res.success) {
         setForgotSuccess(res.message);
+        if (res.dev_otp) {
+          setDevOtpHint(res.dev_otp);
+        }
         setForgotStep(2);
       }
     } catch (err) {
@@ -739,14 +743,6 @@ export default function LoginPage({ onLoginSuccess }) {
               </div>
             )}
 
-            {/* Success Notification */}
-            {forgotSuccess && (
-              <div className="mb-4 p-3 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-xs font-semibold text-emerald-300 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
-                <span>{forgotSuccess}</span>
-              </div>
-            )}
-
             {/* ── STEP 1: Enter Email ── */}
             {forgotStep === 1 && (
               <div className="space-y-4">
@@ -759,7 +755,10 @@ export default function LoginPage({ onLoginSuccess }) {
                   <input
                     type="email"
                     value={forgotIdentifier}
-                    onChange={(e) => setForgotIdentifier(e.target.value)}
+                    onChange={(e) => {
+                      setForgotIdentifier(e.target.value);
+                      if (forgotError) setForgotError('');
+                    }}
                     placeholder="name@company.com"
                     className="w-full px-3.5 py-2.5 rounded-xl border border-white/10 bg-[#030914]/80 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0c83ff]"
                   />
@@ -789,17 +788,34 @@ export default function LoginPage({ onLoginSuccess }) {
             {/* ── STEP 2: Verify 6-Digit OTP ── */}
             {forgotStep === 2 && (
               <div className="space-y-4">
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Enter the 6-digit verification code sent to <strong className="text-white">{forgotIdentifier}</strong>.
-                </p>
+                <div className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-xs text-emerald-200 leading-relaxed flex items-center gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>
+                    Verification code dispatched to <strong className="text-white font-semibold">{forgotIdentifier}</strong> (Valid for 15 mins).
+                  </span>
+                </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-300">Verification code</label>
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-semibold text-slate-300">6-Digit verification code</label>
+                    {devOtpHint && (
+                      <button
+                        type="button"
+                        onClick={() => setForgotOtp(devOtpHint)}
+                        className="text-[11px] font-bold text-[#38a5ff] hover:text-[#70baff] transition-colors cursor-pointer bg-blue-500/15 border border-blue-500/30 px-2.5 py-0.5 rounded-md"
+                      >
+                        ⚡ Auto-fill ({devOtpHint})
+                      </button>
+                    )}
+                  </div>
                   <input
                     type="text"
                     maxLength={6}
                     value={forgotOtp}
-                    onChange={(e) => setForgotOtp(e.target.value.replace(/\D/g, ''))}
+                    onChange={(e) => {
+                      setForgotOtp(e.target.value.replace(/\D/g, ''));
+                      if (forgotError) setForgotError('');
+                    }}
                     placeholder="123456"
                     className="w-full text-center tracking-[0.5em] font-mono text-xl py-3 rounded-xl border border-white/15 bg-[#030914]/90 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#0c83ff]"
                   />
@@ -808,7 +824,12 @@ export default function LoginPage({ onLoginSuccess }) {
                 <div className="pt-3 flex justify-between items-center">
                   <button
                     type="button"
-                    onClick={() => setForgotStep(1)}
+                    onClick={() => {
+                      setForgotStep(1);
+                      setForgotOtp('');
+                      setDevOtpHint('');
+                      setForgotError('');
+                    }}
                     className="text-xs font-semibold text-slate-400 hover:text-white cursor-pointer"
                   >
                     ← Change Email
@@ -831,16 +852,20 @@ export default function LoginPage({ onLoginSuccess }) {
             {/* ── STEP 3: Set New Password ── */}
             {forgotStep === 3 && (
               <div className="space-y-4">
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Enter your new password below.
-                </p>
+                <div className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-xs text-emerald-200 leading-relaxed flex items-center gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Code verified! Enter your new password below.</span>
+                </div>
 
                 <div className="space-y-1.5">
                   <label className="block text-xs font-semibold text-slate-300">New password</label>
                   <input
                     type="password"
                     value={newPasskey}
-                    onChange={(e) => setNewPasskey(e.target.value)}
+                    onChange={(e) => {
+                      setNewPasskey(e.target.value);
+                      if (forgotError) setForgotError('');
+                    }}
                     placeholder="Min. 6 characters"
                     className="w-full px-3.5 py-2.5 rounded-xl border border-white/10 bg-[#030914]/80 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0c83ff]"
                   />
@@ -872,7 +897,10 @@ export default function LoginPage({ onLoginSuccess }) {
                   <input
                     type="password"
                     value={confirmPasskey}
-                    onChange={(e) => setConfirmPasskey(e.target.value)}
+                    onChange={(e) => {
+                      setConfirmPasskey(e.target.value);
+                      if (forgotError) setForgotError('');
+                    }}
                     placeholder="Re-enter password"
                     className="w-full px-3.5 py-2.5 rounded-xl border border-white/10 bg-[#030914]/80 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0c83ff]"
                   />

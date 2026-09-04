@@ -53,6 +53,7 @@ venv.bak/
 virtualenv/
 backend/venv/
 backend/.venv/
+frontend/venv/
 
 # ------------------------------------------------------------------------------
 # 3. Databases, State & Local Storage
@@ -63,8 +64,11 @@ backend/.venv/
 *.db-journal
 *.db-wal
 *.db-shm
+*.dump
+*.sql
 revenue_recovery.db
 backend/revenue_recovery.db
+.supabase/
 
 # ------------------------------------------------------------------------------
 # 4. Testing, Coverage & Type Checking
@@ -92,6 +96,7 @@ frontend/dist-ssr/
 .vite/
 .turbo/
 *.tsbuildinfo
+.eslintcache
 
 # Node package manager logs
 npm-debug.log*
@@ -108,7 +113,7 @@ pgdata/
 n8ndata/
 
 # ------------------------------------------------------------------------------
-# 7. Logs & Temporary Files
+# 7. Logs, PIDs & Temporary Files
 # ------------------------------------------------------------------------------
 logs/
 *.log
@@ -117,9 +122,25 @@ logs/
 *.bak
 *.swp
 *.swo
+*.pid
+*.pid.lock
+*.seed
 
 # ------------------------------------------------------------------------------
-# 8. Operating System & IDEs
+# 8. Security Certificates & Private Keys
+# ------------------------------------------------------------------------------
+*.pem
+*.key
+*.crt
+*.pfx
+*.p12
+id_rsa
+id_rsa.pub
+id_ecdsa
+id_ed25519
+
+# ------------------------------------------------------------------------------
+# 9. Operating System & IDEs
 # ------------------------------------------------------------------------------
 # macOS
 .DS_Store

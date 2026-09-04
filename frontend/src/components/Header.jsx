@@ -172,7 +172,7 @@ export default function Header({
                           {currentUser.username || (isAdmin ? 'Administrator' : 'Customer Support')}
                         </div>
                         <div className="text-[11px] text-slate-400 font-medium truncate">
-                          {isAdmin ? 'admin@razorpay.internal' : 'support@razorpay.com'}
+                          {currentUser.email || (isAdmin ? 'aaryanpatel9784@gmail.com' : 'support@razorpay.com')}
                         </div>
                       </div>
                     </div>

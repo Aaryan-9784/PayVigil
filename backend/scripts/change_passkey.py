@@ -51,7 +51,7 @@ async def update_passkey():
             # Create user if not exists
             user = User(
                 username="Administrator" if role == "admin" else "Support Agent",
-                email="admin@razorpay.internal" if role == "admin" else "support@razorpay.com",
+                email="aaryanpatel9784@gmail.com" if role == "admin" else "support@razorpay.com",
                 role=role,
                 password_hash=hash_password(new_passkey),
                 is_active=True

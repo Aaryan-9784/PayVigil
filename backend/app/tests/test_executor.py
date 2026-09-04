@@ -14,8 +14,11 @@ async def clean_database():
     await init_db()
     async with AsyncSessionLocal() as session:
         await session.execute(delete(AuditLog))
+        await session.commit()
         await session.execute(delete(Action))
+        await session.commit()
         await session.execute(delete(Diagnosis))
+        await session.commit()
         await session.execute(delete(Event))
         await session.commit()
     yield

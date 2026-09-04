@@ -30,11 +30,69 @@ export async function seedDemoData() {
   return response.data;
 }
 
-export async function loginAdmin(username, passkey, role = "admin") {
+export async function loginAdmin(emailOrUser, passwordOrKey, role = "") {
   const response = await axios.post(`${API_BASE}/api/auth/login`, {
-    username: username || (role === 'admin' ? 'Administrator' : 'Support Agent'),
-    passkey: passkey,
+    email: emailOrUser,
+    password: passwordOrKey,
+    username: emailOrUser,
+    passkey: passwordOrKey,
     role: role
+  });
+  return response.data;
+}
+
+export async function loginUser(email, password, role = "") {
+  return loginAdmin(email, password, role);
+}
+
+export async function signupUser(name, email, password, role = "support") {
+  const response = await axios.post(`${API_BASE}/api/auth/signup`, {
+    name: name,
+    email: email,
+    password: password,
+    role: role
+  });
+  return response.data;
+}
+
+export async function requestPasswordReset(identifier) {
+  const response = await axios.post(`${API_BASE}/api/auth/forgot-password`, {
+    identifier: identifier
+  });
+  return response.data;
+}
+
+export async function verifyResetCode(identifier, code) {
+  const response = await axios.post(`${API_BASE}/api/auth/verify-reset-code`, {
+    identifier: identifier,
+    code: code
+  });
+  return response.data;
+}
+
+export async function resetUserPassword(identifier, code, newPasskey) {
+  const response = await axios.post(`${API_BASE}/api/auth/reset-password`, {
+    identifier: identifier,
+    code: code,
+    new_passkey: newPasskey
+  });
+  return response.data;
+}
+
+export async function changeUserPassword(role, currentPasskey, newPasskey) {
+  const response = await axios.post(`${API_BASE}/api/auth/change-password`, {
+    role: role,
+    current_passkey: currentPasskey,
+    new_passkey: newPasskey
+  });
+  return response.data;
+}
+
+export async function fetchCurrentUser(token) {
+  const response = await axios.get(`${API_BASE}/api/auth/me`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
   });
   return response.data;
 }

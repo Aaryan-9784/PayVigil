@@ -189,3 +189,110 @@ def verify_razorpay_signature(body: bytes, signature: str, secret: str, timestam
     if not hmac.compare_digest(expected_signature, signature):
         raise HTTPException(status_code=400, detail="Invalid HMAC-SHA256 webhook signature")
     return True
+
+# ---------------------------------------------------------------------------
+# 5. Cryptographic JWT Access Tokens & Role-Based Authorization
+# ---------------------------------------------------------------------------
+import json
+from app.config import settings
+
+JWT_SECRET = settings.dashboard_api_key or "recovery-agent-auth-secret-key-2025"
+
+def create_jwt_token(payload: dict, expires_in_seconds: int = 86400) -> str:
+    """Creates an RFC 7519 standard HMAC-SHA256 signed JWT token."""
+    header = {"alg": "HS256", "typ": "JWT"}
+    token_payload = dict(payload)
+    token_payload["exp"] = int(time.time()) + expires_in_seconds
+    token_payload["iat"] = int(time.time())
+    
+    header_b64 = base64.urlsafe_b64encode(json.dumps(header).encode()).decode().rstrip("=")
+    payload_b64 = base64.urlsafe_b64encode(json.dumps(token_payload).encode()).decode().rstrip("=")
+    
+    signing_input = f"{header_b64}.{payload_b64}".encode()
+    signature = hmac.new(JWT_SECRET.encode(), signing_input, hashlib.sha256).digest()
+    sig_b64 = base64.urlsafe_b64encode(signature).decode().rstrip("=")
+    
+    return f"{header_b64}.{payload_b64}.{sig_b64}"
+
+def decode_jwt_token(token: str) -> Optional[dict]:
+    """Decodes and cryptographically verifies an HMAC-SHA256 signed JWT token."""
+    if not token or not isinstance(token, str):
+        return None
+    parts = token.strip().split(".")
+    if len(parts) != 3:
+        return None
+    
+    header_b64, payload_b64, sig_b64 = parts
+    signing_input = f"{header_b64}.{payload_b64}".encode()
+    
+    # Pad base64 if needed
+    rem = len(sig_b64) % 4
+    padded_sig = sig_b64 + ("=" * (4 - rem) if rem else "")
+    try:
+        expected_sig = base64.urlsafe_b64decode(padded_sig.encode())
+    except Exception:
+        return None
+        
+    actual_sig = hmac.new(JWT_SECRET.encode(), signing_input, hashlib.sha256).digest()
+    if not hmac.compare_digest(expected_sig, actual_sig):
+        return None
+        
+    rem_p = len(payload_b64) % 4
+    padded_payload = payload_b64 + ("=" * (4 - rem_p) if rem_p else "")
+    try:
+        payload = json.loads(base64.urlsafe_b64decode(padded_payload.encode()).decode())
+    except Exception:
+        return None
+        
+    # Check expiration
+    if "exp" in payload and payload["exp"] < time.time():
+        return None
+        
+    return payload
+
+def generate_otp_code() -> str:
+    """Generates a secure 6-digit numeric OTP for password recovery."""
+    return f"{secrets.randbelow(900000) + 100000}"
+
+async def get_current_user_payload(request: Request) -> dict:
+    """Extracts and verifies JWT token or API key from request headers."""
+    auth_header = request.headers.get("authorization", "")
+    api_key_header = request.headers.get("x-api-key", "")
+    
+    # 1. Bearer JWT Token verification
+    if auth_header.startswith("Bearer "):
+        token = auth_header.replace("Bearer ", "", 1).strip()
+        payload = decode_jwt_token(token)
+        if payload:
+            return payload
+            
+    # 2. Direct API Key authentication (Master system / dashboard key)
+    if api_key_header == settings.dashboard_api_key or auth_header == settings.dashboard_api_key:
+        return {
+            "username": "Administrator",
+            "role": "admin",
+            "email": "aaryanpatel9784@gmail.com",
+            "is_system_key": True
+        }
+        
+    raise HTTPException(status_code=401, detail="Authentication required. Please provide a valid Bearer token or API key.")
+
+async def require_admin_user(request: Request) -> dict:
+    """Ensures caller has Admin role permissions."""
+    user = await get_current_user_payload(request)
+    if user.get("role") != "admin":
+        raise HTTPException(
+            status_code=403, 
+            detail="Forbidden: Admin privileges required to perform this action."
+        )
+    return user
+
+async def require_support_or_admin_user(request: Request) -> dict:
+    """Ensures caller has Support or Admin role permissions."""
+    user = await get_current_user_payload(request)
+    if user.get("role") not in ("admin", "support"):
+        raise HTTPException(
+            status_code=403, 
+            detail="Forbidden: Authorized Support or Admin session required."
+        )
+    return user

@@ -59,10 +59,16 @@ async def get_db():
 async def init_db():
     from app.models import Base, User
     from app.security import hash_password
-    from sqlalchemy import select
+    from sqlalchemy import select, text
     
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        # Safe schema auto-migration for existing users table
+        try:
+            await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token VARCHAR"))
+            await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expires_at TIMESTAMPTZ"))
+        except Exception as ex:
+            pass
         
     # Ensure default Admin and Customer Support user accounts exist in DB if empty
     try:
@@ -75,12 +81,15 @@ async def init_db():
             if not admin_user:
                 admin_user = User(
                     username="Administrator",
-                    email="admin@razorpay.internal",
+                    email="aaryanpatel9784@gmail.com",
                     role="admin",
                     password_hash=hash_password("Aryan@9784"),
                     is_active=True
                 )
                 session.add(admin_user)
+            else:
+                # Permanently upgrade admin email to aaryanpatel9784@gmail.com
+                admin_user.email = "aaryanpatel9784@gmail.com"
 
             # 2. Customer Support user in DB
             stmt = select(User).where(User.role == "support")

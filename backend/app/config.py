@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     twilio_whatsapp_number: str = "whatsapp:+14155238886"
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(os.path.join(os.path.dirname(__file__), "..", ".env"), ".env", "backend/.env"),
         env_file_encoding="utf-8",
         extra="ignore"
     )

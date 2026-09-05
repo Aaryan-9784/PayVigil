@@ -28,10 +28,19 @@ async def send_multichannel_recovery_message(
     logger.info(f"[MultiChannel Messaging] Razorpay native dispatch enabled for {masked_phone_str} across Email, SMS, and WhatsApp.")
     
     # ──────────────────────────────────────────────────────────────────
-    # 1. RAZORPAY NATIVE NOTIFICATION DISPATCH
+    # 1. RESEND CUSTOMER RECOVERY EMAIL (Guaranteed Delivery)
     # ──────────────────────────────────────────────────────────────────
-    # Razorpay's API automatically delivers official Email, SMS, and WhatsApp alerts
-    # to the customer's contact details when the payment link is generated.
+    try:
+        await send_reminder_email(
+            customer_id=customer_id if "@" in customer_id else (settings.support_email or "aaryanpatel9784@gmail.com"),
+            reason=reason,
+            payment_id=payment_id,
+            amount_paise=amount_paise,
+            recovery_url=recovery_url,
+            customer_name=display_name
+        )
+    except Exception as e:
+        logger.warning(f"[Messaging Client] Resend customer email note: {e}")
     
     # ──────────────────────────────────────────────────────────────────
     # 2. 1-CLICK DIRECT WHATSAPP & SMS FALLBACK

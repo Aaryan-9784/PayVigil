@@ -13,7 +13,9 @@ from app.ws_manager import ws_manager
 logger = logging.getLogger("revenue_recovery.webhooks")
 router = APIRouter()
 
+@router.post("/api/webhooks/razorpay")
 @router.post("/webhooks/razorpay")
+@router.post("/api/webhook")
 @router.post("/webhook")
 @router.post("/")
 async def razorpay_webhook(

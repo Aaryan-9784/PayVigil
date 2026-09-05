@@ -79,12 +79,10 @@ export default function App() {
     const connectWebSocket = () => {
       try {
         const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-        let wsUrl = apiBase.replace(/^http/, 'ws');
-        if (!wsUrl.endsWith('/')) {
-          wsUrl += '/ws/events';
-        } else {
-          wsUrl += 'ws/events';
-        }
+        const cleanBase = apiBase.replace(/\/+$/, '');
+        const wsUrl = cleanBase.startsWith('https://')
+          ? cleanBase.replace(/^https:\/\//, 'wss://') + '/ws/events'
+          : cleanBase.replace(/^http:\/\//, 'ws://') + '/ws/events';
 
         socket = new WebSocket(wsUrl);
         wsRef.current = socket;

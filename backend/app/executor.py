@@ -44,22 +44,15 @@ async def execute_action(db: AsyncSession, event: Event, decision: dict) -> Acti
     attempt_number = len(matched_prior_actions) + 1
 
     # ──────────────────────────────────────────────────────────────────
-    # CONDITIONAL ESCALATION RULE:
-    # If payment failed > 3 times -> Escalate to Support Specialist (Case 3)
-    # Otherwise (<= 3 attempts) -> Follow Case 2 (Customer 1-Click Recovery)
+    # FINANCIAL GUARDRAIL: MAX ATTEMPTS STOPPING RULE
+    # If payment failed > 3 times -> Automatically escalate to Support Specialist (Case 3)
+    # Otherwise -> Execute determined action (Case 1 Retry, Case 2 Message, or Case 3 Escalate)
     # ──────────────────────────────────────────────────────────────────
-    if attempt_number > 3:
+    if attempt_number > settings.max_retry_attempts:
         action_type = "escalate_to_human"
         action_input = {
             "razorpay_payment_id": event.razorpay_payment_id,
-            "reason": f"Payment failed {attempt_number} times (exceeded 3-attempt limit). Dispatched to Customer Support specialist."
-        }
-    elif action_type == "escalate_to_human" and attempt_number <= 3:
-        # If <= 3 attempts, prioritize Case 2 customer 1-click recovery
-        action_type = "send_reminder_email"
-        action_input = {
-            "customer_id": event.customer_id,
-            "reason": event.error_description or "Payment retry reminder"
+            "reason": f"Payment failed {attempt_number} times (exceeded {settings.max_retry_attempts}-attempt limit). Escalated to Customer Support specialist."
         }
 
     # STOPPING RULE 2: cooldown between actions on the same payment

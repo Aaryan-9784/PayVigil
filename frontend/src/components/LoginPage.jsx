@@ -250,7 +250,7 @@ export default function LoginPage({ onLoginSuccess }) {
           <div className="flex items-center gap-3.5">
             <img
               src="/favicon.svg"
-              alt="Razorpay AI Recovery Logo"
+              alt="PayVigil AI Logo"
               className="w-12 h-12 rounded-2xl shrink-0 shadow-lg"
               style={{
                 boxShadow: '0 8px 30px rgba(12, 131, 255, 0.4)',
@@ -258,13 +258,13 @@ export default function LoginPage({ onLoginSuccess }) {
             />
             <div>
               <div className="flex items-center gap-2.5">
-                <span className="text-2xl font-black tracking-tight text-white font-sans">Razorpay</span>
+                <span className="text-2xl font-black tracking-tight text-white font-sans">PayVigil</span>
                 <span className="text-[10.5px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#0c83ff]/20 text-[#38a5ff] border border-[#0c83ff]/40">
                   AI Recovery
                 </span>
               </div>
               <p className="text-xs text-slate-400 font-medium tracking-wide mt-0.5">
-                Autonomous Revenue Protection Platform
+                Autonomous Payment Triage &amp; Revenue Protection
               </p>
             </div>
           </div>

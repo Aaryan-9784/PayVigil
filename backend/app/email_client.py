@@ -43,7 +43,7 @@ async def send_reminder_email(
             <!-- Header Banner -->
             <div style="background: linear-gradient(135deg, #0c2340 0%, #0c83ff 100%); padding: 24px 28px; color: #ffffff;">
                 <span style="background: rgba(255,255,255,0.18); color: #ffffff; font-size: 10.5px; font-weight: 700; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;">⚡ ACTION REQUIRED &bull; 1-CLICK RECOVERY</span>
-                <h2 style="margin: 10px 0 4px 0; font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px;">Razorpay AI Revenue Recovery &bull; Complete Payment</h2>
+                <h2 style="margin: 10px 0 4px 0; font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px;">PayVigil &bull; Complete Payment</h2>
                 <p style="margin: 0; font-size: 12.5px; color: #e0f2fe; opacity: 0.9;">Autonomous Transaction Protection &bull; Secure 1-Click Hosted Checkout</p>
             </div>
             
@@ -90,7 +90,7 @@ async def send_reminder_email(
 
             <!-- Footer -->
             <div style="background-color: #f1f5f9; padding: 14px 28px; border-top: 1px solid #e2e8f0; font-size: 11.5px; color: #64748b; text-align: center;">
-                Razorpay AI Revenue Recovery Engine &bull; Incident #{short_id} &bull; Secure 256-Bit SSL Checkout
+                PayVigil Autonomous Recovery Engine &bull; Incident #{short_id} &bull; Secure 256-Bit SSL Checkout
             </div>
         </div>
     </body>
@@ -104,7 +104,7 @@ async def send_reminder_email(
                     "https://api.resend.com/emails",
                     headers={"Authorization": f"Bearer {settings.resend_api_key}"},
                     json={
-                        "from": "Razorpay AI Revenue Recovery <onboarding@resend.dev>",
+                        "from": "PayVigil Recovery <onboarding@resend.dev>",
                         "to": [recipient],
                         "subject": f"⚡ Action Required: Complete your payment of {amount_inr}",
                         "html": html_content
@@ -123,7 +123,7 @@ async def send_reminder_email(
                             "https://api.resend.com/emails",
                             headers={"Authorization": f"Bearer {settings.resend_api_key}"},
                             json={
-                                "from": "Razorpay AI Revenue Recovery <onboarding@resend.dev>",
+                                "from": "PayVigil Recovery <onboarding@resend.dev>",
                                 "to": [fallback_recipient],
                                 "subject": f"⚡ [For {recipient}] Action Required: Complete payment of {amount_inr}",
                                 "html": html_content
@@ -175,7 +175,7 @@ async def send_support_escalation_ticket_email(
     safe_payment_id = html.escape(payment_id)
 
     clean_digits = raw_phone.replace("+", "").replace(" ", "").replace("-", "")[-10:]
-    wa_text = f"🚨 *Razorpay AI Revenue Recovery • Payment Recovery*\n\nNamaste {name_display}! 👋\n\nWe noticed your payment of *{amount_inr}* had an issue ({reason}).\n\n👉 *Complete your payment in 1-click here:*\n{recovery_link}"
+    wa_text = f"🚨 *PayVigil • Payment Recovery*\n\nNamaste {name_display}! 👋\n\nWe noticed your payment of *{amount_inr}* had an issue ({reason}).\n\n👉 *Complete your payment in 1-click here:*\n{recovery_link}"
     wa_url = f"https://wa.me/91{clean_digits}?text={urllib.parse.quote(wa_text)}"
 
     html_content = f"""
@@ -188,7 +188,7 @@ async def send_support_escalation_ticket_email(
             <!-- Header Banner -->
             <div style="background: linear-gradient(135deg, #0c2340 0%, #0c83ff 100%); padding: 24px 28px; color: #ffffff;">
                 <span style="background: #ef4444; color: #ffffff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;">🚨 HIGH PRIORITY CRM TICKET</span>
-                <h2 style="margin: 10px 0 4px 0; font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px;">Razorpay AI Revenue Recovery &bull; Support Escalation</h2>
+                <h2 style="margin: 10px 0 4px 0; font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px;">PayVigil &bull; Support Escalation</h2>
                 <p style="margin: 0; font-size: 12.5px; color: #e0f2fe; opacity: 0.9;">Autonomous Payment Recovery Triage &bull; Human Specialist Outreach Required</p>
             </div>
             
@@ -243,7 +243,7 @@ async def send_support_escalation_ticket_email(
 
             <!-- Footer -->
             <div style="background-color: #f1f5f9; padding: 14px 28px; border-top: 1px solid #e2e8f0; font-size: 11.5px; color: #64748b; text-align: center;">
-                Razorpay AI Revenue Recovery Engine &bull; Incident #{short_id} &bull; Internal Support Ticket
+                PayVigil Autonomous Recovery Engine &bull; Incident #{short_id} &bull; Internal Support Ticket
             </div>
         </div>
     </body>
@@ -257,7 +257,7 @@ async def send_support_escalation_ticket_email(
                     "https://api.resend.com/emails",
                     headers={"Authorization": f"Bearer {settings.resend_api_key}"},
                     json={
-                        "from": "Razorpay AI Support <onboarding@resend.dev>",
+                        "from": "PayVigil Support <onboarding@resend.dev>",
                         "to": [recipient],
                         "subject": f"🚨 High-Priority Incident (Ref: #{order_ref}) - {amount_inr}",
                         "html": html_content
@@ -301,7 +301,7 @@ async def send_password_reset_email(
             <!-- Header Banner -->
             <div style="background: linear-gradient(135deg, #0c2340 0%, #0c83ff 100%); padding: 24px 28px; color: #ffffff;">
                 <span style="background: rgba(255,255,255,0.18); color: #ffffff; font-size: 10.5px; font-weight: 700; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;">🔐 SECURITY VERIFICATION</span>
-                <h2 style="margin: 10px 0 4px 0; font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px;">Razorpay AI Revenue Recovery &bull; Password Reset</h2>
+                <h2 style="margin: 10px 0 4px 0; font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px;">PayVigil &bull; Password Reset</h2>
                 <p style="margin: 0; font-size: 12.5px; color: #e0f2fe; opacity: 0.9;">Autonomous Security &bull; Identity & Access Protection</p>
             </div>
             
@@ -309,7 +309,7 @@ async def send_password_reset_email(
             <div style="padding: 26px 28px; color: #1e293b; font-size: 13.5px; line-height: 1.6;">
                 <p style="font-size: 15px; margin-top: 0; font-weight: 600; color: #0c2340;">Hello {name_display},</p>
                 <p style="color: #475569; margin-bottom: 20px;">
-                    We received a request to reset your password for your <strong>Razorpay AI Revenue Recovery</strong> account (<strong style="color: #0c2340;">{safe_email}</strong>).
+                    We received a request to reset your password for your <strong>PayVigil</strong> account (<strong style="color: #0c2340;">{safe_email}</strong>).
                 </p>
 
                 <!-- Structured Details Table -->
@@ -349,7 +349,7 @@ async def send_password_reset_email(
 
             <!-- Footer -->
             <div style="background-color: #f1f5f9; padding: 14px 28px; border-top: 1px solid #e2e8f0; font-size: 11.5px; color: #64748b; text-align: center;">
-                Razorpay AI Revenue Recovery Engine &bull; Automated Security Service &bull; Do not reply
+                PayVigil Autonomous Recovery Engine &bull; Automated Security Service &bull; Do not reply
             </div>
         </div>
     </body>
@@ -363,9 +363,9 @@ async def send_password_reset_email(
                     "https://api.resend.com/emails",
                     headers={"Authorization": f"Bearer {settings.resend_api_key}"},
                     json={
-                        "from": "Razorpay AI Security <onboarding@resend.dev>",
+                        "from": "PayVigil Security <onboarding@resend.dev>",
                         "to": [recipient_email],
-                        "subject": "🔐 Password Reset Request - Razorpay AI Recovery",
+                        "subject": "🔐 Password Reset Request - PayVigil",
                         "html": html_content
                     }
                 )
@@ -381,9 +381,9 @@ async def send_password_reset_email(
                         "https://api.resend.com/emails",
                         headers={"Authorization": f"Bearer {settings.resend_api_key}"},
                         json={
-                            "from": "Razorpay AI Security <onboarding@resend.dev>",
+                            "from": "PayVigil Security <onboarding@resend.dev>",
                             "to": ["aaryanpatel9784@gmail.com"],
-                            "subject": f"🔐 Password Reset Request for {recipient_email} - Razorpay AI Recovery",
+                            "subject": f"🔐 Password Reset Request for {recipient_email} - PayVigil",
                             "html": html_content
                         }
                     )

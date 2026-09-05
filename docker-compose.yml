@@ -1,46 +1,39 @@
 version: "3.9"
+
 services:
   postgres:
-    image: postgres:16
+    image: postgres:16-alpine
+    container_name: payvigil-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: revenue_recovery
+      POSTGRES_DB: payvigil_db
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: payvigil-backend
+    restart: unless-stopped
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/revenue_recovery
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/payvigil_db
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     env_file:
       - ./backend/.env
 
-  # Optional n8n visual orchestrator service
-  n8n:
-    image: docker.n8n.io/n8nio/n8n
-    restart: always
-    ports:
-      - "5678:5678"
-    environment:
-      - N8N_BASIC_AUTH_ACTIVE=false
-      - N8N_HOST=localhost
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-      - WEBHOOK_URL=http://localhost:5678/
-    volumes:
-      - n8ndata:/home/node/.n8n
-    depends_on:
-      - backend
-
 volumes:
   pgdata:
-  n8ndata:

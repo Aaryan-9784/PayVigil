@@ -67,11 +67,11 @@ export default function Header({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="py-2.5 flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
 
-          {/* ── Official Razorpay Brand Logo ── */}
+          {/* ── Official PayVigil Brand Logo ── */}
           <div className="flex items-center gap-3">
             <img
               src="/favicon.svg"
-              alt="Razorpay AI Recovery Logo"
+              alt="PayVigil AI Logo"
               className="w-8 h-8 rounded-xl shrink-0 shadow-sm"
               style={{
                 boxShadow: '0 4px 12px rgba(12, 131, 255, 0.2)',
@@ -81,11 +81,11 @@ export default function Header({
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-base font-black tracking-tight text-[#0c2340] font-sans">
-                  Razorpay
+                  PayVigil
                 </span>
                 <span className="h-3 w-px bg-slate-300 hidden sm:block" />
                 <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-50 text-[#0c83ff] border border-blue-200/80">
-                  AI Revenue Recovery
+                  AI Payment Recovery
                 </span>
               </div>
               <p className="text-[10px] text-slate-500 font-medium leading-none mt-0.5 hidden md:block">

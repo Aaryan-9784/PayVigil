@@ -36,7 +36,7 @@ async def send_multichannel_recovery_message(
     # ──────────────────────────────────────────────────────────────────
     # 2. 1-CLICK DIRECT WHATSAPP & SMS FALLBACK
     # ──────────────────────────────────────────────────────────────────
-    sms_text = f"Razorpay AI Revenue Recovery: Your payment of {amount_inr} is pending. Complete securely in 1-click: {recovery_url}"
+    sms_text = f"PayVigil: Your payment of {amount_inr} is pending. Complete securely in 1-click: {recovery_url}"
     
     # A. If Fast2SMS API Key is present in .env
     if settings.fast2sms_api_key and not settings.fast2sms_api_key.startswith("mock"):
@@ -78,7 +78,7 @@ async def send_multichannel_recovery_message(
     # ──────────────────────────────────────────────────────────────────
     # 3. DISPATCH WHATSAPP NOTIFICATION
     # ──────────────────────────────────────────────────────────────────
-    wa_text = f"🚨 *Razorpay AI Revenue Recovery • Payment Recovery*\n\nNamaste {display_name}! 👋\n\nWe noticed your payment of *{amount_inr}* could not be processed ({reason}).\n\n👉 *Complete your payment in 1-click here:*\n{recovery_url}\n\n_(Secured by Razorpay 256-bit SSL Checkout)_"
+    wa_text = f"🚨 *PayVigil • Payment Recovery*\n\nNamaste {display_name}! 👋\n\nWe noticed your payment of *{amount_inr}* could not be processed ({reason}).\n\n👉 *Complete your payment in 1-click here:*\n{recovery_url}\n\n_(Secured by Razorpay 256-bit SSL Checkout)_"
     encoded_text = urllib.parse.quote(wa_text)
     wa_link = f"https://wa.me/91{raw_10_digit}?text={encoded_text}"
     logger.info(f"[WhatsApp] [Ready] Generated secure 1-click WhatsApp link for {masked_phone_str}")

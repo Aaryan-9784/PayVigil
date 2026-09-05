@@ -23,8 +23,8 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(
-    title="AI Revenue Recovery Agent",
-    description="Autonomous payment failure recovery and revenue protection engine",
+    title="PayVigil AI Payment Recovery Engine",
+    description="PayVigil: Autonomous payment failure triage and revenue recovery pipeline",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -82,7 +82,7 @@ async def websocket_events_endpoint(websocket: WebSocket):
         # Send initial handshake ping
         await websocket.send_json({
             "type": "connection_established",
-            "message": "Connected to Autonomous AI Revenue Recovery Live Stream",
+            "message": "Connected to PayVigil Autonomous AI Recovery Live Stream",
             "environment": settings.environment
         })
         while True:
@@ -107,6 +107,6 @@ if settings.environment != "production":
 async def health():
     return {
         "status": "ok",
-        "service": "AI Revenue Recovery Agent",
+        "service": "PayVigil AI Recovery Engine",
         "environment": settings.environment
     }

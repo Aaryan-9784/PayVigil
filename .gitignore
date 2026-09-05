@@ -1,5 +1,5 @@
 # ==============================================================================
-# Git Ignore Configuration - AI Revenue Recovery Agent for Razorpay
+# Git Ignore Configuration — PayVigil (AI Payment Recovery for Razorpay)
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
@@ -20,9 +20,12 @@ frontend/.env
 !*/.env.example
 
 # ------------------------------------------------------------------------------
-# 2. Python, Virtual Environments & Caches
+# 2. Python, Virtual Environments & Bytecode Caches
 # ------------------------------------------------------------------------------
 __pycache__/
+*/__pycache__/
+*/*/__pycache__/
+*/*/*/__pycache__/
 *.py[cod]
 *$py.class
 *.so
@@ -56,7 +59,7 @@ backend/.venv/
 frontend/venv/
 
 # ------------------------------------------------------------------------------
-# 3. Databases, State & Local Storage
+# 3. Databases, SQLite & Local Storage
 # ------------------------------------------------------------------------------
 *.db
 *.sqlite
@@ -71,9 +74,10 @@ backend/revenue_recovery.db
 .supabase/
 
 # ------------------------------------------------------------------------------
-# 4. Testing, Coverage & Type Checking
+# 4. Testing, Coverage & Quality Assurance
 # ------------------------------------------------------------------------------
 .pytest_cache/
+*/.pytest_cache/
 .coverage
 .coverage.*
 htmlcov/
@@ -86,7 +90,7 @@ coverage.xml
 .mypy_cache/
 
 # ------------------------------------------------------------------------------
-# 5. Node.js & Frontend (React 18 + Vite)
+# 5. Node.js & Frontend (React + Vite)
 # ------------------------------------------------------------------------------
 node_modules/
 frontend/node_modules/
@@ -98,7 +102,7 @@ frontend/dist-ssr/
 *.tsbuildinfo
 .eslintcache
 
-# Node package manager logs
+# Node logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -106,14 +110,21 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # ------------------------------------------------------------------------------
-# 6. Docker & Persistent Volumes
+# 6. Executables & Tunnels
+# ------------------------------------------------------------------------------
+*.exe
+cloudflared.exe
+ngrok.exe
+
+# ------------------------------------------------------------------------------
+# 7. Docker & Persistent Volumes
 # ------------------------------------------------------------------------------
 docker-compose.override.yml
 pgdata/
 n8ndata/
 
 # ------------------------------------------------------------------------------
-# 7. Logs, PIDs & Temporary Files
+# 8. Logs & Temporary Files
 # ------------------------------------------------------------------------------
 logs/
 *.log
@@ -127,7 +138,7 @@ logs/
 *.seed
 
 # ------------------------------------------------------------------------------
-# 8. Security Certificates & Private Keys
+# 9. Security Certificates & Private Keys
 # ------------------------------------------------------------------------------
 *.pem
 *.key
@@ -140,7 +151,7 @@ id_ecdsa
 id_ed25519
 
 # ------------------------------------------------------------------------------
-# 9. Operating System & IDEs
+# 10. Operating System & IDEs
 # ------------------------------------------------------------------------------
 # macOS
 .DS_Store
@@ -156,7 +167,7 @@ ehthumbs.db
 ehthumbs_vista.db
 desktop.ini
 
-# IDEs & Code Editors
+# IDEs & Editors
 .idea/
 *.sublime-workspace
 *.sublime-project

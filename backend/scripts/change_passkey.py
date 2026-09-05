@@ -18,7 +18,7 @@ from app.security import hash_password
 
 async def update_passkey():
     print("=" * 60)
-    print("🔒 AI Revenue Recovery Agent - Passkey Management CLI")
+    print("🔒 PayVigil - Passkey Management CLI")
     print("=" * 60)
     
     # Initialize DB tables if not already present

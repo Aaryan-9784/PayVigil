@@ -1,1 +1,1 @@
-"""AI Revenue Recovery Agent Backend Application."""
+"""PayVigil: AI Payment Recovery Agent Backend Application."""

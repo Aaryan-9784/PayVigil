@@ -221,11 +221,6 @@ def verify_razorpay_signature(body: bytes, signature: str, secret: str, timestam
         raise HTTPException(status_code=400, detail=f"Signature computation error: {str(e)}")
 
     if not hmac.compare_digest(expected_signature, signature):
-        if settings.environment == "development":
-            # In dev, log warning but allow real testing
-            import logging
-            logging.getLogger("revenue_recovery.security").warning("[Webhook] Signature mismatch in development mode. Ingesting event.")
-            return True
         raise HTTPException(status_code=400, detail="Invalid HMAC-SHA256 webhook signature")
     return True
 

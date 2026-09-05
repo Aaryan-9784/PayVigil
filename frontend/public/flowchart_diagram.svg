@@ -61,7 +61,7 @@
     <rect width="1120" height="54" rx="14" fill="#ffffff" stroke="#fde047" stroke-width="1.5" filter="url(#cardShadow)"/>
     <rect x="8" y="8" width="38" height="38" rx="10" fill="url(#headerGrad)"/>
     <text x="27" y="34" font-size="22" font-weight="900" fill="#ffffff" text-anchor="middle">₹</text>
-    <text x="58" y="34" font-size="17" font-weight="800" fill="#0f172a">Razorpay AI Revenue Recovery Agent <tspan fill="#b45309" font-weight="600">| Complete End-to-End System Architecture Flow</tspan></text>
+    <text x="58" y="34" font-size="17" font-weight="800" fill="#0f172a">PayVigil AI Recovery Agent <tspan fill="#b45309" font-weight="600">| Complete End-to-End System Architecture Flow</tspan></text>
   </g>
 
   <!-- ========================================================================= -->

@@ -92,21 +92,6 @@ async def init_db():
                 admin_user.email = "aaryanpatel9784@gmail.com"
                 admin_user.username = "Aryan Patel"
 
-            # 2. Customer Support user in DB
-            stmt = select(User).where(User.role == "support")
-            result = await session.execute(stmt)
-            support_user = result.scalars().first()
-            
-            if not support_user:
-                support_user = User(
-                    username="Support Agent",
-                    email="support@razorpay.com",
-                    role="support",
-                    password_hash=hash_password("Aryan@3306"),
-                    is_active=True
-                )
-                session.add(support_user)
-                
             await session.commit()
     except Exception as e:
         print(f"User seeding warning: {e}")

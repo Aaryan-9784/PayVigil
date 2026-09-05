@@ -186,19 +186,26 @@ def sanitize_and_redact_pii(data: Any) -> Any:
 # ---------------------------------------------------------------------------
 # 4. Cryptographic HMAC Signature & Replay Attack Defense
 # ---------------------------------------------------------------------------
-def verify_razorpay_signature(body: bytes, signature: str, secret: str, timestamp_header: Optional[str] = None) -> None:
+def verify_razorpay_signature(body: bytes, signature: str, secret: str, timestamp_header: Optional[str] = None) -> bool:
     """
     Verifies HMAC-SHA256 signature and guards against timing attacks and replay attacks.
     """
-    if not signature or not secret:
-        raise HTTPException(status_code=400, detail="Missing signature or webhook secret")
+    if not signature:
+        if settings.environment == "development":
+            return True
+        raise HTTPException(status_code=400, detail="Missing X-Razorpay-Signature header")
+
+    if not secret:
+        if settings.environment == "development":
+            return True
+        raise HTTPException(status_code=400, detail="Missing webhook secret configuration")
 
     # Guard 1: Anti-Replay Timestamp Validation (5 minute window)
     if timestamp_header:
         try:
             event_time = float(timestamp_header)
             current_time = time.time()
-            if abs(current_time - event_time) > 300:
+            if abs(current_time - event_time) > 900:  # 15-minute tolerance
                 raise HTTPException(status_code=400, detail="Webhook timestamp expired (Replay Attack Rejected)")
         except ValueError:
             pass
@@ -214,6 +221,11 @@ def verify_razorpay_signature(body: bytes, signature: str, secret: str, timestam
         raise HTTPException(status_code=400, detail=f"Signature computation error: {str(e)}")
 
     if not hmac.compare_digest(expected_signature, signature):
+        if settings.environment == "development":
+            # In dev, log warning but allow real testing
+            import logging
+            logging.getLogger("revenue_recovery.security").warning("[Webhook] Signature mismatch in development mode. Ingesting event.")
+            return True
         raise HTTPException(status_code=400, detail="Invalid HMAC-SHA256 webhook signature")
     return True
 

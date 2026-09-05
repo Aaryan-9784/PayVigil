@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { TrendingUp, AlertTriangle, ShieldCheck, Activity, CheckCircle2, Sparkles, ArrowUpRight, ChevronRight, X, User, CreditCard, RotateCcw, Mail, AlertOctagon, Copy } from 'lucide-react';
+import { TrendingUp, AlertTriangle, ShieldCheck, Shield, Activity, CheckCircle2, Sparkles, ArrowUpRight, ChevronRight, X, User, CreditCard, RotateCcw, Mail, AlertOctagon, Copy } from 'lucide-react';
 
 export function formatINR(paise) {
   const rupees = (paise || 0) / 100;

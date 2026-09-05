@@ -31,18 +31,31 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# Universal CORS Configuration (Allows Localhost, Render, Vercel, and Cloudflare domains with credentials)
+# Universal Bulletproof CORS Configuration (Localhost + All Cloud Domains + Custom Headers)
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r".*",
+    allow_origins=origins,
+    allow_origin_regex=r"^https?://.*",
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
-# Enterprise Security Headers Middleware (OWASP Standard)
+# Enterprise Security Headers Middleware (OWASP Standard - Passes OPTIONS cleanly)
 @app.middleware("http")
 async def add_enterprise_security_headers(request, call_next):
+    if request.method == "OPTIONS":
+        return await call_next(request)
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"

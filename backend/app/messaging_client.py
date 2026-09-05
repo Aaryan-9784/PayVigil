@@ -45,7 +45,8 @@ async def send_multichannel_recovery_message(
     # ──────────────────────────────────────────────────────────────────
     # 2. 1-CLICK DIRECT WHATSAPP & SMS FALLBACK
     # ──────────────────────────────────────────────────────────────────
-    sms_text = f"PayVigil: Your payment of {amount_inr} is pending. Complete securely in 1-click: {recovery_url}"
+    short_ref = payment_id[-8:] if len(payment_id) > 8 else payment_id
+    sms_text = f"PayVigil Recovery: Payment of {amount_inr} for Order #{short_ref} pending ({reason}). 1-Click Pay: {recovery_url} (Secured by Razorpay)"
     
     # A. If Fast2SMS API Key is present in .env
     if settings.fast2sms_api_key and not settings.fast2sms_api_key.startswith("mock"):
@@ -85,12 +86,24 @@ async def send_multichannel_recovery_message(
         logger.info(f"[SMS Provider] Queued cellular SMS dispatch for {masked_phone_str} with link: {recovery_url}")
 
     # ──────────────────────────────────────────────────────────────────
-    # 3. DISPATCH WHATSAPP NOTIFICATION
+    # 3. STRUCTURED WHATSAPP PAYMENT RECEIPT
     # ──────────────────────────────────────────────────────────────────
-    wa_text = f"🚨 *PayVigil • Payment Recovery*\n\nNamaste {display_name}! 👋\n\nWe noticed your payment of *{amount_inr}* could not be processed ({reason}).\n\n👉 *Complete your payment in 1-click here:*\n{recovery_url}\n\n_(Secured by Razorpay 256-bit SSL Checkout)_"
+    wa_text = (
+        f"💳 *PAYVIGIL • 1-CLICK PAYMENT RECOVERY*\n"
+        f"━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+        f"👤 *Customer:* {display_name}\n"
+        f"💰 *Amount Payable:* *{amount_inr}*\n"
+        f"🏷️ *Reference:* `{payment_id}`\n"
+        f"⚠️ *Failure Reason:* {reason}\n"
+        f"━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"Your order has been safely held. Complete payment in 1 click using *UPI (GPay / PhonePe / Paytm), Cards, or NetBanking*:\n\n"
+        f"👉 *PROCEED TO PAY:*\n"
+        f"{recovery_url}\n\n"
+        f"🔒 _256-Bit SSL Encrypted • Powered by Razorpay & PayVigil_"
+    )
     encoded_text = urllib.parse.quote(wa_text)
     wa_link = f"https://wa.me/91{raw_10_digit}?text={encoded_text}"
-    logger.info(f"[WhatsApp] [Ready] Generated secure 1-click WhatsApp link for {masked_phone_str}")
+    logger.info(f"[WhatsApp] [Ready] Generated structured 1-click WhatsApp link for {masked_phone_str}")
 
     if settings.twilio_account_sid and settings.twilio_auth_token and settings.twilio_whatsapp_number:
         try:

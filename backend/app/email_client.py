@@ -37,60 +37,61 @@ async def send_reminder_email(
     <!DOCTYPE html>
     <html>
     <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-    <body style="margin: 0; padding: 24px 12px; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-        <div style="max-width: 580px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+    <body style="margin: 0; padding: 30px 15px; background-color: #f4f6f8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+        <div style="max-width: 540px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
             
-            <!-- Header Banner -->
-            <div style="background: linear-gradient(135deg, #0c2340 0%, #0c83ff 100%); padding: 24px 28px; color: #ffffff;">
-                <span style="background: rgba(255,255,255,0.18); color: #ffffff; font-size: 10.5px; font-weight: 700; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;">⚡ ACTION REQUIRED &bull; 1-CLICK RECOVERY</span>
-                <h2 style="margin: 10px 0 4px 0; font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px;">PayVigil &bull; Complete Payment</h2>
-                <p style="margin: 0; font-size: 12.5px; color: #e0f2fe; opacity: 0.9;">Autonomous Transaction Protection &bull; Secure 1-Click Hosted Checkout</p>
+            <!-- Blue Brand Header -->
+            <div style="background-color: #2b64e2; padding: 28px 24px; text-align: center; color: #ffffff;">
+                <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; opacity: 0.9; margin-bottom: 6px;">
+                    Payment requested by
+                </div>
+                <h1 style="margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.2px;">
+                    PayVigil Recovery
+                </h1>
+                <div style="font-size: 12px; opacity: 0.85; margin-top: 4px; font-family: monospace;">
+                    Reference: {safe_payment_id}
+                </div>
             </div>
-            
-            <!-- Main Content -->
-            <div style="padding: 26px 28px; color: #1e293b; font-size: 13.5px; line-height: 1.6;">
-                <p style="font-size: 15px; margin-top: 0; font-weight: 600; color: #0c2340;">Hello {name_display},</p>
-                <p style="color: #475569; margin-bottom: 20px;">
-                    We noticed an issue while processing your recent payment of <strong style="color: #0c2340;">{amount_inr}</strong>. No duplicate deduction occurred.
-                </p>
 
-                <!-- Structured Details Table -->
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 22px; background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden;">
-                    <tr style="border-bottom: 1px solid #e2e8f0;">
-                        <td style="padding: 10px 16px; color: #64748b; font-weight: 600; width: 38%;">Transaction Amount:</td>
-                        <td style="padding: 10px 16px; font-weight: 800; color: #0c83ff; font-size: 15px;">{amount_inr}</td>
+            <!-- Notice Banner -->
+            <div style="background-color: #fffbeb; border-bottom: 1px solid #fef3c7; padding: 12px 24px; font-size: 12px; color: #92400e; text-align: center;">
+                ⚡ <strong>1-Click Transaction Recovery:</strong> Your cart & order details have been securely preserved.
+            </div>
+
+            <!-- Order Details Box -->
+            <div style="padding: 24px 28px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #334155;">
+                    <tr style="border-bottom: 1px dashed #e2e8f0;">
+                        <td style="padding: 10px 0; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">PAYMENT FOR</td>
+                        <td style="padding: 10px 0; text-align: right; font-weight: 600; color: #0f172a;">Order {safe_payment_id}</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #e2e8f0;">
-                        <td style="padding: 10px 16px; color: #64748b; font-weight: 600;">Payment Reference:</td>
-                        <td style="padding: 10px 16px; font-family: monospace; color: #334155; font-size: 12.5px; font-weight: bold;">{payment_id or 'pay_pending_checkout'}</td>
+                    <tr style="border-bottom: 1px dashed #e2e8f0;">
+                        <td style="padding: 10px 0; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">ISSUED TO</td>
+                        <td style="padding: 10px 0; text-align: right; font-weight: 600; color: #0f172a;">{name_display}</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #e2e8f0;">
-                        <td style="padding: 10px 16px; color: #64748b; font-weight: 600;">Failure Diagnosis:</td>
-                        <td style="padding: 10px 16px; color: #dc2626; font-size: 12.5px; font-weight: 600;">{reason}</td>
+                    <tr style="border-bottom: 1px dashed #e2e8f0;">
+                        <td style="padding: 10px 0; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">FAILURE REASON</td>
+                        <td style="padding: 10px 0; text-align: right; font-weight: 600; color: #dc2626;">{safe_reason}</td>
                     </tr>
                     <tr>
-                        <td style="padding: 10px 16px; color: #64748b; font-weight: 600;">Payment Status:</td>
-                        <td style="padding: 10px 16px; color: #d97706; font-weight: 700; font-size: 12.5px;">Pending Customer Retry</td>
+                        <td style="padding: 16px 0 6px 0; color: #0f172a; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">AMOUNT PAYABLE</td>
+                        <td style="padding: 16px 0 6px 0; text-align: right; font-size: 22px; font-weight: 800; color: #0f172a;">{amount_inr}</td>
                     </tr>
                 </table>
 
-                <p style="color: #475569; margin-bottom: 18px;">
-                    You can complete your transaction in one click using <strong>UPI, Google Pay, PhonePe, Cards, or Netbanking</strong>:
-                </p>
-
-                <!-- Call to Action Button -->
-                <div style="text-align: center; margin: 26px 0 16px 0;">
-                    <a href="{recovery_link}" style="background: linear-gradient(135deg, #0c83ff 0%, #0056b3 100%); color: #ffffff; padding: 13px 32px; border-radius: 8px; font-weight: 700; text-decoration: none; display: inline-block; font-size: 14.5px; box-shadow: 0 4px 12px rgba(12, 131, 255, 0.35); letter-spacing: 0.2px;">Complete Payment in 1-Click &rarr;</a>
+                <!-- Proceed to Pay CTA Button -->
+                <div style="margin: 24px 0 16px 0; text-align: center;">
+                    <a href="{recovery_link}" style="background-color: #2b64e2; color: #ffffff; padding: 14px 42px; border-radius: 6px; font-weight: 700; text-decoration: none; display: inline-block; font-size: 15px; letter-spacing: 0.3px; box-shadow: 0 4px 12px rgba(43, 100, 226, 0.3);">PROCEED TO PAY &rarr;</a>
                 </div>
 
-                <p style="font-size: 11.5px; color: #64748b; text-align: center; margin: 0;">
-                    Direct secure link: <a href="{recovery_link}" style="color: #0c83ff; font-weight: 600; text-decoration: underline;">{recovery_link}</a>
-                </p>
+                <div style="text-align: center; margin-top: 14px; font-size: 12px; color: #64748b;">
+                    Supported: <strong>UPI (GPay / PhonePe / Paytm), Cards, NetBanking</strong>
+                </div>
             </div>
 
             <!-- Footer -->
-            <div style="background-color: #f1f5f9; padding: 14px 28px; border-top: 1px solid #e2e8f0; font-size: 11.5px; color: #64748b; text-align: center;">
-                PayVigil Autonomous Recovery Engine &bull; Incident #{short_id} &bull; Secure 256-Bit SSL Checkout
+            <div style="background-color: #f8fafc; padding: 16px 24px; border-top: 1px solid #e2e8f0; font-size: 11.5px; color: #64748b; text-align: center;">
+                🔒 <strong>Secured 256-Bit SSL Checkout</strong> &bull; Powered by Razorpay &amp; PayVigil Engine
             </div>
         </div>
     </body>

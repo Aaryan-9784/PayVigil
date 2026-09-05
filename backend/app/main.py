@@ -103,9 +103,7 @@ async def websocket_events_endpoint(websocket: WebSocket):
 app.include_router(webhooks.router)
 app.include_router(dashboard.router)
 app.include_router(indian_recovery.router)
-
-if settings.environment != "production":
-    app.include_router(dev_tools.router)
+app.include_router(dev_tools.router)
 
 @app.get("/health")
 async def health():

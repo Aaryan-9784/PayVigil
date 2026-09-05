@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "https://payvigil-backend.onrender.com";
 const API_KEY = import.meta.env.VITE_DASHBOARD_API_KEY || "rev-recovery-dev-secret-key-2025";
 
 export async function fetchDashboard() {

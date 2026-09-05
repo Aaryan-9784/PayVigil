@@ -78,7 +78,7 @@ export default function App() {
 
     const connectWebSocket = () => {
       try {
-        const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+        const apiBase = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "https://payvigil-backend.onrender.com";
         const cleanBase = apiBase.replace(/\/+$/, '');
         const wsUrl = cleanBase.startsWith('https://')
           ? cleanBase.replace(/^https:\/\//, 'wss://') + '/ws/events'

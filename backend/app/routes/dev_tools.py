@@ -176,6 +176,8 @@ async def simulate_webhook(
                     "status": "failed",
                     "order_id": f"order_{uuid.uuid4().hex[:10]}",
                     "customer_id": customer,
+                    "email": customer if "@" in customer else (settings.support_email if "@" in (settings.support_email or "") else "aaryanpatel9784@gmail.com"),
+                    "contact": customer if (customer.startswith("+") or customer.isdigit()) else "+918238012515",
                     "error_code": scenario_info["error_code"],
                     "error_description": scenario_info["error_description"],
                     "created_at": int(datetime.now(timezone.utc).timestamp())

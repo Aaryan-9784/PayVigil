@@ -1,9 +1,9 @@
 # ==============================================================================
-# Git Ignore Configuration — PayVigil (AI Payment Recovery for Razorpay)
+# Git Ignore Configuration — PayVigil (AI Revenue Recovery for Razorpay)
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
-# 1. Environment & Secret Credentials (Never Commit Secrets)
+# 1. Environment & Secret Credentials (Never Commit Production Secrets)
 # ------------------------------------------------------------------------------
 .env
 .env.*
@@ -27,7 +27,7 @@ __pycache__/
 */*/__pycache__/
 */*/*/__pycache__/
 *.py[cod]
-*$py.class
+*.class
 *.so
 .Python
 build/
@@ -81,6 +81,7 @@ backend/revenue_recovery.db
 .coverage
 .coverage.*
 htmlcov/
+coverage/
 .tox/
 .nox/
 coverage.xml
@@ -90,7 +91,7 @@ coverage.xml
 .mypy_cache/
 
 # ------------------------------------------------------------------------------
-# 5. Node.js & Frontend (React + Vite)
+# 5. Node.js, Frontend (React + Vite) & Deployment Caches
 # ------------------------------------------------------------------------------
 node_modules/
 frontend/node_modules/
@@ -99,6 +100,8 @@ frontend/dist/
 frontend/dist-ssr/
 .vite/
 .turbo/
+.vercel/
+.render/
 *.tsbuildinfo
 .eslintcache
 
@@ -110,11 +113,13 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # ------------------------------------------------------------------------------
-# 6. Executables & Tunnels
+# 6. Executables, Tunnels & Scratch Scripts
 # ------------------------------------------------------------------------------
 *.exe
 cloudflared.exe
 ngrok.exe
+scratch/
+update_urls.py
 
 # ------------------------------------------------------------------------------
 # 7. Docker & Persistent Volumes
@@ -151,7 +156,7 @@ id_ecdsa
 id_ed25519
 
 # ------------------------------------------------------------------------------
-# 10. Operating System & IDEs
+# 10. Operating System, IDEs & AI Agents
 # ------------------------------------------------------------------------------
 # macOS
 .DS_Store
@@ -167,7 +172,7 @@ ehthumbs.db
 ehthumbs_vista.db
 desktop.ini
 
-# IDEs & Editors
+# IDEs, Editors & AI Agents
 .idea/
 *.sublime-workspace
 *.sublime-project
@@ -176,3 +181,6 @@ desktop.ini
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+.gemini/
+.agents/
+.agent/

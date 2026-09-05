@@ -762,7 +762,7 @@ async def get_dashboard(db: AsyncSession = Depends(get_db)):
             "error_description": event.error_description if event else "Payment processing failure",
             "root_cause": diagnosis.root_cause if diagnosis else "Automated recovery diagnostic triggered",
             "confidence": diagnosis.confidence if diagnosis else "98.5% HIGH",
-            "ai_model": "Google Gemini 1.5 Flash" if settings.gemini_api_key else ("Groq Llama-3.3" if settings.groq_api_key else "Built-in Heuristic Engine"),
+            "ai_model": "Google Gemini 2.5 Flash" if settings.gemini_api_key else ("Groq Llama-3.3" if settings.groq_api_key else "Built-in Heuristic Engine"),
             "action_type": action_type,
             "action_status": action.status if action else "completed",
             "attempt_number": action.attempt_number if action else 1,

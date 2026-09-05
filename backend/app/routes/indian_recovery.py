@@ -268,19 +268,19 @@ async def generate_vernacular_support_script(payload: VernacularScriptRequest):
             "language_name": "Hindi (हिंदी)",
             "greeting": "नमस्ते जी,",
             "phone_script": (
-                f"नमस्ते! मैं Razorpay सपोर्ट से बात कर रहा हूँ। हम देख पा रहे हैं कि आपके बैंक सर्वर में "
+                f"नमस्ते! मैं PayVigil सपोर्ट से बात कर रहा हूँ। हम देख पा रहे हैं कि आपके बैंक सर्वर में "
                 f"अस्थायी तकनीकी देरी की वजह से आपका {amt_str} का भुगतान पूरा नहीं हो सका। "
                 f"कृपया बिल्कुल निश्चिंत रहें, आपका पैसा पूरी तरह सुरक्षित है और कोई भी डबल डिडक्शन (दोहरा भुगतान) नहीं होगा। "
                 f"हम आपके फ़ोन पर एक 1-क्लिक सुरक्षित UPI रिक्वेस्ट भेज रहे हैं जिससे आप बिना किसी परेशानी के ऑर्डर पूरा कर सकते हैं।"
             ),
             "whatsapp_message": (
-                f"🙏 *नमस्ते! Razorpay कस्टमर केयर*\n\n"
+                f"🙏 *नमस्ते! PayVigil कस्टमर केयर*\n\n"
                 f"हम आपको सूचित करना चाहते हैं कि आपके बैंक सर्वर में तकनीकी रुकावट के कारण {amt_str} का ट्रांजेक्शन पेंडिंग है।\n\n"
                 f"🛡️ *आपका पैसा 100% सुरक्षित है।*\n"
                 f"• बैंक से कोई दोहरा पैसा नहीं कटेगा।\n"
                 f"• आपका ऑर्डर सुरक्षित रखा गया है।\n\n"
                 f"👉 *1-क्लिक UPI से तुरंत पूरा करें:* https://rzp.io/i/{short_pid}\n\n"
-                f"धन्यवाद! टीम रेज़रपे"
+                f"धन्यवाद! टीम PayVigil"
             ),
             "tts_voice_code": "hi-IN"
         },
@@ -288,19 +288,19 @@ async def generate_vernacular_support_script(payload: VernacularScriptRequest):
             "language_name": "Hinglish (Urban Conversational)",
             "greeting": "Namaste!",
             "phone_script": (
-                f"Namaste! Main Razorpay customer support se baat kar raha hoon. Aapka {amt_str} ka transaction "
+                f"Namaste! Main PayVigil customer support se baat kar raha hoon. Aapka {amt_str} ka transaction "
                 f"bank server delay ki wajah se temporarily pause ho gaya hai. "
                 f"Aap bilkul tension mat lijiye, aapka paisa 100% safe hai aur koi double deduction nahi hoga. "
                 f"Hum aapke PhonePe/GPay par 1-click UPI push notification bhej rahe hain jisse aap payment instantly confirm kar sakte hain."
             ),
             "whatsapp_message": (
-                f"🌟 *Namaste! Razorpay Care*\n\n"
+                f"🌟 *Namaste! PayVigil Care*\n\n"
                 f"Aapka {amt_str} ka payment bank connectivity issue ki wajah se complete nahi ho paya.\n\n"
                 f"🔒 *Aapka Paisa Safe Hai:*\n"
                 f"• Zero double debit guarantee.\n"
                 f"• Aapka cart 24 hours ke liye reserved hai.\n\n"
                 f"⚡ *1-Click UPI Pay:* https://rzp.io/i/{short_pid}\n\n"
-                f"Shukriya! Team Razorpay"
+                f"Shukriya! Team PayVigil"
             ),
             "tts_voice_code": "hi-IN"
         },
@@ -308,19 +308,19 @@ async def generate_vernacular_support_script(payload: VernacularScriptRequest):
             "language_name": "Gujarati (ગુજરાતી)",
             "greeting": "નમસ્તે!",
             "phone_script": (
-                f"નમસ્તે! હું Razorpay કસ્ટમર સપોર્ટમાંથી વાત કરું છું. તમારા બેંક સર્વરમાં ટેકનિકલ ખામીને કારણે "
+                f"નમસ્તે! હું PayVigil કસ્ટમર સપોર્ટમાંથી વાત કરું છું. તમારા બેંક સર્વરમાં ટેકનિકલ ખામીને કારણે "
                 f"{amt_str} ની ચુકવણી અટકી ગઈ છે. "
                 f"કૃપા કરીને ચિંતા કરશો નહીં, તમારા પૈસા સંપૂર્ણપણે સુરક્ષિત છે અને ખાતામાંથી બે વાર પૈસા કપાશે નહીં. "
                 f"અમે તમારા નંબર પર 1-ક્લિક UPI કલેક્ટ મોકલી રહ્યા છીએ જેથી તમારો ઓર્ડર સરળતાથી કન્ફર્મ થઈ જાય."
             ),
             "whatsapp_message": (
-                f"🙏 *નમસ્તે! Razorpay સહાયતા કેન્દ્ર*\n\n"
+                f"🙏 *નમસ્તે! PayVigil સહાયતા કેન્દ્ર*\n\n"
                 f"તમારા બેંક સર્વરમાં ધીમી ગતિને કારણે {amt_str} ની ચુકવણી પેન્ડિંગ છે.\n\n"
                 f"🛡️ *તમારા પૈસા 100% સલામત છે:*\n"
                 f"• કોઈ ડબલ પેમેન્ટ કપાશે નહીં.\n"
                 f"• તમારો ઓર્ડર રિઝર્વ રાખવામાં આવ્યો છે.\n\n"
                 f"👉 *1-ક્લિક UPI થી ચુકવણી કરો:* https://rzp.io/i/{short_pid}\n\n"
-                f"આભાર! ટીમ Razorpay"
+                f"આભાર! ટીમ PayVigil"
             ),
             "tts_voice_code": "gu-IN"
         },
@@ -328,18 +328,18 @@ async def generate_vernacular_support_script(payload: VernacularScriptRequest):
             "language_name": "Marathi (मराठी)",
             "greeting": "नमस्कार!",
             "phone_script": (
-                f"नमस्कार! मी Razorpay सपोर्ट टीममधून बोलत आहे. आपल्या बँकेच्या सर्व्हर समस्येमुळे {amt_str} चे पेमेंट "
+                f"नमस्कार! मी PayVigil सपोर्ट टीममधून बोलत आहे. आपल्या बँकेच्या सर्व्हर समस्येमुळे {amt_str} चे पेमेंट "
                 f"तात्पुरते रखडले आहे. कृपया काळजी करू नका, आपले पैसे १००% सुरक्षित आहेत आणि खात्यातून दुहेरी वजावट होणार नाही. "
                 f"आम्ही आपल्या फोनवर त्वरित UPI रिक्वेस्ट पाठवत आहोत ज्याद्वारे आपण लगेच व्यवहार पूर्ण करू शकता."
             ),
             "whatsapp_message": (
-                f"🙏 *नमस्कार! Razorpay ग्राहक सेवा*\n\n"
+                f"🙏 *नमस्कार! PayVigil ग्राहक सेवा*\n\n"
                 f"बँक सर्व्हरमधील तांत्रिक समस्येमुळे आपले {amt_str} चे व्यवहार पूर्ण झाले नाही.\n\n"
                 f"🛡️ *आपले पैसे सुरक्षित आहेत:*\n"
                 f"• दुहेरी कपात होणार नाही.\n"
                 f"• आपली ऑर्डर सुरक्षित ठेवली आहे.\n\n"
                 f"👉 *१-क्लिक UPI लिंक:* https://rzp.io/i/{short_pid}\n\n"
-                f"धन्यवाद! टीम Razorpay"
+                f"धन्यवाद! टीम PayVigil"
             ),
             "tts_voice_code": "mr-IN"
         },
@@ -347,18 +347,18 @@ async def generate_vernacular_support_script(payload: VernacularScriptRequest):
             "language_name": "Tamil (தமிழ்)",
             "greeting": "வணக்கம்!",
             "phone_script": (
-                f"வணக்கம்! நான் Razorpay ஆதரவு குழுவிலிருந்து பேசுகிறேன். வங்கி சர்வர் தாமதம் காரணமாக உங்கள் {amt_str} "
+                f"வணக்கம்! நான் PayVigil ஆதரவு குழுவிலிருந்து பேசுகிறேன். வங்கி சர்வர் தாமதம் காரணமாக உங்கள் {amt_str} "
                 f"பரிவர்த்தனை நிலுவையில் உள்ளது. உங்கள் பணம் முற்றிலும் பாதுகாப்பானது, இரட்டை பிடித்தம் ஏற்படாது. "
                 f"உங்கள் ஆர்டரை உடனடியாக உறுதிப்படுத்த எளிய UPI இணைப்பை அனுப்பியுள்ளோம்."
             ),
             "whatsapp_message": (
-                f"🙏 *வணக்கம்! Razorpay வாடிக்கையாளர் சேவை*\n\n"
+                f"🙏 *வணக்கம்! PayVigil வாடிக்கையாளர் சேவை*\n\n"
                 f"வங்கி சர்வர் நெரிசல் காரணமாக உங்கள் {amt_str} கட்டணம் நிலுவையில் உள்ளது.\n\n"
                 f"🛡️ *உங்கள் பணம் பாதுகாப்பானது:*\n"
                 f"• இரட்டை கட்டணம் வசூலிக்கப்படாது.\n"
                 f"• உங்கள் ஆர்டர் இருப்பு வைக்கப்பட்டுள்ளது.\n\n"
                 f"👉 *1-கிளிக் UPI மூலம் செலுத்த:* https://rzp.io/i/{short_pid}\n\n"
-                f"நன்றி! Razorpay குழு"
+                f"நன்றி! PayVigil குழு"
             ),
             "tts_voice_code": "ta-IN"
         },
@@ -366,18 +366,18 @@ async def generate_vernacular_support_script(payload: VernacularScriptRequest):
             "language_name": "Telugu (తెలుగు)",
             "greeting": "నమస్కారం!",
             "phone_script": (
-                f"నమస్కారం! నేను Razorpay సపోర్ట్ నుండి మాట్లాడుతున్నాను. మీ బ్యాంక్ సర్వర్ సమస్య కారణంగా {amt_str} "
+                f"నమస్కారం! నేను PayVigil సపోర్ట్ నుండి మాట్లాడుతున్నాను. మీ బ్యాంక్ సర్వర్ సమస్య కారణంగా {amt_str} "
                 f"చెల్లింపు పెండింగ్‌లో ఉంది. దయచేసి చింతించకండి, మీ డబ్బు పూర్తిగా సురక్షితం మరియు రెట్టింపు మినహాయింపు ఉండదు. "
                 f"మీ ఆర్డర్‌ను సులభంగా పూర్తి చేయడానికి మేము UPI అభ్యర్థనను పంపుతున్నాము."
             ),
             "whatsapp_message": (
-                f"🙏 *నమస్కారం! Razorpay కస్టమర్ కేర్*\n\n"
+                f"🙏 *నమస్కారం! PayVigil కస్టమర్ కేర్*\n\n"
                 f"బ్యాంక్ సర్వర్ సమస్య కారణంగా మీ {amt_str} చెల్లింపు పూర్తికాలేదు.\n\n"
                 f"🛡️ *మీ డబ్బు 100% సురక్షితం:*\n"
                 f"• డబుల్ కటింగ్ జరగదు.\n"
                 f"• మీ ఆర్డర్ రిజర్వ్ చేయబడింది.\n\n"
                 f"👉 *1-క్లిక్ UPI లింక్:* https://rzp.io/i/{short_pid}\n\n"
-                f"ధన్యవాదాలు! Razorpay బృందం"
+                f"ధన్యవాదాలు! PayVigil బృందం"
             ),
             "tts_voice_code": "te-IN"
         },
@@ -385,18 +385,18 @@ async def generate_vernacular_support_script(payload: VernacularScriptRequest):
             "language_name": "Indian English (Corporate)",
             "greeting": "Dear Customer,",
             "phone_script": (
-                f"Hello! This is Razorpay Priority Support. We noticed that your transaction of {amt_str} encountered "
+                f"Hello! This is PayVigil Priority Recovery Support. We noticed that your transaction of {amt_str} encountered "
                 f"a temporary banking gateway delay. Please be assured that your funds are 100% safe and protected against double deduction. "
                 f"We have dispatched an instant 1-click UPI push to your registered device so you can securely confirm the order."
             ),
             "whatsapp_message": (
-                f"🛡️ *Razorpay Payment Protection Alert*\n\n"
+                f"🛡️ *PayVigil Payment Protection Alert*\n\n"
                 f"Your transaction of {amt_str} experienced a temporary banking network delay.\n\n"
                 f"✅ *Paisa Safe Hai Assurance:*\n"
                 f"• Zero double-deduction guarantee.\n"
                 f"• Promotional pricing & inventory locked for 24 hours.\n\n"
                 f"📲 *1-Click UPI Complete:* https://rzp.io/i/{short_pid}\n\n"
-                f"Thank you, Team Razorpay"
+                f"Thank you, Team PayVigil"
             ),
             "tts_voice_code": "en-IN"
         }

@@ -1,6 +1,8 @@
 # 🛡️ PayVigil — Autonomous AI Payment Recovery & Revenue Assurance Engine
 
 [![Razorpay Buildathon 2026](https://img.shields.io/badge/Razorpay_Buildathon_2026-Track_03:_Autonomous_Revenue_Recovery-0c83ff?style=for-the-badge&logo=razorpay)](https://razorpay.com)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel_Frontend-000000?style=for-the-badge&logo=vercel)](https://pay-vigil.vercel.app)
+[![Render Backend](https://img.shields.io/badge/Render_Backend-46E3B7?style=for-the-badge&logo=render)](https://payvigil-backend.onrender.com/docs)
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React_18-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev)
 [![Google Gemini](https://img.shields.io/badge/Gemini_2.0_Flash-4285F4?style=for-the-badge&logo=google)](https://ai.google.dev)
@@ -8,9 +10,11 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL_Supabase-316192?style=for-the-badge&logo=postgresql)](https://supabase.com)
 [![Tests Passing](https://img.shields.io/badge/Tests-43%2F43_Passing-22c55e?style=for-the-badge)]()
 
-> **Live Backend API & Swagger Docs:** [https://payvigil-backend.onrender.com/docs](https://payvigil-backend.onrender.com/docs)  
-> **Live Webhook Ingress:** https://payvigil-backend.onrender.com/api/webhooks/razorpay  
-> **GitHub Repository:** [https://github.com/Aaryan-9784/PayVigil](https://github.com/Aaryan-9784/PayVigil)
+> 🚀 **Live Production Dashboard (Vercel):** [https://pay-vigil.vercel.app](https://pay-vigil.vercel.app)  
+> ⚡ **Live Backend API & Swagger Docs (Render):** [https://payvigil-backend.onrender.com/docs](https://payvigil-backend.onrender.com/docs)  
+> 🪝 **Live Webhook Ingress:** `https://payvigil-backend.onrender.com/api/webhooks/razorpay`  
+> 📦 **GitHub Repository:** [https://github.com/Aaryan-9784/PayVigil](https://github.com/Aaryan-9784/PayVigil)  
+> 🔑 **Demo Admin Credentials:** `aaryanpatel9784@gmail.com` / `Aryan@9784` *(or Passkey: `TSDkf1pltC2m41sm95baMx1TJmKt7769iK99TU8BQDD`)*
 
 ---
 
@@ -86,6 +90,17 @@ etry_payment
 * **Frontend**: React 18, Vite, Tailwind CSS, Lucide Icons, Recharts, Native WebSocket Client
 * **Integrations**: Razorpay REST API & Webhooks, Resend API (Email), Twilio (WhatsApp & SMS), Slack Block Kit Webhooks
 * **Cloud Hosting**: Render (FastAPI Web Service), Supabase (PostgreSQL), Vercel (React Frontend)
+
+### 🌐 Live Production Deployments
+
+| Component | Platform | Live URL | Status |
+|---|---|---|:---:|
+| **Frontend Web Dashboard** | **Vercel** | [https://pay-vigil.vercel.app](https://pay-vigil.vercel.app) | 🟢 **Live** |
+| **Backend REST API** | **Render** | [https://payvigil-backend.onrender.com](https://payvigil-backend.onrender.com) | 🟢 **Live** |
+| **Interactive API Docs (Swagger)** | **FastAPI** | [https://payvigil-backend.onrender.com/docs](https://payvigil-backend.onrender.com/docs) | 🟢 **Live** |
+| **Razorpay Webhook Ingress** | **Render** | `https://payvigil-backend.onrender.com/api/webhooks/razorpay` | 🟢 **Active** |
+| **Database Cluster** | **Supabase** | AWS ap-south-1 PostgreSQL Session Pooler | 🟢 **Connected** |
+
 
 ---
 
